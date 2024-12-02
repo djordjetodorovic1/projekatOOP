@@ -1,5 +1,3 @@
-package src;
-
 public class Meni {
     private int id;
     private Objekat objekat;

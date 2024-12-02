@@ -1,5 +1,3 @@
-package src;
-
 public class Objekat {
     private int id;
     private Vlasnik vlasnik;

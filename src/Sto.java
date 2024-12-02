@@ -1,5 +1,3 @@
-package src;
-
 public class Sto {
     private int id;
     private Objekat objekat;

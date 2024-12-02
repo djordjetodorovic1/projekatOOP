@@ -1,5 +1,3 @@
-package src;
-
 public class Osoba {
     private int id;
     private String ime;
