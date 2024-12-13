@@ -4,6 +4,8 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+
 public class Database {
     private static String DB_user = "root";
     private static String DB_password = "";
@@ -11,6 +13,12 @@ public class Database {
     private static int port = 3306;
     private static String DB_name = "sistemzaplaniranjeproslava";
     private static Connection connection;
+
+    private static Admin admin = null;
+    private static Obavjestenje obavjestenje = null;
+    private static HashMap<Integer, BankovniRacun> bankovniRacuni = new HashMap<>();
+    private static HashMap<Integer, Vlasnik> vlasnici = new HashMap<>();
+    private static HashMap<Integer, Klijent> klijenti = new HashMap<>();
 
     public static void DBConnect() throws SQLException /*, ClassNotFoundException*/ {
         //Class.forName("com.mysql.cj.jdbc.Driver");
@@ -24,23 +32,35 @@ public class Database {
             System.out.println("Uspjesno ste se konektovali na bazu:" + connectionUrl);
             ResultSet resultSet = null;
             Statement statement = connection.createStatement();
+
             String SQLQuery = "SELECT * FROM admin";
             resultSet = statement.executeQuery(SQLQuery);
-            System.out.println("--------------------------------------------");
-            while (resultSet.next()) {
-                String result = resultSet.getString(1) + ", " + resultSet.getString(2)
-                        + ", " + resultSet.getString(3) + ", " + resultSet.getString(4)
-                        + ", " + resultSet.getString(5);
-                System.out.println(result);
-                System.out.println("--------------------------------------------");
-            }
+            while (resultSet.next())
+                admin = new Admin(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getString(5));
+
+            SQLQuery = "SELECT * FROM `bankovni racun`";
+            resultSet = statement.executeQuery(SQLQuery);
+            while (resultSet.next())
+                bankovniRacuni.put(resultSet.getInt(1), new BankovniRacun(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getDouble(4)));
+            bankovniRacuni.forEach((k, v) -> System.out.println(k + ": " + v));
+
+            SQLQuery = "SELECT * FROM klijent";
+            resultSet = statement.executeQuery(SQLQuery);
+            while (resultSet.next())
+                klijenti.put(resultSet.getInt(1), new Klijent(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getString(5), resultSet.getString(6), resultSet.getString(7)));
+            klijenti.forEach((k, v) -> System.out.println(k + ": " + v));
+
+            SQLQuery = "SELECT * FROM vlasnik";
+            resultSet = statement.executeQuery(SQLQuery);
+            while (resultSet.next())
+                vlasnici.put(resultSet.getInt(1), new Vlasnik(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getString(5), resultSet.getString(6), resultSet.getString(7)));
+            vlasnici.forEach((k, v) -> System.out.println(k + ": " + v));
 
             statement.close();
             connection.close();
         } catch (SQLException e){
             e.printStackTrace();
-        } //catch (ClassNotFoundException e) {
-            //throw new RuntimeException(e);
-        //}
+        }
+        System.out.println(admin);
     }
 }

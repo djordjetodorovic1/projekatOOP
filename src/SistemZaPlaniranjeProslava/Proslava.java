@@ -7,7 +7,6 @@ public class Proslava {
     private Objekat objekat;
     private Klijent klijent;
     private Meni meni;
-    private String Proslavacol;
     private Date datum;
     private int broj_gostiju;
     private double ukupna_cijena;

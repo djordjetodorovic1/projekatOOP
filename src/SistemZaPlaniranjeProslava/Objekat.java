@@ -11,5 +11,5 @@ public class Objekat {
     private int broj_stolova;
     private String datumi;
     private double zarada;
-    private Status status;
+    private StatusObjekta status;
 }

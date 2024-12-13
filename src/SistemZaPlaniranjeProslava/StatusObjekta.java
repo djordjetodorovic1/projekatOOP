@@ -1,5 +1,5 @@
 package SistemZaPlaniranjeProslava;
 
-public enum Status {
+public enum StatusObjekta {
     NA_CEKANJU, ODOBREN, ODBIJEN
 }
