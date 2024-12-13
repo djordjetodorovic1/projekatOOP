@@ -1,4 +1,9 @@
 package SistemZaPlaniranjeProslava;
 
-public class Admin extends Osoba{
+public class Admin{
+    private int id;
+    private String ime;
+    private String prezime;
+    private String korisnicko_ime;
+    private String lozinka;
 }
