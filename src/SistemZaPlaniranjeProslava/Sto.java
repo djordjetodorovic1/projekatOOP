@@ -1,3 +1,5 @@
+package SistemZaPlaniranjeProslava;
+
 public class Sto {
     private int id;
     private Objekat objekat;

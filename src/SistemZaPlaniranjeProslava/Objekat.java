@@ -1,3 +1,5 @@
+package SistemZaPlaniranjeProslava;
+
 public class Objekat {
     private int id;
     private Vlasnik vlasnik;

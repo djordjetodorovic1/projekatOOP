@@ -1,3 +1,5 @@
+package SistemZaPlaniranjeProslava;
+
 public class Osoba {
     private int id;
     private String ime;

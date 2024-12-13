@@ -1,3 +1,5 @@
+package SistemZaPlaniranjeProslava;
+
 public class BankovniRacun {
     private int id;
     private String broj_racuna;

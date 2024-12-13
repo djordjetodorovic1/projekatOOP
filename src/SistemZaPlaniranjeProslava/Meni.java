@@ -1,3 +1,5 @@
+package SistemZaPlaniranjeProslava;
+
 public class Meni {
     private int id;
     private Objekat objekat;

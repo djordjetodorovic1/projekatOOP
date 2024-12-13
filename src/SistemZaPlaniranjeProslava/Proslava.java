@@ -1,3 +1,5 @@
+package SistemZaPlaniranjeProslava;
+
 import java.util.Date;
 
 public class Proslava {
