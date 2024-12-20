@@ -5,8 +5,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
-public class Database {
+public class Database extends Application{
     private static String DB_user = "root";
     private static String DB_password = "";
     private static String connectionUrl;
@@ -61,6 +71,23 @@ public class Database {
         } catch (SQLException e){
             e.printStackTrace();
         }
+
         System.out.println(admin);
+        launch(args);
+    }
+
+    public void start(Stage primaryStage) {
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(10, 10, 10, 10));
+
+        Label lblTekst = new Label("Dobrodosli u nasu aplikaciju");
+        lblTekst.setTextFill(Color.BLUE);
+
+        root.getChildren().add(lblTekst);
+        Scene scene = new Scene(root, 400, 200);
+
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Aplikacija");
+        primaryStage.show();
     }
 }
