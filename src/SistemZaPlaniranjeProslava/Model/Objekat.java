@@ -1,4 +1,4 @@
-package SistemZaPlaniranjeProslava;
+package SistemZaPlaniranjeProslava.Model;
 
 public class Objekat {
     private int id;

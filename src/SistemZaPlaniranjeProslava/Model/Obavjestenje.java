@@ -1,4 +1,4 @@
-package SistemZaPlaniranjeProslava;
+package SistemZaPlaniranjeProslava.Model;
 
 public class Obavjestenje {
     private int id;

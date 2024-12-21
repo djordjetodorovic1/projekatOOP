@@ -1,4 +1,4 @@
-package SistemZaPlaniranjeProslava;
+package SistemZaPlaniranjeProslava.Model;
 
 public class BankovniRacun {
     private int id;
@@ -11,6 +11,22 @@ public class BankovniRacun {
         this.broj_racuna = broj_racuna;
         this.jmbg = jmbg;
         this.stanje = stanje;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getBroj_racuna() {
+        return broj_racuna;
+    }
+
+    public String getJmbg() {
+        return jmbg;
+    }
+
+    public double getStanje() {
+        return stanje;
     }
 
     @Override

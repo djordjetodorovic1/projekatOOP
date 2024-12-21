@@ -1,6 +1,6 @@
-package SistemZaPlaniranjeProslava;
+package SistemZaPlaniranjeProslava.Model;
 
-public class Klijent{
+public class Vlasnik {
     private int id;
     private String ime;
     private String prezime;
@@ -9,7 +9,7 @@ public class Klijent{
     private String korisnicko_ime;
     private String lozinka;
 
-    public Klijent(int id, String ime, String prezime, String jmbg, String broj_racuna, String korisnicko_ime, String lozinka) {
+    public Vlasnik(int id, String ime, String prezime, String jmbg, String broj_racuna, String korisnicko_ime, String lozinka) {
         this.id = id;
         this.ime = ime;
         this.prezime = prezime;
@@ -19,9 +19,37 @@ public class Klijent{
         this.lozinka = lozinka;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public String getIme() {
+        return ime;
+    }
+
+    public String getPrezime() {
+        return prezime;
+    }
+
+    public String getJmbg() {
+        return jmbg;
+    }
+
+    public String getBroj_racuna() {
+        return broj_racuna;
+    }
+
+    public String getKorisnicko_ime() {
+        return korisnicko_ime;
+    }
+
+    public String getLozinka() {
+        return lozinka;
+    }
+
     @Override
     public String toString() {
-        return "Klijent{" +
+        return "Vlasnik{" +
                 "id=" + id +
                 ", ime='" + ime + '\'' +
                 ", prezime='" + prezime + '\'' +
