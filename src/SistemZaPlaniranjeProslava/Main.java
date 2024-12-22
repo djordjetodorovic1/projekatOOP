@@ -18,6 +18,12 @@ public class Main extends Application {
         a.showAndWait();
     }
 
+    public static void informacija(String poruka) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setContentText(poruka);
+        a.showAndWait();
+    }
+
     public static <T extends javafx.scene.control.TextInputControl> void ocistiPolje(T polje) {
         polje.clear();
     }
@@ -28,7 +34,7 @@ public class Main extends Application {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         Controller.ispisBaze();
         Controller.disconnectDB();
     }

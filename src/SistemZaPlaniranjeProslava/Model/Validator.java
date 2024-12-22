@@ -41,7 +41,7 @@ public class Validator {
         return matcher.matches() && !korisnici.containsKey(korisnickoIme);
     }
 
-    private static boolean verifikujLozinku(String lozinka, String potvrdaLozinke) {
+    public static boolean verifikujLozinku(String lozinka, String potvrdaLozinke) {
         Pattern pattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9_\\.]+");
         Matcher matcher = pattern.matcher(lozinka);
         return matcher.matches() && lozinka.equals(potvrdaLozinke);

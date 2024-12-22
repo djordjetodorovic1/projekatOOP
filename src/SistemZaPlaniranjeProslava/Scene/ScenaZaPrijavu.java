@@ -26,7 +26,7 @@ public class ScenaZaPrijavu {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 
-        Image logo = new Image((new File("logo.jpg")).toURI().toString());
+        Image logo = new Image((new File("resursi/logo.jpg")).toURI().toString());
         ImageView logoPrikaz = new ImageView(logo);
         logoPrikaz.setFitWidth(250);
         logoPrikaz.setPreserveRatio(true);
@@ -52,7 +52,7 @@ public class ScenaZaPrijavu {
         btnPrijava.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                Controller.prijava(tfKorisnickoIme, pfLozinka);
+                Controller.prijava(primaryStage, tfKorisnickoIme, pfLozinka);
             }
         });
         root.setOnKeyPressed(event -> {

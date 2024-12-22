@@ -14,4 +14,6 @@ public interface Korisnik {
     String getKorisnicko_ime();
 
     String getLozinka();
+
+    void setLozinka(String novaLozinka);
 }

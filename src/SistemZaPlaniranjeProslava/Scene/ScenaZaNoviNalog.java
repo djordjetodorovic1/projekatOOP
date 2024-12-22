@@ -8,10 +8,17 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.io.File;
 
 public class ScenaZaNoviNalog {
     public static void scenaNoviNalog(Stage primaryStage) {
@@ -44,12 +51,25 @@ public class ScenaZaNoviNalog {
         pfLozinka.setPromptText("nole_24");
         pfPotvrdaLozinke.setPromptText("nole_24");
 
+        Image strelica = new Image((new File("resursi/backArrow.png")).toURI().toString());
+        ImageView prikazStrelice = new ImageView(strelica);
+        prikazStrelice.setFitWidth(20);
+        prikazStrelice.setFitHeight(20);
+
         Button btnNoviNalog = new Button("Kreiraj novi nalog");
+        Button btnNazad = new Button("", prikazStrelice);
 
         ComboBox<String> cbTipNaloga = new ComboBox<>();
         cbTipNaloga.getItems().addAll("Klijent", "Vlasnik");
         cbTipNaloga.setValue("Klijent");
         cbTipNaloga.setPadding(new Insets(0, 53, 0, 53));
+
+        btnNazad.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                ScenaZaPrijavu.scenaPrijava(primaryStage);
+            }
+        });
 
         btnNoviNalog.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -73,8 +93,11 @@ public class ScenaZaNoviNalog {
         hBox.getChildren().addAll(vBoxLijevi, vBoxDesni);
         hBox.setPadding(new Insets(40, 0, 40, 0));
 
-        root.getChildren().addAll(lblNaslov, hBox, btnNoviNalog);
-        root.setAlignment(Pos.CENTER);
+        VBox vBoxUnos = new VBox(10);
+        vBoxUnos.getChildren().addAll(lblNaslov, hBox, btnNoviNalog);
+        vBoxUnos.setAlignment(Pos.CENTER);
+
+        root.getChildren().addAll(btnNazad, vBoxUnos);
         root.setStyle("-fx-font: 16 'Comic Sans MS';");
         Platform.runLater(root::requestFocus);
         Scene scenaNoviNalog = new Scene(root, 750, 600);

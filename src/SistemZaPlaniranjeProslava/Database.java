@@ -17,6 +17,7 @@ public class Database {
     private static Map<String, BankovniRacun> bankovniRacuni = new HashMap<>();
     private static Map<String, Vlasnik> vlasnici = new HashMap<>();
     private static Map<String, Klijent> klijenti = new HashMap<>();
+    private static Map<String, Objekat> objekti = new HashMap<>();
 
     public static void connectWithDB() {
         try {
@@ -45,7 +46,8 @@ public class Database {
         String SQLQuery = "SELECT * FROM admin";
         ResultSet resultSet = statement.executeQuery(SQLQuery);
         while (resultSet.next())
-            admin = new Admin(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getString(5));
+            admin = new Admin(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
+                    resultSet.getString(4), resultSet.getString(5));
         statement.close();
         return admin;
     }
@@ -55,7 +57,8 @@ public class Database {
         String SQLQuery = "SELECT * FROM `bankovni racun`";
         ResultSet resultSet = statement.executeQuery(SQLQuery);
         while (resultSet.next())
-            bankovniRacuni.put(resultSet.getString(2), new BankovniRacun(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getDouble(4)));
+            bankovniRacuni.put(resultSet.getString(2), new BankovniRacun(resultSet.getInt(1), resultSet.getString(2),
+                    resultSet.getString(3), resultSet.getDouble(4)));
         statement.close();
         return bankovniRacuni;
     }
@@ -65,7 +68,8 @@ public class Database {
         String SQLQuery = "SELECT * FROM klijent";
         ResultSet resultSet = statement.executeQuery(SQLQuery);
         while (resultSet.next())
-            klijenti.put(resultSet.getString(6), new Klijent(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getString(5), resultSet.getString(6), resultSet.getString(7)));
+            klijenti.put(resultSet.getString(6), new Klijent(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
+                    resultSet.getString(4), resultSet.getString(5), resultSet.getString(6), resultSet.getString(7)));
         statement.close();
         return klijenti;
     }
@@ -75,12 +79,31 @@ public class Database {
         String SQLQuery = "SELECT * FROM vlasnik";
         ResultSet resultSet = statement.executeQuery(SQLQuery);
         while (resultSet.next())
-            vlasnici.put(resultSet.getString(6), new Vlasnik(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getString(5), resultSet.getString(6), resultSet.getString(7)));
+            vlasnici.put(resultSet.getString(6), new Vlasnik(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3),
+                    resultSet.getString(4), resultSet.getString(5), resultSet.getString(6), resultSet.getString(7)));
         statement.close();
         return vlasnici;
     }
 
+    public static Map<String, Objekat> ucitajObjekte() throws SQLException {
+        Statement statement = connection.createStatement();
+        String SQLQuery = "SELECT * FROM objekat";
+        ResultSet resultSet = statement.executeQuery(SQLQuery);
+        while (resultSet.next())
+            objekti.put(resultSet.getString(3), new Objekat(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3),
+                    resultSet.getDouble(4), resultSet.getString(5), resultSet.getString(6), resultSet.getInt(7),
+                    resultSet.getInt(8), resultSet.getString(9), resultSet.getDouble(10), resultSet.getString(11)));
+        statement.close();
+        return objekti;
+    }
+
     public static void dodajUBazu(String SQLQuery) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(SQLQuery);
+        statement.close();
+    }
+
+    public static void izmjeniUBazi(String SQLQuery) throws SQLException {
         Statement statement = connection.createStatement();
         statement.executeUpdate(SQLQuery);
         statement.close();

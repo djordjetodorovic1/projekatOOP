@@ -16,6 +16,7 @@ public class Controller {
     private static Map<String, BankovniRacun> bankovniRacuni = new HashMap<>();
     private static Map<String, Vlasnik> vlasnici = new HashMap<>();
     private static Map<String, Klijent> klijenti = new HashMap<>();
+    private static Map<String, Objekat> objekti = new HashMap<>();
 
     public static void connectDB() {
         Database.connectWithDB();
@@ -31,6 +32,7 @@ public class Controller {
             bankovniRacuni = Database.ucitajBankovneRacune();
             vlasnici = Database.ucitajVlasnike();
             klijenti = Database.ucitajKlijente();
+            objekti = Database.ucitajObjekte();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -41,9 +43,10 @@ public class Controller {
         vlasnici.forEach((k, v) -> System.out.println(k + ": " + v));
         klijenti.forEach((k, v) -> System.out.println(k + ": " + v));
         bankovniRacuni.forEach((k, v) -> System.out.println(k + ": " + v));
+        objekti.forEach((k, v) -> System.out.println(k + ": " + v));
     }
 
-    public static void prijava(TextField tfKorisnickoIme, PasswordField pfLozinka) {
+    public static void prijava(Stage primaryStage, TextField tfKorisnickoIme, PasswordField pfLozinka) {
         if (tfKorisnickoIme.getText().isEmpty() || pfLozinka.getText().isEmpty()) {
             Main.upozorenje("Niste popunili sva polja! Pokusajte ponovo");
         } else if (Validator.provjeriPrijavu(tfKorisnickoIme, pfLozinka)) {
@@ -63,7 +66,7 @@ public class Controller {
                 }
             } else if (vlasnici.containsKey(tfKorisnickoIme.getText())) {
                 if (vlasnici.get(tfKorisnickoIme.getText()).getLozinka().equals(pfLozinka.getText())) {
-                    //Vlasnik se ulogovao
+                    ScenaVlasnik.scenaVlasnik(primaryStage, vlasnici.get(tfKorisnickoIme.getText()));
                 } else {
                     Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
                     Main.ocistiPolje(pfLozinka);
@@ -102,5 +105,45 @@ public class Controller {
                 vlasnici.put(tfKorisnickoIme.getText(), new Vlasnik(id, tfIme.getText(), tfPrezime.getText(), tfJMBG.getText(), tfBrojUBanci.getText(), tfKorisnickoIme.getText(), pfLozinka.getText()));
             ScenaZaPrijavu.scenaPrijava(primaryStage);
         }
+    }
+
+    public static Vlasnik getVlasnik(int id) {
+        for (Vlasnik vlasnik : vlasnici.values())
+            if (vlasnik.getId() == id)
+                return vlasnik;
+        return null;
+    }
+
+    public static double getStanjeRacuna(String brojRacuna) {
+        if (bankovniRacuni.containsKey(brojRacuna)) {
+            return bankovniRacuni.get(brojRacuna).getStanje();
+        }
+        return 0;
+    }
+
+    public static boolean promjenaLozinke(Korisnik korisnik, TextField tfStaraLozinka, PasswordField pfLozinka, PasswordField pfPotvrdaLozinke) {
+        if (korisnik.getLozinka().equals(tfStaraLozinka.getText())) {
+            if (Validator.verifikujLozinku(pfLozinka.getText(), pfPotvrdaLozinke.getText())) {
+                korisnik.setLozinka(pfLozinka.getText());
+                try {
+                    String nalog = "vlasnik";
+                    if (korisnik instanceof Klijent)
+                        nalog = "klijent";
+                    Database.izmjeniUBazi("UPDATE `" + nalog + "` SET `lozinka`='" + pfLozinka.getText() + "' WHERE korisnicko_ime = '" + korisnik.getKorisnicko_ime() + "'");
+                    Main.informacija("Uspjesno promjenjena lozinka!");
+                    return true;
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                Main.ocistiPolje(pfLozinka);
+                Main.ocistiPolje(pfPotvrdaLozinke);
+                Main.upozorenje("Nova lozinka nije pravilno unesena! Pokusajte ponovo");
+            }
+        } else {
+            Main.ocistiPolje(tfStaraLozinka);
+            Main.upozorenje("Stara lozinka nije pravilno unesena! Pokusajte ponovo");
+        }
+        return false;
     }
 }

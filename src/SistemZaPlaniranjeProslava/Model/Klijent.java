@@ -47,6 +47,10 @@ public class Klijent implements Korisnik {
         return lozinka;
     }
 
+    public void setLozinka(String lozinka) {
+        this.lozinka = lozinka;
+    }
+
     @Override
     public String toString() {
         return "Klijent{" +
