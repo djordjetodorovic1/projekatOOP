@@ -1,6 +1,6 @@
 package SistemZaPlaniranjeProslava.Model;
 
-public class Klijent {
+public class Klijent implements Korisnik {
     private int id;
     private String ime;
     private String prezime;

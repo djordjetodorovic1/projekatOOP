@@ -46,7 +46,7 @@ public class ScenaZaNoviNalog {
 
         Button btnNoviNalog = new Button("Kreiraj novi nalog");
 
-        ComboBox cbTipNaloga = new ComboBox<>();
+        ComboBox<String> cbTipNaloga = new ComboBox<>();
         cbTipNaloga.getItems().addAll("Klijent", "Vlasnik");
         cbTipNaloga.setValue("Klijent");
         cbTipNaloga.setPadding(new Insets(0, 53, 0, 53));
@@ -54,8 +54,7 @@ public class ScenaZaNoviNalog {
         btnNoviNalog.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                Controller.kreirajNoviNalog(tfIme, tfPrezime, tfJMBG, tfBrojUBanci, tfKorisnickoIme, pfLozinka, pfPotvrdaLozinke, cbTipNaloga);
-                //ScenaZaPrijavu.scenaPrijava(primaryStage);
+                Controller.kreirajNoviNalog(primaryStage, tfIme, tfPrezime, tfJMBG, tfBrojUBanci, tfKorisnickoIme, pfLozinka, pfPotvrdaLozinke, cbTipNaloga);
             }
         });
         root.setOnKeyPressed(event -> {
@@ -77,7 +76,7 @@ public class ScenaZaNoviNalog {
         root.getChildren().addAll(lblNaslov, hBox, btnNoviNalog);
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-font: 16 'Comic Sans MS';");
-        Platform.runLater(() -> root.requestFocus());
+        Platform.runLater(root::requestFocus);
         Scene scenaNoviNalog = new Scene(root, 750, 600);
         primaryStage.setScene(scenaNoviNalog);
         primaryStage.show();

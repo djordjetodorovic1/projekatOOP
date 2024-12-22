@@ -1,6 +1,6 @@
 package SistemZaPlaniranjeProslava.Model;
 
-public class Vlasnik {
+public class Vlasnik implements Korisnik {
     private int id;
     private String ime;
     private String prezime;

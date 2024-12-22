@@ -29,6 +29,7 @@ public class Main extends Application {
 
     @Override
     public void stop() throws Exception {
+        Controller.ispisBaze();
         Controller.disconnectDB();
     }
 }

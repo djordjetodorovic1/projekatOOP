@@ -79,7 +79,7 @@ public class ScenaZaPrijavu {
         root.getChildren().addAll(lblNaziv, logoPrikaz, lblSlogan, hBoxLogIn, lblIli, btnNoviNalog);
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-font: 16 'Comic Sans MS';");
-        Platform.runLater(() -> root.requestFocus());
+        Platform.runLater(root::requestFocus);
         Scene scenaPrijava = new Scene(root, 750, 600);
         primaryStage.setScene(scenaPrijava);
         primaryStage.show();

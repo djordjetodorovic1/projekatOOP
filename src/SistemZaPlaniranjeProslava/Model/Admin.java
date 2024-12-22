@@ -1,6 +1,6 @@
 package SistemZaPlaniranjeProslava.Model;
 
-public class Admin{
+public class Admin {
     private int id;
     private String ime;
     private String prezime;
@@ -37,12 +37,6 @@ public class Admin{
 
     @Override
     public String toString() {
-        return "Admin{" +
-                "id=" + id +
-                ", ime='" + ime + '\'' +
-                ", prezime='" + prezime + '\'' +
-                ", korisnicko_ime='" + korisnicko_ime + '\'' +
-                ", lozinka='" + lozinka + '\'' +
-                '}';
+        return "Admin{id=" + id + ", ime='" + ime + ", prezime='" + prezime + ", korisnicko_ime='" + korisnicko_ime + ", lozinka='" + lozinka + '}';
     }
 }

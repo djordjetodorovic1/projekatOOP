@@ -1,6 +1,6 @@
 package SistemZaPlaniranjeProslava;
-import SistemZaPlaniranjeProslava.Model.*;
 
+import SistemZaPlaniranjeProslava.Model.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -78,5 +78,21 @@ public class Database {
             vlasnici.put(resultSet.getString(6), new Vlasnik(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getString(5), resultSet.getString(6), resultSet.getString(7)));
         statement.close();
         return vlasnici;
+    }
+
+    public static void dodajUBazu(String SQLQuery) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(SQLQuery);
+        statement.close();
+    }
+
+    public static int procitajID(String SQLQuery) throws SQLException {
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(SQLQuery);
+        int id = 0;
+        if (resultSet.next())
+            id = resultSet.getInt(1);
+        statement.close();
+        return id;
     }
 }

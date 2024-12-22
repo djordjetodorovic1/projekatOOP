@@ -1,15 +1,14 @@
 package SistemZaPlaniranjeProslava;
 
 import SistemZaPlaniranjeProslava.Model.*;
+import SistemZaPlaniranjeProslava.Scene.*;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-
+import javafx.stage.Stage;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Controller {
     private static Admin admin = null;
@@ -44,102 +43,64 @@ public class Controller {
         bankovniRacuni.forEach((k, v) -> System.out.println(k + ": " + v));
     }
 
-    public static void prijava(TextField korisnickoIme, PasswordField lozinka) {
-        boolean detektorGreske = false;
-        if (korisnickoIme.getText().isEmpty() || lozinka.getText().isEmpty()) {
+    public static void prijava(TextField tfKorisnickoIme, PasswordField pfLozinka) {
+        if (tfKorisnickoIme.getText().isEmpty() || pfLozinka.getText().isEmpty()) {
             Main.upozorenje("Niste popunili sva polja! Pokusajte ponovo");
-            detektorGreske = true;
-        } else if (admin.getKorisnicko_ime().equals(korisnickoIme.getText())) {
-            if (admin.getLozinka().equals(lozinka.getText())) {
-                //admin se ulogovao
+        } else if (Validator.provjeriPrijavu(tfKorisnickoIme, pfLozinka)) {
+            if (admin.getKorisnicko_ime().equals(tfKorisnickoIme.getText())) {
+                if (admin.getLozinka().equals(pfLozinka.getText())) {
+                    //admin se ulogovao
+                } else {
+                    Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
+                    Main.ocistiPolje(pfLozinka);
+                }
+            } else if (klijenti.containsKey(tfKorisnickoIme.getText())) {
+                if (klijenti.get(tfKorisnickoIme.getText()).getLozinka().equals(pfLozinka.getText())) {
+                    //Klijent se ulogovao
+                } else {
+                    Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
+                    Main.ocistiPolje(pfLozinka);
+                }
+            } else if (vlasnici.containsKey(tfKorisnickoIme.getText())) {
+                if (vlasnici.get(tfKorisnickoIme.getText()).getLozinka().equals(pfLozinka.getText())) {
+                    //Vlasnik se ulogovao
+                } else {
+                    Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
+                    Main.ocistiPolje(pfLozinka);
+                }
             } else {
-                Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
-                detektorGreske = true;
-            }
-        } else if (klijenti.containsKey(korisnickoIme.getText())) {
-            if (klijenti.get(korisnickoIme.getText()).getLozinka().equals(lozinka.getText())) {
-                //klijent se ulogovao
-            } else {
-                Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
-                detektorGreske = true;
-            }
-        } else if (vlasnici.containsKey(korisnickoIme.getText())) {
-            if (vlasnici.get(korisnickoIme.getText()).getLozinka().equals(lozinka.getText())) {
-                //vlasnik se ulogovao
-            } else {
-                Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
-                detektorGreske = true;
+                Main.upozorenje("Nalog ne postoji! Pokusajte ponovo ili kreirajte novi nalog");
+                Main.ocistiPolje(tfKorisnickoIme);
+                Main.ocistiPolje(pfLozinka);
             }
         } else {
-            Main.upozorenje("Uneseno korisnicko ime ne postoji! Pokusajte ponovo ili kreirajte novi nalog");
-            detektorGreske = true;
-        }
-        if (detektorGreske) {
-            Main.ocistiPolje(korisnickoIme);
-            Main.ocistiPolje(lozinka);
-        }
-    }
-
-    private static boolean verifikujIme(String ime) {
-        Pattern pattern = Pattern.compile("^[A-Z][a-zA-Z]+(\\s?[a-zA-Z]+)*");
-        Matcher matcher = pattern.matcher(ime);
-        return matcher.matches();
-    }
-
-    private static boolean verifikujJMBG(String jmbg) {
-        Pattern pattern = Pattern.compile("[0-9]{13}");
-        Matcher matcher = pattern.matcher(jmbg);
-        return matcher.matches();
-    }
-
-    private static boolean verifikujRacun(String brojRacuna, String jmbg) {
-        Pattern pattern = Pattern.compile("[0-9]{16}");
-        Matcher matcher = pattern.matcher(brojRacuna);
-        return matcher.matches() && bankovniRacuni.containsKey(brojRacuna) && bankovniRacuni.get(brojRacuna).getJmbg().equals(jmbg);
-    }
-
-    private static <T> boolean verifikujKorisnickoIme(String korisnickoIme, Map<String, T> korisnici) {
-        Pattern pattern = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_\\.]+");
-        Matcher matcher = pattern.matcher(korisnickoIme);
-        return matcher.matches() && !korisnici.containsKey(korisnickoIme);
-    }
-
-    private static boolean verifikujLozinku(String lozinka, String potvrdaLozinke) {
-        return lozinka.equals(potvrdaLozinke);
-    }
-
-    public static void kreirajNoviNalog(TextField tfIme, TextField tfPrezime, TextField tfJMBG, TextField tfBrojUBanci, TextField tfKorisnickoIme, PasswordField pfLozinka, PasswordField pfPotvrdaLozinke, ComboBox cbTipNaloga) {
-        boolean detektorGreske = false;
-        if (!verifikujIme(tfIme.getText())) {
-            Main.ocistiPolje(tfIme);
-            detektorGreske = true;
-        }
-        if (!verifikujIme(tfPrezime.getText())) {
-            Main.ocistiPolje(tfPrezime);
-            detektorGreske = true;
-        }
-        if (!verifikujJMBG(tfJMBG.getText())) {
-            Main.ocistiPolje(tfJMBG);
-            detektorGreske = true;
-        }
-        if (!verifikujRacun(tfBrojUBanci.getText(), tfJMBG.getText())) {
-            Main.ocistiPolje(tfBrojUBanci);
-            detektorGreske = true;
-        }
-        if (cbTipNaloga.getValue().equals("Klijent") && !verifikujKorisnickoIme(tfKorisnickoIme.getText(), klijenti)) {
+            Main.upozorenje("Nekorektan unos! Pokusajte ponovo");
             Main.ocistiPolje(tfKorisnickoIme);
-            detektorGreske = true;
-        }
-        if (cbTipNaloga.getValue().equals("Vlasnik") && !verifikujKorisnickoIme(tfKorisnickoIme.getText(), vlasnici)) {
-            Main.ocistiPolje(tfKorisnickoIme);
-            detektorGreske = true;
-        }
-        if (!verifikujLozinku(pfLozinka.getText(), pfPotvrdaLozinke.getText())) {
             Main.ocistiPolje(pfLozinka);
-            Main.ocistiPolje(pfPotvrdaLozinke);
-            detektorGreske = true;
         }
-        if (detektorGreske)
-            Main.upozorenje("Neka od polja nisu korektno popunjena ili je korisnicko ime vec zauzeto! Pokusajte ponovo");
+    }
+
+    public static void kreirajNoviNalog(Stage primaryStage, TextField tfIme, TextField tfPrezime, TextField tfJMBG, TextField tfBrojUBanci, TextField tfKorisnickoIme,
+                                        PasswordField pfLozinka, PasswordField pfPotvrdaLozinke, ComboBox<String> cbTipNaloga) {
+        if (!Validator.provjeriNoviNalog(tfIme, tfPrezime, tfJMBG, tfBrojUBanci, tfKorisnickoIme, pfLozinka, pfPotvrdaLozinke, cbTipNaloga, bankovniRacuni, klijenti, vlasnici)) {
+            Main.upozorenje("Neka od polja nisu pravilno popunjena ili je korisnicko ime vec zauzeto! Pokusajte ponovo");
+        } else {
+            int id;
+            String nalog = "klijent";
+            if (cbTipNaloga.getValue().equals("Vlasnik"))
+                nalog = "vlasnik";
+            try {
+                Database.dodajUBazu("INSERT INTO `" + nalog + "`(`ime`, `prezime`, `jmbg`, `broj_racuna`, `korisnicko_ime`, `lozinka`) VALUES ('" + tfIme.getText() + "','" +
+                        tfPrezime.getText() + "','" + tfJMBG.getText() + "','" + tfBrojUBanci.getText() + "','" + tfKorisnickoIme.getText() + "','" + pfLozinka.getText() + "')");
+                id = Database.procitajID("SELECT id FROM " + nalog + " WHERE korisnicko_ime = '" + tfKorisnickoIme.getText() + "'");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            if (nalog.equals("klijent"))
+                klijenti.put(tfKorisnickoIme.getText(), new Klijent(id, tfIme.getText(), tfPrezime.getText(), tfJMBG.getText(), tfBrojUBanci.getText(), tfKorisnickoIme.getText(), pfLozinka.getText()));
+            else
+                vlasnici.put(tfKorisnickoIme.getText(), new Vlasnik(id, tfIme.getText(), tfPrezime.getText(), tfJMBG.getText(), tfBrojUBanci.getText(), tfKorisnickoIme.getText(), pfLozinka.getText()));
+            ScenaZaPrijavu.scenaPrijava(primaryStage);
+        }
     }
 }
