@@ -16,7 +16,7 @@ public class Controller {
     private static Map<String, BankovniRacun> bankovniRacuni = new HashMap<>();
     private static Map<String, Vlasnik> vlasnici = new HashMap<>();
     private static Map<String, Klijent> klijenti = new HashMap<>();
-    private static Map<String, Objekat> objekti = new HashMap<>();
+    private static Map<Integer, Objekat> objekti = new HashMap<>();
 
     public static void connectDB() {
         Database.connectWithDB();
@@ -104,6 +104,24 @@ public class Controller {
             else
                 vlasnici.put(tfKorisnickoIme.getText(), new Vlasnik(id, tfIme.getText(), tfPrezime.getText(), tfJMBG.getText(), tfBrojUBanci.getText(), tfKorisnickoIme.getText(), pfLozinka.getText()));
             ScenaZaPrijavu.scenaPrijava(primaryStage);
+        }
+    }
+
+    public static void kreirajNoviObjekat(Stage stage, TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova, String meni, Vlasnik vlasnik) {
+        if (!Validator.provjeraObjektaZaUnos(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMijesta, tfBrojStolova)) {
+            Main.upozorenje("Neka od polja nisu pravilno popunjena ili je korisnicko ime vec zauzeto! Pokusajte ponovo");
+        } else {
+            int id;
+            try {
+                // Greska Database.dodajUBazu("INSERT INTO `objekat`(`Vlasnik_id`, `naziv`, `cijena_rezervacije`, `grad`, `adresa`, `broj_mjesta`, `broj_stolova`, `status`)" +
+                        //" VALUES (" + vlasnik.getId() + ",'" + tfNaziv.getText() + "'," + Double.parseDouble(tfCijenaRezervacije.getText()) + ",'" + tfGrad.getText() + "','" + tfAdresa.getText() + "'," + Integer.parseInt(tfBrojMijesta.getText()) + "," + Integer.parseInt(tfBrojStolova.getText()) + ",'NA_CEKANJU'");
+                id = Database.procitajID("SELECT id FROM objekat ORDER BY id DESC LIMIT 1'");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            objekti.put(id, new Objekat(id, vlasnik, tfNaziv.getText(), Double.parseDouble(tfCijenaRezervacije.getText()), tfGrad.getText(), tfAdresa.getText(), Integer.parseInt(tfBrojMijesta.getText()), Integer.parseInt(tfBrojStolova.getText()), StatusObjekta.NA_CEKANJU));
+            Main.informacija("Objekat uspjesno kreiran!");
+            ScenaVlasnik.scenaVlasnik(stage, vlasnik);
         }
     }
 

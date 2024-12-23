@@ -17,7 +17,7 @@ public class Database {
     private static Map<String, BankovniRacun> bankovniRacuni = new HashMap<>();
     private static Map<String, Vlasnik> vlasnici = new HashMap<>();
     private static Map<String, Klijent> klijenti = new HashMap<>();
-    private static Map<String, Objekat> objekti = new HashMap<>();
+    private static Map<Integer, Objekat> objekti = new HashMap<>();
 
     public static void connectWithDB() {
         try {
@@ -85,12 +85,12 @@ public class Database {
         return vlasnici;
     }
 
-    public static Map<String, Objekat> ucitajObjekte() throws SQLException {
+    public static Map<Integer, Objekat> ucitajObjekte() throws SQLException {
         Statement statement = connection.createStatement();
         String SQLQuery = "SELECT * FROM objekat";
         ResultSet resultSet = statement.executeQuery(SQLQuery);
         while (resultSet.next())
-            objekti.put(resultSet.getString(3), new Objekat(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3),
+            objekti.put(resultSet.getInt(1), new Objekat(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3),
                     resultSet.getDouble(4), resultSet.getString(5), resultSet.getString(6), resultSet.getInt(7),
                     resultSet.getInt(8), resultSet.getString(9), resultSet.getDouble(10), resultSet.getString(11)));
         statement.close();

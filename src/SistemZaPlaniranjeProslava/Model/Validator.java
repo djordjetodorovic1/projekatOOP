@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class Validator {
     private static boolean validacijaIme(String ime) {
-        Pattern pattern = Pattern.compile("^[A-Z][a-zA-Z]+(\\s?[a-zA-Z]+)*");
+        Pattern pattern = Pattern.compile("^[A-Z][a-zA-Z]+([a-zA-Z\\s]+)*");
         Matcher matcher = pattern.matcher(ime);
         return matcher.matches();
     }
@@ -55,6 +55,22 @@ public class Validator {
         return matcherK.matches() && matcherP.matches();
     }
 
+    private static boolean validacijaAdresa(String adresa) {
+        Pattern pattern = Pattern.compile("^[A-Z][a-zA-Z]+([a-zA-Z\\s]+)*(\\d|bb|BB)");
+        Matcher matcher = pattern.matcher(adresa);
+        return matcher.matches();
+    }
+
+    public static boolean validacijaBroj(TextField tfBrojStolova) {
+        try {
+            Integer.parseInt(tfBrojStolova.getText());
+            return true;
+        } catch (NumberFormatException e) {
+            Main.ocistiPolje(tfBrojStolova);
+            return false;
+        }
+    }
+
     public static boolean provjeriNoviNalog(TextField tfIme, TextField tfPrezime, TextField tfJMBG, TextField tfBrojUBanci, TextField tfKorisnickoIme, PasswordField pfLozinka,
                                             PasswordField pfPotvrdaLozinke, ComboBox<String> cbTipNaloga, Map<String, BankovniRacun> bankovniRacuni, Map<String, Klijent> klijenti, Map<String, Vlasnik> vlasnici) {
         boolean detektorGreske = false;
@@ -95,6 +111,37 @@ public class Validator {
             Main.ocistiPolje(pfPotvrdaLozinke);
             detektorGreske = true;
         }
+        return !detektorGreske;
+    }
+
+    public static boolean provjeraObjektaZaUnos(TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova) {
+        boolean detektorGreske = false;
+        if (!validacijaIme(tfGrad.getText())) {
+            Main.ocistiPolje(tfGrad);
+            detektorGreske = true;
+        }
+        if (!validacijaAdresa(tfAdresa.getText())) {
+            Main.ocistiPolje(tfAdresa);
+            detektorGreske = true;
+        }
+
+        try {
+            Double.parseDouble(tfCijenaRezervacije.getText());
+        } catch (NumberFormatException e) {
+            Main.ocistiPolje(tfCijenaRezervacije);
+            detektorGreske = true;
+        }
+
+        try {
+            Double.parseDouble(tfBrojMijesta.getText());
+        } catch (NumberFormatException e) {
+            Main.ocistiPolje(tfBrojMijesta);
+            detektorGreske = true;
+        }
+
+        if (!validacijaBroj(tfBrojStolova))
+            detektorGreske = true;
+
         return !detektorGreske;
     }
 }

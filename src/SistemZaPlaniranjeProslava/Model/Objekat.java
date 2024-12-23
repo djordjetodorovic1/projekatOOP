@@ -16,14 +16,8 @@ public class Objekat {
     private StatusObjekta status;
 
     public Objekat(int id, int vlasnikID, String naziv, double cijena_rezervacije, String grad, String adresa, int broj_mijesta, int broj_stolova, String datumi, double zarada, String statusObjekta) {
-        this.id = id;
+        init(id, naziv, cijena_rezervacije, grad, adresa, broj_mijesta, broj_stolova);
         this.vlasnik = Controller.getVlasnik(vlasnikID);
-        this.naziv = naziv;
-        this.cijena_rezervacije = cijena_rezervacije;
-        this.grad = grad;
-        this.adresa = adresa;
-        this.broj_mijesta = broj_mijesta;
-        this.broj_stolova = broj_stolova;
         this.datumi = datumi;
         this.zarada = zarada;
         switch (statusObjekta) {
@@ -39,6 +33,24 @@ public class Objekat {
             default:
                 this.status = StatusObjekta.NA_CEKANJU;
         }
+    }
+
+    public Objekat(int id, Vlasnik vlasnik, String naziv, double cijena_rezervacije, String grad, String adresa, int broj_mijesta, int broj_stolova, StatusObjekta statusObjekta) {
+        init(id, naziv, cijena_rezervacije, grad, adresa, broj_mijesta, broj_stolova);
+        this.vlasnik = vlasnik;
+        this.datumi = "";
+        this.zarada = 0.0;
+        this.status = statusObjekta;
+    }
+
+    private void init(int id, String naziv, double cijena_rezervacije, String grad, String adresa, int broj_mijesta, int broj_stolova) {
+        this.id = id;
+        this.naziv = naziv;
+        this.cijena_rezervacije = cijena_rezervacije;
+        this.grad = grad;
+        this.adresa = adresa;
+        this.broj_mijesta = broj_mijesta;
+        this.broj_stolova = broj_stolova;
     }
 
     public void setDatumi(String datumi) {
