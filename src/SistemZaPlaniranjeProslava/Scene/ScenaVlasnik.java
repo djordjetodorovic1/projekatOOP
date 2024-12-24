@@ -1,6 +1,7 @@
 package SistemZaPlaniranjeProslava.Scene;
 
 import SistemZaPlaniranjeProslava.Controller;
+import SistemZaPlaniranjeProslava.Model.Objekat;
 import SistemZaPlaniranjeProslava.Model.Vlasnik;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -16,9 +17,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.Map;
 
 public class ScenaVlasnik {
-    public static void scenaVlasnik(Stage primaryStage, Vlasnik vlasnik) {
+    public static void scenaVlasnik(Stage primaryStage, Vlasnik vlasnik, Map<Integer, Objekat> objekti) {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 
@@ -54,9 +56,10 @@ public class ScenaVlasnik {
         btnNoviObjekat.setPadding(new Insets(10, 53, 10, 53));
 
         ComboBox<String> cbObjekti = new ComboBox<>();
-        cbObjekti.getItems().addAll();
-        cbObjekti.setValue("Klijent");
-        cbObjekti.setPadding(new Insets(5, 53, 5, 53));
+        for (Objekat objekat : objekti.values())
+            cbObjekti.getItems().add(objekat.getNaziv());
+        cbObjekti.setValue("Izaberite objekat za prikaz");
+        cbObjekti.setPadding(new Insets(5, 40, 5, 40));
 
         btnNazad.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -75,7 +78,7 @@ public class ScenaVlasnik {
         btnNoviObjekat.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                ScenaZaNoviObjekat.scenaNoviObjekat(primaryStage, vlasnik);
+                ScenaZaNoviObjekat.scenaNoviObjekat(primaryStage, vlasnik, objekti);
             }
         });
 

@@ -7,16 +7,19 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Controller {
     private static Admin admin = null;
-    private static Obavjestenje obavjestenje = null;
+    private static ArrayList<Obavjestenje> obavjestenja = new ArrayList<>();
     private static Map<String, BankovniRacun> bankovniRacuni = new HashMap<>();
     private static Map<String, Vlasnik> vlasnici = new HashMap<>();
     private static Map<String, Klijent> klijenti = new HashMap<>();
     private static Map<Integer, Objekat> objekti = new HashMap<>();
+    private static Map<Integer, Sto> stolovi = new HashMap<>();
+    private static Map<Integer, Meni> meniji = new HashMap<>();
 
     public static void connectDB() {
         Database.connectWithDB();
@@ -33,6 +36,11 @@ public class Controller {
             vlasnici = Database.ucitajVlasnike();
             klijenti = Database.ucitajKlijente();
             objekti = Database.ucitajObjekte();
+            stolovi = Database.ucitajStolove();
+            meniji = Database.ucitajMenije();
+            Obavjestenje ob = Database.ucitajObavjestenje();
+            if (ob != null)
+                obavjestenja.add(ob);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -44,6 +52,9 @@ public class Controller {
         klijenti.forEach((k, v) -> System.out.println(k + ": " + v));
         bankovniRacuni.forEach((k, v) -> System.out.println(k + ": " + v));
         objekti.forEach((k, v) -> System.out.println(k + ": " + v));
+        stolovi.forEach((k, v) -> System.out.println(k + ": " + v));
+        meniji.forEach((k, v) -> System.out.println(k + ": " + v));
+        System.out.println(obavjestenja);
     }
 
     public static void prijava(Stage primaryStage, TextField tfKorisnickoIme, PasswordField pfLozinka) {
@@ -66,7 +77,8 @@ public class Controller {
                 }
             } else if (vlasnici.containsKey(tfKorisnickoIme.getText())) {
                 if (vlasnici.get(tfKorisnickoIme.getText()).getLozinka().equals(pfLozinka.getText())) {
-                    ScenaVlasnik.scenaVlasnik(primaryStage, vlasnici.get(tfKorisnickoIme.getText()));
+                    ScenaVlasnik.scenaVlasnik(primaryStage, vlasnici.get(tfKorisnickoIme.getText()), objekti);
+                    // Dodati za obavjestenje
                 } else {
                     Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
                     Main.ocistiPolje(pfLozinka);
@@ -107,21 +119,49 @@ public class Controller {
         }
     }
 
-    public static void kreirajNoviObjekat(Stage stage, TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova, String meni, Vlasnik vlasnik) {
-        if (!Validator.provjeraObjektaZaUnos(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMijesta, tfBrojStolova)) {
-            Main.upozorenje("Neka od polja nisu pravilno popunjena ili je korisnicko ime vec zauzeto! Pokusajte ponovo");
+    public static void kreirajNoviObjekat(Stage stage, TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova, TextField tfMeni, TextField tfCijenaMenija, Vlasnik vlasnik, ArrayList<Integer> brojMijestaPoStolovima) {
+        if (!Validator.provjeraObjektaZaUnos(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMijesta, tfBrojStolova, tfMeni, tfCijenaMenija)) {
+            Main.upozorenje("Neka od polja nisu pravilno popunjena! Pokusajte ponovo");
         } else {
-            int id;
+            int idObjekat, idSto, idMeni, idObavjestenje;
             try {
-                // Greska Database.dodajUBazu("INSERT INTO `objekat`(`Vlasnik_id`, `naziv`, `cijena_rezervacije`, `grad`, `adresa`, `broj_mjesta`, `broj_stolova`, `status`)" +
-                        //" VALUES (" + vlasnik.getId() + ",'" + tfNaziv.getText() + "'," + Double.parseDouble(tfCijenaRezervacije.getText()) + ",'" + tfGrad.getText() + "','" + tfAdresa.getText() + "'," + Integer.parseInt(tfBrojMijesta.getText()) + "," + Integer.parseInt(tfBrojStolova.getText()) + ",'NA_CEKANJU'");
-                id = Database.procitajID("SELECT id FROM objekat ORDER BY id DESC LIMIT 1'");
+                Database.dodajUBazu("INSERT INTO `objekat` (`Vlasnik_id`, `naziv`, `cijena_rezervacije`, `grad`, `adresa`, `broj_mjesta`, `broj_stolova`, `datumi`, `zarada`) VALUES ("
+                        + vlasnik.getId() + ", '" + tfNaziv.getText() + "', " + Double.parseDouble(tfCijenaRezervacije.getText()) + ", '" + tfGrad.getText() + "', '" + tfAdresa.getText() + "', "
+                        + Integer.parseInt(tfBrojMijesta.getText()) + ", " + Integer.parseInt(tfBrojStolova.getText()) + ", '', " + 0.0 + ")");
+                idObjekat = Database.procitajID("SELECT id FROM objekat ORDER BY id DESC LIMIT 1");
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-            objekti.put(id, new Objekat(id, vlasnik, tfNaziv.getText(), Double.parseDouble(tfCijenaRezervacije.getText()), tfGrad.getText(), tfAdresa.getText(), Integer.parseInt(tfBrojMijesta.getText()), Integer.parseInt(tfBrojStolova.getText()), StatusObjekta.NA_CEKANJU));
+            objekti.put(idObjekat, new Objekat(idObjekat, vlasnik, tfNaziv.getText(), Double.parseDouble(tfCijenaRezervacije.getText()), tfGrad.getText(), tfAdresa.getText(), Integer.parseInt(tfBrojMijesta.getText()), Integer.parseInt(tfBrojStolova.getText()), StatusObjekta.NA_CEKANJU));
+
+            try {
+                Database.dodajUBazu("INSERT INTO `meni`(`Objekat_id`, `opis`, `cijena_po_osobi`) VALUES (" + idObjekat + ",'" + tfMeni.getText() + "'," + Double.parseDouble(tfCijenaMenija.getText()) + ")");
+                idMeni = Database.procitajID("SELECT id FROM meni ORDER BY id DESC LIMIT 1");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            meniji.put(idMeni, new Meni(idMeni, idObjekat, tfMeni.getText(), Double.parseDouble(tfCijenaMenija.getText())));
+
+            try {
+                for (int i = 0; i < brojMijestaPoStolovima.size(); i++) {
+                    Database.dodajUBazu("INSERT INTO `sto`(`Objekat_id`, `broj_mjesta`) VALUES (" + idObjekat + "," + brojMijestaPoStolovima.get(i) + ")");
+                    idSto = Database.procitajID("SELECT id FROM sto ORDER BY id DESC LIMIT 1");
+                    stolovi.put(idSto, new Sto(idSto, idObjekat, brojMijestaPoStolovima.get(i)));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                Database.dodajUBazu("INSERT INTO `obavjestenje`(`Objekat_id`, `tekst`) VALUES (" + idObjekat + ",'Novi objekat ceka na odobrenje!')");
+                idObavjestenje = Database.procitajID("SELECT id FROM obavjestenje ORDER BY id DESC LIMIT 1");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            obavjestenja.add(new Obavjestenje(idObavjestenje, idObjekat, "Novi objekat ceka na odobreneje!"));
             Main.informacija("Objekat uspjesno kreiran!");
-            ScenaVlasnik.scenaVlasnik(stage, vlasnik);
+            ScenaVlasnik.scenaVlasnik(stage, vlasnik, objekti);
         }
     }
 
@@ -129,6 +169,13 @@ public class Controller {
         for (Vlasnik vlasnik : vlasnici.values())
             if (vlasnik.getId() == id)
                 return vlasnik;
+        return null;
+    }
+
+    public static Objekat getObjekat(int id) {
+        for (Objekat objekat : objekti.values())
+            if (objekat.getId() == id)
+                return objekat;
         return null;
     }
 

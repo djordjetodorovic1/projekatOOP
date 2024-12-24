@@ -2,7 +2,8 @@ package SistemZaPlaniranjeProslava.Scene;
 
 import SistemZaPlaniranjeProslava.Controller;
 import SistemZaPlaniranjeProslava.Main;
-import SistemZaPlaniranjeProslava.Model.Validator;
+import SistemZaPlaniranjeProslava.Model.Objekat;
+import SistemZaPlaniranjeProslava.Validator;
 import SistemZaPlaniranjeProslava.Model.Vlasnik;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -21,9 +22,11 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ScenaZaNoviObjekat {
-    private static List<Spinner<Integer>> spinnerList = new ArrayList<>();
+    private static List<Spinner<Integer>> spinnerBrojMijestaPoStolovima = new ArrayList<>();
 
     private static void scenaZaUnosStolova(int brojStolova) {
         Stage stage = new Stage();
@@ -40,13 +43,18 @@ public class ScenaZaNoviObjekat {
         vBoxtf.setAlignment(Pos.CENTER);
         vBoxtf.setPadding(new Insets(10, 40, 10, 40));
 
+        spinnerBrojMijestaPoStolovima.clear();
         for (int i = 0; i < brojStolova; i++) {
             Label lblSto = new Label("Sto broj " + (i + 1));
             Spinner<Integer> newSpinner = new Spinner<>(1, 100, 5);
             newSpinner.setPromptText("Sto broj " + (i + 1));
+
+            //Ukloniti
             newSpinner.setMaxWidth(250);
+
+            newSpinner.setEditable(true);
             vBoxtf.getChildren().addAll(lblSto, newSpinner);
-            ScenaZaNoviObjekat.spinnerList.add(newSpinner);
+            ScenaZaNoviObjekat.spinnerBrojMijestaPoStolovima.add(newSpinner);
         }
 
         Button btnSacuvaj = new Button("Sacuvaj izmjene");
@@ -67,9 +75,8 @@ public class ScenaZaNoviObjekat {
         stage.show();
     }
 
-    public static void scenaNoviObjekat(Stage stageNoviObjekat, Vlasnik vlasnik) {
+    public static void scenaNoviObjekat(Stage stageNoviObjekat, Vlasnik vlasnik, Map<Integer, Objekat> objekti) {
         stageNoviObjekat.setTitle("Kreiraj novi objekat");
-
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 
@@ -81,7 +88,7 @@ public class ScenaZaNoviObjekat {
         Label lblBrojMijesta = new Label("Unesite broj mijesta");
         Label lblBrojStolova = new Label("Unesite broj stolova");
         Label lblMijestaZaStolom = new Label("Unesite broj mijesta za svaki sto");
-        Label lblMeni = new Label("Izaberite meni");
+        Label lblMeni = new Label("Unesite meni i cijenu menija");
         lblNaslov.setStyle("-fx-font: 32 'Comic Sans MS';");
 
         TextField tfNaziv = new TextField();
@@ -90,11 +97,17 @@ public class ScenaZaNoviObjekat {
         TextField tfAdresa = new TextField();
         TextField tfBrojMijesta = new TextField();
         TextField tfBrojStolova = new TextField();
+        TextField tfMeni = new TextField();
+        TextField tfCijenaMenija = new TextField();
         tfNaziv.setPromptText("Caffe Renas");
-        tfCijenaRezervacije.setPromptText("20.0");
+        tfCijenaRezervacije.setPromptText("200.00");
         tfGrad.setPromptText("Banja Luka");
         tfAdresa.setPromptText("Mladena Stojanovica 2");
         tfBrojMijesta.setPromptText("50");
+        tfMeni.setPromptText("Predjelo - Glavno jelo - Dezert");
+        tfCijenaMenija.setPromptText("50.00");
+        tfMeni.setMaxWidth(150);
+        tfCijenaMenija.setMaxWidth(150);
 
         Image strelica = new Image((new File("resursi/backArrow.png")).toURI().toString());
         ImageView prikazStrelice = new ImageView(strelica);
@@ -104,16 +117,12 @@ public class ScenaZaNoviObjekat {
         Button btnNoviObjekat = new Button("Kreiraj novi nalog");
         Button btnBrojStolica = new Button("Unesi");
         Button btnNazad = new Button("", prikazStrelice);
-
-        ComboBox<String> cbMeni = new ComboBox<>();
-        cbMeni.getItems().addAll("Klijent", "Vlasnik");
-        cbMeni.setValue("Klijent");
-        cbMeni.setPadding(new Insets(0, 53, 0, 53));
+        btnBrojStolica.setPadding(new Insets(5,50,5,50));
 
         btnNazad.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                stageNoviObjekat.close();
+                ScenaVlasnik.scenaVlasnik(stageNoviObjekat, vlasnik, objekti);
             }
         });
 
@@ -131,7 +140,11 @@ public class ScenaZaNoviObjekat {
         btnNoviObjekat.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                Controller.kreirajNoviObjekat(stageNoviObjekat, tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMijesta, tfBrojStolova, cbMeni.getValue(), vlasnik);
+                ArrayList<Integer> brojMijestaPoStolovima = spinnerBrojMijestaPoStolovima.stream()
+                        .map(spinner -> Integer.parseInt(spinner.getValue().toString()))
+                        .collect(Collectors.toCollection(ArrayList::new));
+                System.out.println("broj Mijesta:  " + brojMijestaPoStolovima);
+                Controller.kreirajNoviObjekat(stageNoviObjekat, tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMijesta, tfBrojStolova, tfMeni, tfCijenaMenija, vlasnik, brojMijestaPoStolovima);
             }
         });
         root.setOnKeyPressed(event -> {
@@ -142,8 +155,10 @@ public class ScenaZaNoviObjekat {
 
         VBox vBoxLijevi = new VBox(10);
         vBoxLijevi.getChildren().addAll(lblNaziv, tfNaziv, lblGrad, tfGrad, lblAdresa, tfAdresa, lblCijenaRezervacije, tfCijenaRezervacije);
+        HBox hBoxMeni = new HBox(10);
+        hBoxMeni.getChildren().addAll(tfMeni, tfCijenaMenija);
         VBox vBoxDesni = new VBox(10);
-        vBoxDesni.getChildren().addAll(lblBrojMijesta, tfBrojMijesta, lblBrojStolova, tfBrojStolova, lblMijestaZaStolom, btnBrojStolica, lblMeni, cbMeni);
+        vBoxDesni.getChildren().addAll(lblBrojMijesta, tfBrojMijesta, lblBrojStolova, tfBrojStolova, lblMijestaZaStolom, btnBrojStolica, lblMeni, hBoxMeni);
 
         HBox hBox = new HBox(40);
         hBox.setAlignment(Pos.CENTER);

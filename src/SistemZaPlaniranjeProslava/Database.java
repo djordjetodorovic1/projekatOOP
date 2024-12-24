@@ -18,6 +18,8 @@ public class Database {
     private static Map<String, Vlasnik> vlasnici = new HashMap<>();
     private static Map<String, Klijent> klijenti = new HashMap<>();
     private static Map<Integer, Objekat> objekti = new HashMap<>();
+    private static Map<Integer, Sto> stolovi = new HashMap<>();
+    private static Map<Integer, Meni> meniji = new HashMap<>();
 
     public static void connectWithDB() {
         try {
@@ -95,6 +97,37 @@ public class Database {
                     resultSet.getInt(8), resultSet.getString(9), resultSet.getDouble(10), resultSet.getString(11)));
         statement.close();
         return objekti;
+    }
+
+    public static Map<Integer, Sto> ucitajStolove() throws SQLException {
+        Statement statement = connection.createStatement();
+        String SQLQuery = "SELECT * FROM sto";
+        ResultSet resultSet = statement.executeQuery(SQLQuery);
+        while (resultSet.next())
+            stolovi.put(resultSet.getInt(1), new Sto(resultSet.getInt(1), resultSet.getInt(2), resultSet.getInt(3)));
+        statement.close();
+        return stolovi;
+    }
+
+    public static Map<Integer, Meni> ucitajMenije() throws SQLException {
+        Statement statement = connection.createStatement();
+        String SQLQuery = "SELECT * FROM meni";
+        ResultSet resultSet = statement.executeQuery(SQLQuery);
+        while (resultSet.next())
+            meniji.put(resultSet.getInt(1), new Meni(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3),
+                    resultSet.getDouble(4)));
+        statement.close();
+        return meniji;
+    }
+
+    public static Obavjestenje ucitajObavjestenje() throws SQLException {
+        Statement statement = connection.createStatement();
+        String SQLQuery = "SELECT * FROM obavjestenje";
+        ResultSet resultSet = statement.executeQuery(SQLQuery);
+        while (resultSet.next())
+            obavjestenje = new Obavjestenje(resultSet.getInt(1), resultSet.getInt(2), resultSet.getString(3));
+        statement.close();
+        return obavjestenje;
     }
 
     public static void dodajUBazu(String SQLQuery) throws SQLException {

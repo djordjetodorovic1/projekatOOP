@@ -1,6 +1,9 @@
-package SistemZaPlaniranjeProslava.Model;
+package SistemZaPlaniranjeProslava;
 
-import SistemZaPlaniranjeProslava.Main;
+import SistemZaPlaniranjeProslava.Model.BankovniRacun;
+import SistemZaPlaniranjeProslava.Model.Klijent;
+import SistemZaPlaniranjeProslava.Model.Korisnik;
+import SistemZaPlaniranjeProslava.Model.Vlasnik;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -71,6 +74,12 @@ public class Validator {
         }
     }
 
+    private static boolean validacijaMeni(String meni) {
+        Pattern pattern = Pattern.compile("[a-zA-Z\\s]+");
+        Matcher matcher = pattern.matcher(meni);
+        return matcher.matches();
+    }
+
     public static boolean provjeriNoviNalog(TextField tfIme, TextField tfPrezime, TextField tfJMBG, TextField tfBrojUBanci, TextField tfKorisnickoIme, PasswordField pfLozinka,
                                             PasswordField pfPotvrdaLozinke, ComboBox<String> cbTipNaloga, Map<String, BankovniRacun> bankovniRacuni, Map<String, Klijent> klijenti, Map<String, Vlasnik> vlasnici) {
         boolean detektorGreske = false;
@@ -114,7 +123,7 @@ public class Validator {
         return !detektorGreske;
     }
 
-    public static boolean provjeraObjektaZaUnos(TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova) {
+    public static boolean provjeraObjektaZaUnos(TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova, TextField tfMeni, TextField tfCijenaMenija) {
         boolean detektorGreske = false;
         if (!validacijaIme(tfGrad.getText())) {
             Main.ocistiPolje(tfGrad);
@@ -139,8 +148,20 @@ public class Validator {
             detektorGreske = true;
         }
 
+        try {
+            Double.parseDouble(tfCijenaMenija.getText());
+        } catch (NumberFormatException e) {
+            Main.ocistiPolje(tfCijenaMenija);
+            detektorGreske = true;
+        }
+
         if (!validacijaBroj(tfBrojStolova))
             detektorGreske = true;
+
+        if (!validacijaMeni(tfMeni.getText())) {
+            Main.ocistiPolje(tfMeni);
+            detektorGreske = true;
+        }
 
         return !detektorGreske;
     }

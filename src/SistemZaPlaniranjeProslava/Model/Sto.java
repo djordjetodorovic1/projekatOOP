@@ -1,5 +1,7 @@
 package SistemZaPlaniranjeProslava.Model;
 
+import SistemZaPlaniranjeProslava.Controller;
+
 public class Sto {
     private int id;
     private Objekat objekat;
@@ -8,6 +10,12 @@ public class Sto {
     public Sto(int id, Objekat objekat, int broj_mijesta) {
         this.id = id;
         this.objekat = objekat;
+        this.broj_mijesta = broj_mijesta;
+    }
+
+    public Sto(int id, int objekatID, int broj_mijesta) {
+        this.id = id;
+        this.objekat = Controller.getObjekat(objekatID);
         this.broj_mijesta = broj_mijesta;
     }
 

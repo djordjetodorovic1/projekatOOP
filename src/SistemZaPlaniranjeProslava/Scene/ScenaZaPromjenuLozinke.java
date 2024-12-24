@@ -28,9 +28,9 @@ public class ScenaZaPromjenuLozinke {
 
         Label lblNaslov = new Label("Promjena lozinke");
         Label lblKorisnickoIme = new Label("Korisnicko ime");
-        Label lblStaraLozinka = new Label("Unesite novu lozinku");
-        Label lblNovaLozinka = new Label("Potvrdite novu lozinku");
-        Label lblPotvrdaLozinke = new Label("Ime:");
+        Label lblStaraLozinka = new Label("Unesite staru lozinku");
+        Label lblNovaLozinka = new Label("Unesite novu lozinku");
+        Label lblPotvrdaLozinke = new Label("Potvrdite novu lozinku:");
         lblNaslov.setStyle("-fx-font: 32 'Comic Sans MS';");
 
         TextField tfKorisnickoIme = new TextField(korisnik.getKorisnicko_ime());
