@@ -59,7 +59,7 @@ public class Validator {
     }
 
     private static boolean validacijaAdresa(String adresa) {
-        Pattern pattern = Pattern.compile("^[A-Z][a-zA-Z]+([a-zA-Z\\s]+)*(\\d|bb|BB)");
+        Pattern pattern = Pattern.compile("^[A-Z][a-zA-Z]+([a-zA-Z\\s]+)*(\\d|bb|BB)?");
         Matcher matcher = pattern.matcher(adresa);
         return matcher.matches();
     }
@@ -74,10 +74,23 @@ public class Validator {
         }
     }
 
-    private static boolean validacijaMeni(String meni) {
+    public static boolean validacijaMeni(TextField meni, TextField cijena) {
+        boolean detektorGreske = false;
         Pattern pattern = Pattern.compile("[a-zA-Z\\s]+");
-        Matcher matcher = pattern.matcher(meni);
-        return matcher.matches();
+        Matcher matcher = pattern.matcher(meni.getText());
+        if (!matcher.matches()) {
+            Main.ocistiPolje(meni);
+            detektorGreske = true;
+        }
+
+        try {
+            Double.parseDouble(cijena.getText());
+        } catch (NumberFormatException e) {
+            Main.ocistiPolje(cijena);
+            detektorGreske = true;
+        }
+
+        return detektorGreske;
     }
 
     public static boolean provjeriNoviNalog(TextField tfIme, TextField tfPrezime, TextField tfJMBG, TextField tfBrojUBanci, TextField tfKorisnickoIme, PasswordField pfLozinka,
@@ -123,7 +136,7 @@ public class Validator {
         return !detektorGreske;
     }
 
-    public static boolean provjeraObjektaZaUnos(TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova, TextField tfMeni, TextField tfCijenaMenija) {
+    public static boolean provjeraObjektaZaUnos(TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova) {
         boolean detektorGreske = false;
         if (!validacijaIme(tfGrad.getText())) {
             Main.ocistiPolje(tfGrad);
@@ -148,20 +161,8 @@ public class Validator {
             detektorGreske = true;
         }
 
-        try {
-            Double.parseDouble(tfCijenaMenija.getText());
-        } catch (NumberFormatException e) {
-            Main.ocistiPolje(tfCijenaMenija);
-            detektorGreske = true;
-        }
-
         if (!validacijaBroj(tfBrojStolova))
             detektorGreske = true;
-
-        if (!validacijaMeni(tfMeni.getText())) {
-            Main.ocistiPolje(tfMeni);
-            detektorGreske = true;
-        }
 
         return !detektorGreske;
     }

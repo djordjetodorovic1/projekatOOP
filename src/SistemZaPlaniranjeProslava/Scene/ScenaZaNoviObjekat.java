@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 
 public class ScenaZaNoviObjekat {
     private static List<Spinner<Integer>> spinnerBrojMijestaPoStolovima = new ArrayList<>();
+    private static ArrayList<String> meniOpis = new ArrayList<>();
+    private static ArrayList<Double> meniCijene = new ArrayList<>();
 
     private static void scenaZaUnosStolova(int brojStolova) {
         Stage stage = new Stage();
@@ -75,7 +77,56 @@ public class ScenaZaNoviObjekat {
         stage.show();
     }
 
+    private static void scenaZaUnosMenija() {
+        Stage stage = new Stage();
+        stage.setTitle("Kreiraj novi objekat");
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(20, 20, 20, 20));
+        root.setAlignment(Pos.CENTER);
+
+        Label lblNaslov = new Label("Unesite novi meni i njegovu cijenu");
+        lblNaslov.setStyle("-fx-font: 24 'Comic Sans MS';");
+
+        TextField tfMeni = new TextField();
+        TextField tfCijenaMenija = new TextField();
+        tfMeni.setPromptText("Predjelo - Glavno jelo - Dezert");
+        tfCijenaMenija.setPromptText("50.00");
+        tfMeni.setMaxWidth(300);
+        tfCijenaMenija.setMaxWidth(300);
+
+        Button btnDodajMeni = new Button("Dodaj meni");
+        btnDodajMeni.setPadding(new Insets(5, 50, 5, 50));
+
+        btnDodajMeni.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if (Controller.dodavanjeMenija(tfMeni, tfCijenaMenija)) {
+                    meniOpis.add(tfMeni.getText());
+                    meniCijene.add(Double.parseDouble(tfCijenaMenija.getText()));
+
+                    Main.ocistiPolje(tfMeni);
+                    Main.ocistiPolje(tfCijenaMenija);
+                }
+            }
+        });
+        root.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                btnDodajMeni.fire();
+            }
+        });
+
+        root.getChildren().addAll(lblNaslov, tfMeni, tfCijenaMenija, btnDodajMeni);
+        root.setStyle("-fx-font: 16 'Comic Sans MS';");
+        Platform.runLater(root::requestFocus);
+        Scene scena = new Scene(root, 550, 400);
+        stage.setScene(scena);
+        stage.show();
+    }
+
     public static void scenaNoviObjekat(Stage stageNoviObjekat, Vlasnik vlasnik, Map<Integer, Objekat> objekti) {
+        meniOpis.clear();
+        meniCijene.clear();
+
         stageNoviObjekat.setTitle("Kreiraj novi objekat");
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
@@ -88,7 +139,7 @@ public class ScenaZaNoviObjekat {
         Label lblBrojMijesta = new Label("Unesite broj mijesta");
         Label lblBrojStolova = new Label("Unesite broj stolova");
         Label lblMijestaZaStolom = new Label("Unesite broj mijesta za svaki sto");
-        Label lblMeni = new Label("Unesite meni i cijenu menija");
+        Label lblMeni = new Label("Unesite menije");
         lblNaslov.setStyle("-fx-font: 32 'Comic Sans MS';");
 
         TextField tfNaziv = new TextField();
@@ -97,17 +148,12 @@ public class ScenaZaNoviObjekat {
         TextField tfAdresa = new TextField();
         TextField tfBrojMijesta = new TextField();
         TextField tfBrojStolova = new TextField();
-        TextField tfMeni = new TextField();
-        TextField tfCijenaMenija = new TextField();
         tfNaziv.setPromptText("Caffe Renas");
         tfCijenaRezervacije.setPromptText("200.00");
         tfGrad.setPromptText("Banja Luka");
         tfAdresa.setPromptText("Mladena Stojanovica 2");
         tfBrojMijesta.setPromptText("50");
-        tfMeni.setPromptText("Predjelo - Glavno jelo - Dezert");
-        tfCijenaMenija.setPromptText("50.00");
-        tfMeni.setMaxWidth(150);
-        tfCijenaMenija.setMaxWidth(150);
+        tfBrojStolova.setPromptText("10");
 
         Image strelica = new Image((new File("resursi/backArrow.png")).toURI().toString());
         ImageView prikazStrelice = new ImageView(strelica);
@@ -116,8 +162,10 @@ public class ScenaZaNoviObjekat {
 
         Button btnNoviObjekat = new Button("Kreiraj novi nalog");
         Button btnBrojStolica = new Button("Unesi");
+        Button btnMeni = new Button("Unesi");
         Button btnNazad = new Button("", prikazStrelice);
-        btnBrojStolica.setPadding(new Insets(5,50,5,50));
+        btnBrojStolica.setPadding(new Insets(5, 50, 5, 50));
+        btnMeni.setPadding(new Insets(5, 50, 5, 50));
 
         btnNazad.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -137,14 +185,21 @@ public class ScenaZaNoviObjekat {
             }
         });
 
+        btnMeni.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                scenaZaUnosMenija();
+            }
+        });
+
         btnNoviObjekat.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 ArrayList<Integer> brojMijestaPoStolovima = spinnerBrojMijestaPoStolovima.stream()
                         .map(spinner -> Integer.parseInt(spinner.getValue().toString()))
                         .collect(Collectors.toCollection(ArrayList::new));
-                System.out.println("broj Mijesta:  " + brojMijestaPoStolovima);
-                Controller.kreirajNoviObjekat(stageNoviObjekat, tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMijesta, tfBrojStolova, tfMeni, tfCijenaMenija, vlasnik, brojMijestaPoStolovima);
+                Controller.kreirajNoviObjekat(stageNoviObjekat, tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
+                        tfBrojMijesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMijestaPoStolovima);
             }
         });
         root.setOnKeyPressed(event -> {
@@ -155,10 +210,8 @@ public class ScenaZaNoviObjekat {
 
         VBox vBoxLijevi = new VBox(10);
         vBoxLijevi.getChildren().addAll(lblNaziv, tfNaziv, lblGrad, tfGrad, lblAdresa, tfAdresa, lblCijenaRezervacije, tfCijenaRezervacije);
-        HBox hBoxMeni = new HBox(10);
-        hBoxMeni.getChildren().addAll(tfMeni, tfCijenaMenija);
         VBox vBoxDesni = new VBox(10);
-        vBoxDesni.getChildren().addAll(lblBrojMijesta, tfBrojMijesta, lblBrojStolova, tfBrojStolova, lblMijestaZaStolom, btnBrojStolica, lblMeni, hBoxMeni);
+        vBoxDesni.getChildren().addAll(lblBrojMijesta, tfBrojMijesta, lblBrojStolova, tfBrojStolova, lblMijestaZaStolom, btnBrojStolica, lblMeni, btnMeni);
 
         HBox hBox = new HBox(40);
         hBox.setAlignment(Pos.CENTER);

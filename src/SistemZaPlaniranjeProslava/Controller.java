@@ -119,8 +119,12 @@ public class Controller {
         }
     }
 
-    public static void kreirajNoviObjekat(Stage stage, TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova, TextField tfMeni, TextField tfCijenaMenija, Vlasnik vlasnik, ArrayList<Integer> brojMijestaPoStolovima) {
-        if (!Validator.provjeraObjektaZaUnos(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMijesta, tfBrojStolova, tfMeni, tfCijenaMenija)) {
+    public static void kreirajNoviObjekat(Stage stage, TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova, ArrayList<String> meniOpis, ArrayList<Double> meniCijene, Vlasnik vlasnik, ArrayList<Integer> brojMijestaPoStolovima) {
+        if (meniOpis.isEmpty()) {
+            Main.upozorenje("Niste popunili meni! Pokusajte ponovo");
+        } else if (brojMijestaPoStolovima.isEmpty()) {
+            Main.upozorenje("Niste popunili podatke o stolovima! Pokusajte ponovo");
+        } else if (!Validator.provjeraObjektaZaUnos(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMijesta, tfBrojStolova)) {
             Main.upozorenje("Neka od polja nisu pravilno popunjena! Pokusajte ponovo");
         } else {
             int idObjekat, idSto, idMeni, idObavjestenje;
@@ -135,12 +139,15 @@ public class Controller {
             objekti.put(idObjekat, new Objekat(idObjekat, vlasnik, tfNaziv.getText(), Double.parseDouble(tfCijenaRezervacije.getText()), tfGrad.getText(), tfAdresa.getText(), Integer.parseInt(tfBrojMijesta.getText()), Integer.parseInt(tfBrojStolova.getText()), StatusObjekta.NA_CEKANJU));
 
             try {
-                Database.dodajUBazu("INSERT INTO `meni`(`Objekat_id`, `opis`, `cijena_po_osobi`) VALUES (" + idObjekat + ",'" + tfMeni.getText() + "'," + Double.parseDouble(tfCijenaMenija.getText()) + ")");
-                idMeni = Database.procitajID("SELECT id FROM meni ORDER BY id DESC LIMIT 1");
-            } catch (SQLException e) {
+                for (int i = 0; i < meniOpis.size(); i++) {
+                    Database.dodajUBazu("INSERT INTO `meni`(`Objekat_id`, `opis`, `cijena_po_osobi`) VALUES (" + idObjekat + ",'" + meniOpis.get(i) + "'," + meniCijene.get(i) + ")");
+                    idMeni = Database.procitajID("SELECT id FROM meni ORDER BY id DESC LIMIT 1");
+                    meniji.put(idMeni, new Meni(idMeni, idObjekat, meniOpis.get(i), meniCijene.get(i)));
+
+                }
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            meniji.put(idMeni, new Meni(idMeni, idObjekat, tfMeni.getText(), Double.parseDouble(tfCijenaMenija.getText())));
 
             try {
                 for (int i = 0; i < brojMijestaPoStolovima.size(); i++) {
@@ -163,6 +170,14 @@ public class Controller {
             Main.informacija("Objekat uspjesno kreiran!");
             ScenaVlasnik.scenaVlasnik(stage, vlasnik, objekti);
         }
+    }
+
+    public static boolean dodavanjeMenija(TextField tfMeni, TextField tfCijenaMenija) {
+        if (Validator.validacijaMeni(tfMeni, tfCijenaMenija)) {
+            Main.upozorenje("Nekorektan unos! Pokusajte ponovo");
+            return false;
+        }
+        return true;
     }
 
     public static Vlasnik getVlasnik(int id) {
