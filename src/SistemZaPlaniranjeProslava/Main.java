@@ -24,6 +24,13 @@ public class Main extends Application {
         a.showAndWait();
     }
 
+    public static boolean potvrda(String poruka) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION);
+        a.setContentText(poruka);
+        ButtonType izbor = a.showAndWait().orElse(ButtonType.CANCEL);
+        return izbor == ButtonType.OK;
+    }
+
     public static <T extends javafx.scene.control.TextInputControl> void ocistiPolje(T polje) {
         polje.clear();
     }

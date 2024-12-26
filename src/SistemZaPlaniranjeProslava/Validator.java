@@ -78,7 +78,7 @@ public class Validator {
         boolean detektorGreske = false;
         Pattern pattern = Pattern.compile("[a-zA-Z\\s]+");
         Matcher matcher = pattern.matcher(meni.getText());
-        if (!matcher.matches()) {
+        if (!matcher.matches() || meni.getText().length() > 45) {
             Main.ocistiPolje(meni);
             detektorGreske = true;
         }
@@ -90,11 +90,14 @@ public class Validator {
             detektorGreske = true;
         }
 
-        return detektorGreske;
+        if (detektorGreske)
+            Main.upozorenje("Nekorektan unos! Pokusajte ponovo");
+        return !detektorGreske;
     }
 
-    public static boolean provjeriNoviNalog(TextField tfIme, TextField tfPrezime, TextField tfJMBG, TextField tfBrojUBanci, TextField tfKorisnickoIme, PasswordField pfLozinka,
-                                            PasswordField pfPotvrdaLozinke, ComboBox<String> cbTipNaloga, Map<String, BankovniRacun> bankovniRacuni, Map<String, Klijent> klijenti, Map<String, Vlasnik> vlasnici) {
+    public static boolean provjeriNoviNalog(TextField tfIme, TextField tfPrezime, TextField tfJMBG, TextField tfBrojUBanci,
+                                            TextField tfKorisnickoIme, PasswordField pfLozinka, PasswordField pfPotvrdaLozinke, ComboBox<String> cbTipNaloga,
+                                            Map<String, BankovniRacun> bankovniRacuni, Map<String, Klijent> klijenti, Map<String, Vlasnik> vlasnici) {
         boolean detektorGreske = false;
         if (!validacijaIme(tfIme.getText())) {
             Main.ocistiPolje(tfIme);
@@ -136,7 +139,8 @@ public class Validator {
         return !detektorGreske;
     }
 
-    public static boolean provjeraObjektaZaUnos(TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova) {
+    public static boolean provjeraObjektaZaUnos(TextField tfNaziv, TextField tfGrad, TextField tfAdresa,
+                                                TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova) {
         boolean detektorGreske = false;
         if (!validacijaIme(tfGrad.getText())) {
             Main.ocistiPolje(tfGrad);

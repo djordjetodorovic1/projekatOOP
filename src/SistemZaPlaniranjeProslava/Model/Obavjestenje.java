@@ -1,7 +1,5 @@
 package SistemZaPlaniranjeProslava.Model;
 
-import SistemZaPlaniranjeProslava.Controller;
-
 public class Obavjestenje {
     private int id;
     private Objekat objekat;
@@ -13,17 +11,23 @@ public class Obavjestenje {
         this.tekst = tekst;
     }
 
-    public Obavjestenje(int id, int objekatID, String tekst) {
-        this.id = id;
-        this.objekat = Controller.getObjekat(objekatID);
-        this.tekst = tekst;
+    public int getId() {
+        return id;
+    }
+
+    public Objekat getObjekat() {
+        return objekat;
+    }
+
+    public String getTekst() {
+        return tekst;
     }
 
     @Override
     public String toString() {
         return "Obavjestenje{" +
                 "id=" + id +
-                ", objekat=" + objekat +
+                ", objekat=" + objekat.getId() + " " + objekat.getNaziv() +
                 ", tekst='" + tekst + '\'' +
                 '}';
     }

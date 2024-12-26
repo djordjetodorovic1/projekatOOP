@@ -1,7 +1,5 @@
 package SistemZaPlaniranjeProslava.Model;
 
-import SistemZaPlaniranjeProslava.Controller;
-
 public class Sto {
     private int id;
     private Objekat objekat;
@@ -13,17 +11,11 @@ public class Sto {
         this.broj_mijesta = broj_mijesta;
     }
 
-    public Sto(int id, int objekatID, int broj_mijesta) {
-        this.id = id;
-        this.objekat = Controller.getObjekat(objekatID);
-        this.broj_mijesta = broj_mijesta;
-    }
-
     @Override
     public String toString() {
         return "Sto{" +
                 "id=" + id +
-                ", objekat=" + objekat +
+                ", objekat=" + objekat.getId() + " " + objekat.getNaziv() +
                 ", broj_mijesta=" + broj_mijesta +
                 '}';
     }

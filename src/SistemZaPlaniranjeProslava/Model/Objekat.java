@@ -1,7 +1,5 @@
 package SistemZaPlaniranjeProslava.Model;
 
-import SistemZaPlaniranjeProslava.Controller;
-
 public class Objekat {
     private int id;
     private Vlasnik vlasnik;
@@ -15,41 +13,49 @@ public class Objekat {
     private double zarada;
     private StatusObjekta status;
 
-    public Objekat(int id, int vlasnikID, String naziv, double cijena_rezervacije, String grad, String adresa, int broj_mijesta, int broj_stolova, String datumi, double zarada, String statusObjekta) {
-        init(id, naziv, cijena_rezervacije, grad, adresa, broj_mijesta, broj_stolova);
-        this.vlasnik = Controller.getVlasnik(vlasnikID);
-        this.datumi = datumi;
-        this.zarada = zarada;
-        switch (statusObjekta) {
-            case ("NA_CEKANJU"):
-                this.status = StatusObjekta.NA_CEKANJU;
-                break;
-            case ("ODOBREN"):
-                this.status = StatusObjekta.ODOBREN;
-                break;
-            case ("ODBIJEN"):
-                this.status = StatusObjekta.ODBIJEN;
-                break;
-            default:
-                this.status = StatusObjekta.NA_CEKANJU;
-        }
-    }
-
-    public Objekat(int id, Vlasnik vlasnik, String naziv, double cijena_rezervacije, String grad, String adresa, int broj_mijesta, int broj_stolova, StatusObjekta statusObjekta) {
-        init(id, naziv, cijena_rezervacije, grad, adresa, broj_mijesta, broj_stolova);
-        this.vlasnik = vlasnik;
-        this.datumi = "";
-        this.zarada = 0.0;
-        this.status = statusObjekta;
-    }
-
-    private void init(int id, String naziv, double cijena_rezervacije, String grad, String adresa, int broj_mijesta, int broj_stolova) {
+    public Objekat(int id, Vlasnik vlasnik, String naziv, double cijena_rezervacije, String grad, String adresa, int broj_mijesta, int broj_stolova, String datumi, double zarada, StatusObjekta statusObjekta) {
         this.id = id;
+        this.vlasnik = vlasnik;
         this.naziv = naziv;
         this.cijena_rezervacije = cijena_rezervacije;
         this.grad = grad;
         this.adresa = adresa;
         this.broj_mijesta = broj_mijesta;
+        this.broj_stolova = broj_stolova;
+        this.datumi = datumi;
+        this.zarada = zarada;
+        this.status = statusObjekta;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setVlasnik(Vlasnik vlasnik) {
+        this.vlasnik = vlasnik;
+    }
+
+    public void setNaziv(String naziv) {
+        this.naziv = naziv;
+    }
+
+    public void setCijena_rezervacije(double cijena_rezervacije) {
+        this.cijena_rezervacije = cijena_rezervacije;
+    }
+
+    public void setGrad(String grad) {
+        this.grad = grad;
+    }
+
+    public void setAdresa(String adresa) {
+        this.adresa = adresa;
+    }
+
+    public void setBroj_mijesta(int broj_mijesta) {
+        this.broj_mijesta = broj_mijesta;
+    }
+
+    public void setBroj_stolova(int broj_stolova) {
         this.broj_stolova = broj_stolova;
     }
 
@@ -113,7 +119,7 @@ public class Objekat {
     public String toString() {
         return "Objekat{" +
                 "id=" + id +
-                ", vlasnik=" + vlasnik +
+                ", vlasnik=" + vlasnik.getKorisnicko_ime() +
                 ", naziv='" + naziv + '\'' +
                 ", cijena_rezervacije=" + cijena_rezervacije +
                 ", grad='" + grad + '\'' +

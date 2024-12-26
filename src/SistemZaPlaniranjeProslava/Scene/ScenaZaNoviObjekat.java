@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ScenaZaNoviObjekat {
+    private static boolean scenaZaMeniAktivna = false;
+    private static boolean scenaZaStoAktivna = false;
     private static List<Spinner<Integer>> spinnerBrojMijestaPoStolovima = new ArrayList<>();
     private static ArrayList<String> meniOpis = new ArrayList<>();
     private static ArrayList<Double> meniCijene = new ArrayList<>();
@@ -33,6 +35,8 @@ public class ScenaZaNoviObjekat {
     private static void scenaZaUnosStolova(int brojStolova) {
         Stage stage = new Stage();
         stage.setTitle("Kreiraj novi objekat");
+        stage.setOnCloseRequest(e -> scenaZaStoAktivna = false);
+
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
         root.setAlignment(Pos.CENTER);
@@ -80,6 +84,8 @@ public class ScenaZaNoviObjekat {
     private static void scenaZaUnosMenija() {
         Stage stage = new Stage();
         stage.setTitle("Kreiraj novi objekat");
+        stage.setOnCloseRequest(e -> scenaZaMeniAktivna = false);
+
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
         root.setAlignment(Pos.CENTER);
@@ -124,6 +130,11 @@ public class ScenaZaNoviObjekat {
     }
 
     public static void scenaNoviObjekat(Stage stageNoviObjekat, Vlasnik vlasnik, Map<Integer, Objekat> objekti) {
+        scenaNoviObjekatPonovo(stageNoviObjekat, vlasnik, objekti, 0, () -> {
+        });
+    }
+//Popraviti
+    public static void scenaNoviObjekatPonovo(Stage stageNoviObjekat, Vlasnik vlasnik, Map<Integer, Objekat> objekti, int idObjekta, Runnable onComplete) {
         meniOpis.clear();
         meniCijene.clear();
 
@@ -148,12 +159,6 @@ public class ScenaZaNoviObjekat {
         TextField tfAdresa = new TextField();
         TextField tfBrojMijesta = new TextField();
         TextField tfBrojStolova = new TextField();
-        tfNaziv.setPromptText("Caffe Renas");
-        tfCijenaRezervacije.setPromptText("200.00");
-        tfGrad.setPromptText("Banja Luka");
-        tfAdresa.setPromptText("Mladena Stojanovica 2");
-        tfBrojMijesta.setPromptText("50");
-        tfBrojStolova.setPromptText("10");
 
         Image strelica = new Image((new File("resursi/backArrow.png")).toURI().toString());
         ImageView prikazStrelice = new ImageView(strelica);
@@ -167,6 +172,26 @@ public class ScenaZaNoviObjekat {
         btnBrojStolica.setPadding(new Insets(5, 50, 5, 50));
         btnMeni.setPadding(new Insets(5, 50, 5, 50));
 
+        if (idObjekta > 0) {
+            tfNaziv.setText(objekti.get(idObjekta).getNaziv());
+            tfCijenaRezervacije.setText("" + objekti.get(idObjekta).getCijena_rezervacije());
+            tfGrad.setText(objekti.get(idObjekta).getGrad());
+            tfAdresa.setText(objekti.get(idObjekta).getAdresa());
+            tfBrojMijesta.setText("" + objekti.get(idObjekta).getBroj_mijesta());
+            tfBrojStolova.setText("" + objekti.get(idObjekta).getBroj_stolova());
+            tfNaziv.setEditable(false);
+            tfGrad.setEditable(false);
+            tfAdresa.setEditable(false);
+            btnNazad.setVisible(false);
+        } else {
+            tfNaziv.setPromptText("Caffe Renas");
+            tfCijenaRezervacije.setPromptText("200.00");
+            tfGrad.setPromptText("Banja Luka");
+            tfAdresa.setPromptText("Mladena Stojanovica 2");
+            tfBrojMijesta.setPromptText("50");
+            tfBrojStolova.setPromptText("10");
+        }
+
         btnNazad.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
@@ -177,10 +202,13 @@ public class ScenaZaNoviObjekat {
         btnBrojStolica.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (Validator.validacijaBroj(tfBrojStolova)) {
-                    scenaZaUnosStolova(Integer.parseInt(tfBrojStolova.getText()));
-                } else {
-                    Main.upozorenje("Polje za broj stolova nije korektno popunjeno! Pokusajte ponovo");
+                if (!scenaZaStoAktivna) {
+                    if (Validator.validacijaBroj(tfBrojStolova)) {
+                        scenaZaStoAktivna = true;
+                        scenaZaUnosStolova(Integer.parseInt(tfBrojStolova.getText()));
+                    } else {
+                        Main.upozorenje("Polje za broj stolova nije korektno popunjeno! Pokusajte ponovo");
+                    }
                 }
             }
         });
@@ -188,7 +216,10 @@ public class ScenaZaNoviObjekat {
         btnMeni.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                scenaZaUnosMenija();
+                if (!scenaZaMeniAktivna) {
+                    scenaZaMeniAktivna = true;
+                    scenaZaUnosMenija();
+                }
             }
         });
 
@@ -198,8 +229,13 @@ public class ScenaZaNoviObjekat {
                 ArrayList<Integer> brojMijestaPoStolovima = spinnerBrojMijestaPoStolovima.stream()
                         .map(spinner -> Integer.parseInt(spinner.getValue().toString()))
                         .collect(Collectors.toCollection(ArrayList::new));
-                Controller.kreirajNoviObjekat(stageNoviObjekat, tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
-                        tfBrojMijesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMijestaPoStolovima);
+                if (Controller.kreirajNoviObjekat(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
+                        tfBrojMijesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMijestaPoStolovima, idObjekta)) {
+                    if (idObjekta == 0)
+                        ScenaVlasnik.scenaVlasnik(stageNoviObjekat, vlasnik, objekti);
+                    else
+                        stageNoviObjekat.close();
+                }
             }
         });
         root.setOnKeyPressed(event -> {
@@ -224,9 +260,11 @@ public class ScenaZaNoviObjekat {
 
         root.getChildren().addAll(btnNazad, vBoxUnos);
         root.setStyle("-fx-font: 16 'Comic Sans MS';");
-        Platform.runLater(root::requestFocus);
         Scene scena = new Scene(root, 750, 600);
         stageNoviObjekat.setScene(scena);
+        stageNoviObjekat.setOnHidden(e -> {
+            Platform.runLater(onComplete);  // Obezbeđuje da se scena ne zatvori odmah
+        });
         stageNoviObjekat.show();
     }
 }

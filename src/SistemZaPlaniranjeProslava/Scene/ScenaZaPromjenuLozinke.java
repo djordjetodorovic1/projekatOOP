@@ -22,6 +22,7 @@ public class ScenaZaPromjenuLozinke {
     public static void scenaZaPromjenuLozinke(Korisnik korisnik) {
         Stage stageLozinka = new Stage();
         stageLozinka.setTitle("Promjena lozinke");
+        stageLozinka.setOnCloseRequest(e -> ScenaVlasnik.scenaZaLozinkuAktivna = false);
 
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
@@ -50,6 +51,7 @@ public class ScenaZaPromjenuLozinke {
         btnNazad.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
+                ScenaVlasnik.scenaZaLozinkuAktivna = false;
                 stageLozinka.close();
             }
         });
@@ -57,8 +59,10 @@ public class ScenaZaPromjenuLozinke {
         btnPromjeniLozinku.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                if (Controller.promjenaLozinke(korisnik, tfStaraLozinka, pfNovaLozinka, pfPotvrdaLozinke))
+                if (Controller.promjenaLozinke(korisnik, tfStaraLozinka, pfNovaLozinka, pfPotvrdaLozinke)) {
+                    ScenaVlasnik.scenaZaLozinkuAktivna = false;
                     stageLozinka.close();
+                }
             }
         });
         root.setOnKeyPressed(event -> {

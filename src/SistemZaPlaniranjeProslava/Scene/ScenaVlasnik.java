@@ -20,6 +20,8 @@ import java.io.File;
 import java.util.Map;
 
 public class ScenaVlasnik {
+    public static boolean scenaZaLozinkuAktivna = false;
+
     public static void scenaVlasnik(Stage primaryStage, Vlasnik vlasnik, Map<Integer, Objekat> objekti) {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
@@ -59,7 +61,9 @@ public class ScenaVlasnik {
         for (Objekat objekat : objekti.values())
             cbObjekti.getItems().add(objekat.getNaziv());
         cbObjekti.setValue("Izaberite objekat za prikaz");
-        cbObjekti.setPadding(new Insets(5, 40, 5, 40));
+        cbObjekti.setPadding(new Insets(5, 5, 5, 5));
+
+        //dodati eventListener za comboBox i prikaz informacija za objekat
 
         btnNazad.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -71,7 +75,10 @@ public class ScenaVlasnik {
         btnPromjeniLozinku.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                ScenaZaPromjenuLozinke.scenaZaPromjenuLozinke(vlasnik);
+                if (!scenaZaLozinkuAktivna) {
+                    scenaZaLozinkuAktivna = true;
+                    ScenaZaPromjenuLozinke.scenaZaPromjenuLozinke(vlasnik);
+                }
             }
         });
 
