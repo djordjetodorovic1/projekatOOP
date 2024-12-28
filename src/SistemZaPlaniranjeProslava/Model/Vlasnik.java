@@ -35,11 +35,11 @@ public class Vlasnik implements Korisnik {
         return jmbg;
     }
 
-    public String getBroj_racuna() {
+    public String getBrojRacuna() {
         return broj_racuna;
     }
 
-    public String getKorisnicko_ime() {
+    public String getKorisnickoIme() {
         return korisnicko_ime;
     }
 

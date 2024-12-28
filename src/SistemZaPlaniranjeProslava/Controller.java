@@ -2,8 +2,7 @@ package SistemZaPlaniranjeProslava;
 
 import SistemZaPlaniranjeProslava.Model.*;
 import SistemZaPlaniranjeProslava.Scene.*;
-import javafx.application.Platform;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -55,39 +54,30 @@ public class Controller {
             System.out.println(ob);
     }
 
-    private static void provjeriNovaObavjestenja(Stage sstage, Vlasnik vlasnik, ArrayList<Obavjestenje> obavjestenja, String korisnickoIme) {
+    private static void prijavaVlasnika(Stage primaryStage, String korisnickoIme) {
         ArrayList<Obavjestenje> obavjestenjaZaVlansika = new ArrayList<>(obavjestenja.stream()
-                .filter(ob -> (ob.getObjekat().getVlasnik().getKorisnicko_ime().equals(korisnickoIme)))
+                .filter(ob -> (ob.getObjekat().getVlasnik().getKorisnickoIme().equals(korisnickoIme) && ob.getObjekat().getStatus() != StatusObjekta.NA_CEKANJU))
                 .toList());
-        processObavjestenja(obavjestenjaZaVlansika.iterator(), sstage, vlasnik);
-    }
-//Popraviti Dodati za brisanje iz baze
-//Dodati i kod poziva metode da se izvrsi nakon njenog zavrsetka
-    private static void processObavjestenja(Iterator<Obavjestenje> iterator, Stage stage, Vlasnik vlasnik) {
-        if (iterator.hasNext()) {
-            Obavjestenje ob = iterator.next();
-            if (ob.getObjekat().getStatus() == StatusObjekta.ODOBREN) {
-                Main.informacija(ob.getTekst());
-                processObavjestenja(iterator, stage, vlasnik);
-
-            } else if (ob.getObjekat().getStatus() == StatusObjekta.ODBIJEN) {
-                if (Main.potvrda(ob.getTekst())) {
-                    ScenaZaNoviObjekat.scenaNoviObjekatPonovo(stage, vlasnik, objekti, ob.getObjekat().getId(), () -> {
-                        Platform.runLater(() -> {
-                            stage.close();
-                            processObavjestenja(iterator, stage, vlasnik);
-                        });
-                    });
-                }
+        if (!obavjestenjaZaVlansika.isEmpty()) {
+            Collections.sort(obavjestenjaZaVlansika);
+            for (Obavjestenje ob : obavjestenjaZaVlansika) {
+                Stage stagePonoviObjekat = new Stage();
+                if (ob.getObjekat().getStatus() == StatusObjekta.ODOBREN)
+                    Main.informacija(ob.getTekst());
+                else if (Main.potvrda(ob.getTekst()))
+                    ScenaZaNoviObjekat.scenaIzmjenaObjekta(stagePonoviObjekat, vlasnici.get(korisnickoIme), objekti, ob);
+                Database.izbrisiObavjestenjeIzBaze(ob.getId());
+                obavjestenja.remove(ob);
             }
         }
+        ScenaVlasnik.scenaVlasnik(primaryStage, vlasnici.get(korisnickoIme), objekti);
     }
 
     public static void prijava(Stage primaryStage, TextField tfKorisnickoIme, PasswordField pfLozinka) {
         if (tfKorisnickoIme.getText().isEmpty() || pfLozinka.getText().isEmpty()) {
             Main.upozorenje("Niste popunili sva polja! Pokusajte ponovo");
-        } else if (Validator.provjeriPrijavu(tfKorisnickoIme, pfLozinka)) {
-            if (admin.getKorisnicko_ime().equals(tfKorisnickoIme.getText())) {
+        } else if (Validator.provjeriPrijavu(tfKorisnickoIme.getText(), pfLozinka.getText())) {
+            if (admin.getKorisnickoIme().equals(tfKorisnickoIme.getText())) {
                 if (admin.getLozinka().equals(pfLozinka.getText())) {
                     //admin se ulogovao
                 } else {
@@ -103,9 +93,7 @@ public class Controller {
                 }
             } else if (vlasnici.containsKey(tfKorisnickoIme.getText())) {
                 if (vlasnici.get(tfKorisnickoIme.getText()).getLozinka().equals(pfLozinka.getText())) {
-                    if (!obavjestenja.isEmpty())
-                        provjeriNovaObavjestenja(primaryStage, vlasnici.get(tfKorisnickoIme.getText()), obavjestenja, tfKorisnickoIme.getText());
-                    ScenaVlasnik.scenaVlasnik(primaryStage, vlasnici.get(tfKorisnickoIme.getText()), objekti);
+                    prijavaVlasnika(primaryStage, tfKorisnickoIme.getText());
                 } else {
                     Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
                     Main.ocistiPolje(pfLozinka);
@@ -123,23 +111,21 @@ public class Controller {
     }
 
     public static void kreirajNoviNalog(Stage primaryStage, TextField tfIme, TextField tfPrezime, TextField tfJMBG, TextField tfBrojUBanci,
-                                        TextField tfKorisnickoIme, PasswordField pfLozinka, PasswordField pfPotvrdaLozinke, ComboBox<String> cbTipNaloga) {
+                                        TextField tfKorisnickoIme, PasswordField pfLozinka, PasswordField pfPotvrdaLozinke, ChoiceBox<String> cbTipNaloga) {
         if (!Validator.provjeriNoviNalog(tfIme, tfPrezime, tfJMBG, tfBrojUBanci, tfKorisnickoIme, pfLozinka, pfPotvrdaLozinke, cbTipNaloga, bankovniRacuni, klijenti, vlasnici)) {
             Main.upozorenje("Neka od polja nisu pravilno popunjena ili je korisnicko ime vec zauzeto! Pokusajte ponovo");
         } else {
-            int id;
             String nalog = "klijent";
             if (cbTipNaloga.getValue().equals("Vlasnik"))
                 nalog = "vlasnik";
 
-            Database.dodajUBazu("INSERT INTO `" + nalog + "`(`ime`, `prezime`, `jmbg`, `broj_racuna`, `korisnicko_ime`, `lozinka`) VALUES ('" + tfIme.getText() + "','"
-                    + tfPrezime.getText() + "','" + tfJMBG.getText() + "','" + tfBrojUBanci.getText() + "','" + tfKorisnickoIme.getText() + "','" + pfLozinka.getText() + "')");
-            id = Database.procitajID("SELECT id FROM " + nalog + " WHERE korisnicko_ime = '" + tfKorisnickoIme.getText() + "'");
+            int id = Database.dodajNalogUBazu(nalog, tfIme.getText(), tfPrezime.getText(), tfJMBG.getText(), tfBrojUBanci.getText(), tfKorisnickoIme.getText(), pfLozinka.getText());
 
             if (nalog.equals("klijent"))
                 klijenti.put(tfKorisnickoIme.getText(), new Klijent(id, tfIme.getText(), tfPrezime.getText(), tfJMBG.getText(), tfBrojUBanci.getText(), tfKorisnickoIme.getText(), pfLozinka.getText()));
             else
                 vlasnici.put(tfKorisnickoIme.getText(), new Vlasnik(id, tfIme.getText(), tfPrezime.getText(), tfJMBG.getText(), tfBrojUBanci.getText(), tfKorisnickoIme.getText(), pfLozinka.getText()));
+            Main.informacija("Nalog uspjesno kreiran!");
             ScenaZaPrijavu.scenaPrijava(primaryStage);
         }
     }
@@ -151,8 +137,8 @@ public class Controller {
                 String nalog = "vlasnik";
                 if (korisnik instanceof Klijent)
                     nalog = "klijent";
-                Database.izmjeniUBazi("UPDATE `" + nalog + "` SET `lozinka`='" + pfLozinka.getText() + "' WHERE korisnicko_ime = '" + korisnik.getKorisnicko_ime() + "'");
-                Main.informacija("Uspjesno promjenjena lozinka!");
+                Database.izmjeniLozinku(nalog, pfLozinka.getText(), korisnik.getKorisnickoIme());
+                korisnik.setLozinka(pfLozinka.getText());
                 return true;
 
             } else {
@@ -173,14 +159,13 @@ public class Controller {
             Main.upozorenje("Niste popunili meni! Pokusajte ponovo");
         } else if (brojMijestaPoStolovima.isEmpty()) {
             Main.upozorenje("Niste popunili podatke o stolovima! Pokusajte ponovo");
-        } else if (!Validator.provjeraObjektaZaUnos(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMijesta, tfBrojStolova)) {
+        } else if (!Validator.provjeraObjektaZaUnos(tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMijesta, tfBrojStolova)) {
             Main.upozorenje("Neka od polja nisu pravilno popunjena! Pokusajte ponovo");
         } else {
             if (idObjekat > 0) {
-                Database.izmjeniUBazi("UPDATE `objekat` SET `cijena_rezervacije`=" + Double.parseDouble(tfCijenaRezervacije.getText()) + ",`broj_mjesta`=" + Integer.parseInt(tfBrojMijesta.getText())
-                        + ",`broj_stolova`=" + Integer.parseInt(tfBrojStolova.getText()) + ", `status`='" + StatusObjekta.NA_CEKANJU + "' WHERE id=" + idObjekat);
-                Database.izbrisiIzBaze("DELETE FROM `meni` WHERE Objekat_id =" + idObjekat);
-                Database.izbrisiIzBaze("DELETE FROM `sto` WHERE Objekat_id =" + idObjekat);
+                Database.izmjeniObjekatUBazi(Double.parseDouble(tfCijenaRezervacije.getText()), Integer.parseInt(tfBrojMijesta.getText()), Integer.parseInt(tfBrojStolova.getText()), idObjekat);
+                Database.izbrisiIzBazeZaObjekatID("meni", idObjekat);
+                Database.izbrisiIzBazeZaObjekatID("sto", idObjekat);
                 try {
                     meniji = Database.ucitajMenije();
                     stolovi = Database.ucitajStolove();
@@ -191,11 +176,7 @@ public class Controller {
                         Integer.parseInt(tfBrojMijesta.getText()), Integer.parseInt(tfBrojStolova.getText()), "", 0.0, StatusObjekta.NA_CEKANJU);
                 objekti.put(idObjekat, objekatZaIzmjenu);
             } else if (idObjekat == 0) {
-                Database.dodajUBazu("INSERT INTO `objekat` (`Vlasnik_id`, `naziv`, `cijena_rezervacije`, `grad`, `adresa`, `broj_mjesta`, `broj_stolova`, `datumi`, `zarada`) VALUES ("
-                        + vlasnik.getId() + ", '" + tfNaziv.getText() + "', " + Double.parseDouble(tfCijenaRezervacije.getText()) + ", '" + tfGrad.getText() + "', '" + tfAdresa.getText() + "', "
-                        + Integer.parseInt(tfBrojMijesta.getText()) + ", " + Integer.parseInt(tfBrojStolova.getText()) + ", '', " + 0.0 + ")");
-                idObjekat = Database.procitajID("SELECT id FROM objekat ORDER BY id DESC LIMIT 1");
-
+                idObjekat = Database.dodajObjekatUBazu(vlasnik.getId(), tfNaziv.getText(), Double.parseDouble(tfCijenaRezervacije.getText()), tfGrad.getText(), tfAdresa.getText(), Integer.parseInt(tfBrojMijesta.getText()), Integer.parseInt(tfBrojStolova.getText()));
                 objekti.put(idObjekat, new Objekat(idObjekat, vlasnik, tfNaziv.getText(), Double.parseDouble(tfCijenaRezervacije.getText()), tfGrad.getText(), tfAdresa.getText(),
                         Integer.parseInt(tfBrojMijesta.getText()), Integer.parseInt(tfBrojStolova.getText()), "", 0.0, StatusObjekta.NA_CEKANJU));
             }
@@ -203,19 +184,16 @@ public class Controller {
             int idMeni, idSto, idObavjestenje;
 
             for (int i = 0; i < meniOpis.size(); i++) {
-                Database.dodajUBazu("INSERT INTO `meni`(`Objekat_id`, `opis`, `cijena_po_osobi`) VALUES (" + idObjekat + ",'" + meniOpis.get(i) + "'," + meniCijene.get(i) + ")");
-                idMeni = Database.procitajID("SELECT id FROM meni ORDER BY id DESC LIMIT 1");
+                idMeni = Database.dodajMeniUBazu(idObjekat, meniOpis.get(i), meniCijene.get(i));
                 meniji.put(idMeni, new Meni(idMeni, objekti.get(idObjekat), meniOpis.get(i), meniCijene.get(i)));
             }
 
-            for (Integer integer : brojMijestaPoStolovima) {
-                Database.dodajUBazu("INSERT INTO `sto`(`Objekat_id`, `broj_mjesta`) VALUES (" + idObjekat + "," + integer + ")");
-                idSto = Database.procitajID("SELECT id FROM sto ORDER BY id DESC LIMIT 1");
-                stolovi.put(idSto, new Sto(idSto, objekti.get(idObjekat), integer));
+            for (Integer brMijesta : brojMijestaPoStolovima) {
+                idSto = Database.dodajStoUBazu(idObjekat, brMijesta);
+                stolovi.put(idSto, new Sto(idSto, objekti.get(idObjekat), brMijesta));
             }
 
-            Database.dodajUBazu("INSERT INTO `obavjestenje`(`Objekat_id`, `tekst`) VALUES (" + idObjekat + ",'Novi objekat ceka na odobrenje!')");
-            idObavjestenje = Database.procitajID("SELECT id FROM obavjestenje ORDER BY id DESC LIMIT 1");
+            idObavjestenje = Database.dodajObavjestenjeUBazu(idObjekat);
             obavjestenja.add(new Obavjestenje(idObavjestenje, objekti.get(idObjekat), "Novi objekat ceka na odobreneje!"));
 
             Main.informacija("Objekat uspjesno kreiran!");

@@ -1,6 +1,6 @@
 package SistemZaPlaniranjeProslava.Model;
 
-public class Obavjestenje {
+public class Obavjestenje implements Comparable<Obavjestenje> {
     private int id;
     private Objekat objekat;
     private String tekst;
@@ -21,6 +21,11 @@ public class Obavjestenje {
 
     public String getTekst() {
         return tekst;
+    }
+
+    @Override
+    public int compareTo(Obavjestenje o) {
+        return this.getObjekat().getStatus().compareTo(o.getObjekat().getStatus());
     }
 
     @Override

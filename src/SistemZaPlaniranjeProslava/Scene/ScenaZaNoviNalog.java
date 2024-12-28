@@ -59,7 +59,7 @@ public class ScenaZaNoviNalog {
         Button btnNoviNalog = new Button("Kreiraj novi nalog");
         Button btnNazad = new Button("", prikazStrelice);
 
-        ComboBox<String> cbTipNaloga = new ComboBox<>();
+        ChoiceBox<String> cbTipNaloga = new ChoiceBox<>();
         cbTipNaloga.getItems().addAll("Klijent", "Vlasnik");
         cbTipNaloga.setValue("Klijent");
         cbTipNaloga.setPadding(new Insets(0, 53, 0, 53));

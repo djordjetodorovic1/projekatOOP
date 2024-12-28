@@ -35,6 +35,7 @@ public class Main extends Application {
         polje.clear();
     }
 
+    @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Zlatna ribica");
         ScenaZaPrijavu.scenaPrijava(primaryStage);

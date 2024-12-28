@@ -40,8 +40,8 @@ public class ScenaVlasnik {
 
         TextField tfIme = new TextField(vlasnik.getIme());
         TextField tfPrezime = new TextField(vlasnik.getPrezime());
-        TextField tfKorisnickoIme = new TextField(vlasnik.getKorisnicko_ime());
-        TextField tfStanjeUBanci = new TextField("" + Controller.getStanjeRacuna(vlasnik.getBroj_racuna()));
+        TextField tfKorisnickoIme = new TextField(vlasnik.getKorisnickoIme());
+        TextField tfStanjeUBanci = new TextField("" + Controller.getStanjeRacuna(vlasnik.getBrojRacuna()));
         tfIme.setEditable(false);
         tfPrezime.setEditable(false);
         tfKorisnickoIme.setEditable(false);
@@ -57,13 +57,16 @@ public class ScenaVlasnik {
         Button btnNoviObjekat = new Button("Kreiraj zahtjev");
         btnNoviObjekat.setPadding(new Insets(10, 53, 10, 53));
 
-        ComboBox<String> cbObjekti = new ComboBox<>();
-        for (Objekat objekat : objekti.values())
-            cbObjekti.getItems().add(objekat.getNaziv());
+        ChoiceBox<String> cbObjekti = new ChoiceBox<>();
+        for (Objekat objekat : objekti.values()) {
+            if (objekat.getVlasnik().getId() == vlasnik.getId())
+                cbObjekti.getItems().add(objekat.getNaziv());
+        }
         cbObjekti.setValue("Izaberite objekat za prikaz");
         cbObjekti.setPadding(new Insets(5, 5, 5, 5));
+        cbObjekti.setPrefWidth(250);
 
-        //dodati eventListener za comboBox i prikaz informacija za objekat
+        //dodati eventListener za ChoiceBox i prikaz informacija za objekat
 
         btnNazad.setOnAction(new EventHandler<ActionEvent>() {
             @Override

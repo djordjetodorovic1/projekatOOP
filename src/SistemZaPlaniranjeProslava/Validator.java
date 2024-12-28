@@ -4,7 +4,7 @@ import SistemZaPlaniranjeProslava.Model.BankovniRacun;
 import SistemZaPlaniranjeProslava.Model.Klijent;
 import SistemZaPlaniranjeProslava.Model.Korisnik;
 import SistemZaPlaniranjeProslava.Model.Vlasnik;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
@@ -13,17 +13,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Validator {
-    private static boolean validacijaIme(String ime) {
-        Pattern pattern = Pattern.compile("^[A-Z][a-zA-Z]+([a-zA-Z\\s]+)*");
-        Matcher matcher = pattern.matcher(ime);
+    private static boolean provjeraRegIzraza(String string, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(string);
         return matcher.matches();
     }
 
-    private static <T extends Korisnik> boolean validacijaJMBG(String jmbg, Map<String, T> korisnici) {
-        Pattern pattern = Pattern.compile("[0-9]{13}");
-        Matcher matcher = pattern.matcher(jmbg);
+    private static boolean validacijaIme(String ime) {
+        return provjeraRegIzraza(ime, "^[A-Z][a-zA-Z]+([a-zA-Z\\s]+)*");
+    }
 
-        if (matcher.matches()) {
+    private static <T extends Korisnik> boolean validacijaJMBG(String jmbg, Map<String, T> korisnici) {
+        if (provjeraRegIzraza(jmbg, "[0-9]{13}")) {
             for (T korisnik : korisnici.values())
                 if (korisnik.getJmbg().equals(jmbg))
                     return false;
@@ -33,35 +34,23 @@ public class Validator {
     }
 
     private static boolean validacijaRacun(String brojRacuna, String jmbg, Map<String, BankovniRacun> bankovniRacuni) {
-        Pattern pattern = Pattern.compile("[0-9]{16}");
-        Matcher matcher = pattern.matcher(brojRacuna);
-        return matcher.matches() && bankovniRacuni.containsKey(brojRacuna) && bankovniRacuni.get(brojRacuna).getJmbg().equals(jmbg);
+        return provjeraRegIzraza(brojRacuna, "[0-9]{16}") && bankovniRacuni.containsKey(brojRacuna) && bankovniRacuni.get(brojRacuna).getJmbg().equals(jmbg);
     }
 
     private static <T extends Korisnik> boolean validacijaKorisnickoIme(String korisnickoIme, Map<String, T> korisnici) {
-        Pattern pattern = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_\\.]+");
-        Matcher matcher = pattern.matcher(korisnickoIme);
-        return matcher.matches() && !korisnici.containsKey(korisnickoIme);
+        return provjeraRegIzraza(korisnickoIme, "^[a-zA-Z][a-zA-Z0-9_\\.]+") && !korisnici.containsKey(korisnickoIme);
     }
 
     public static boolean verifikujLozinku(String lozinka, String potvrdaLozinke) {
-        Pattern pattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9_\\.]+");
-        Matcher matcher = pattern.matcher(lozinka);
-        return matcher.matches() && lozinka.equals(potvrdaLozinke);
+        return provjeraRegIzraza(lozinka, "^[a-zA-Z0-9][a-zA-Z0-9_\\.]+") && lozinka.equals(potvrdaLozinke);
     }
 
-    public static boolean provjeriPrijavu(TextField tfKorisnickoIme, PasswordField pfLozinka) {
-        Pattern pattern = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_\\.]+");
-        Matcher matcherK = pattern.matcher(tfKorisnickoIme.getText());
-        pattern = Pattern.compile("^[a-zA-Z0-9][a-zA-Z0-9_\\.]+");
-        Matcher matcherP = pattern.matcher(pfLozinka.getText());
-        return matcherK.matches() && matcherP.matches();
+    public static boolean provjeriPrijavu(String korisnickoIme, String lozinka) {
+        return provjeraRegIzraza(korisnickoIme, "^[a-zA-Z][a-zA-Z0-9_\\.]+") && provjeraRegIzraza(lozinka, "^[a-zA-Z0-9][a-zA-Z0-9_\\.]+");
     }
 
     private static boolean validacijaAdresa(String adresa) {
-        Pattern pattern = Pattern.compile("^[A-Z][a-zA-Z]+([a-zA-Z\\s]+)*(\\d|bb|BB)?");
-        Matcher matcher = pattern.matcher(adresa);
-        return matcher.matches();
+        return provjeraRegIzraza(adresa, "^[A-Z][a-zA-Z]+([a-zA-Z\\s]+)*(\\d|bb|BB)?");
     }
 
     public static boolean validacijaBroj(TextField tfBrojStolova) {
@@ -76,9 +65,7 @@ public class Validator {
 
     public static boolean validacijaMeni(TextField meni, TextField cijena) {
         boolean detektorGreske = false;
-        Pattern pattern = Pattern.compile("[a-zA-Z\\s]+");
-        Matcher matcher = pattern.matcher(meni.getText());
-        if (!matcher.matches() || meni.getText().length() > 45) {
+        if (meni.getText().length() > 45 || !provjeraRegIzraza(meni.getText(), "[a-zA-Z\\s]+")) {
             Main.ocistiPolje(meni);
             detektorGreske = true;
         }
@@ -96,7 +83,7 @@ public class Validator {
     }
 
     public static boolean provjeriNoviNalog(TextField tfIme, TextField tfPrezime, TextField tfJMBG, TextField tfBrojUBanci,
-                                            TextField tfKorisnickoIme, PasswordField pfLozinka, PasswordField pfPotvrdaLozinke, ComboBox<String> cbTipNaloga,
+                                            TextField tfKorisnickoIme, PasswordField pfLozinka, PasswordField pfPotvrdaLozinke, ChoiceBox<String> cbTipNaloga,
                                             Map<String, BankovniRacun> bankovniRacuni, Map<String, Klijent> klijenti, Map<String, Vlasnik> vlasnici) {
         boolean detektorGreske = false;
         if (!validacijaIme(tfIme.getText())) {
@@ -139,7 +126,7 @@ public class Validator {
         return !detektorGreske;
     }
 
-    public static boolean provjeraObjektaZaUnos(TextField tfNaziv, TextField tfGrad, TextField tfAdresa,
+    public static boolean provjeraObjektaZaUnos(TextField tfGrad, TextField tfAdresa,
                                                 TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova) {
         boolean detektorGreske = false;
         if (!validacijaIme(tfGrad.getText())) {

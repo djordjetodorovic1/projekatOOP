@@ -108,6 +108,7 @@ public class Database {
     }
 
     public static Map<Integer, Sto> ucitajStolove() throws SQLException {
+        stolovi.clear();
         Statement statement = connection.createStatement();
         String SQLQuery = "SELECT * FROM sto";
         ResultSet resultSet = statement.executeQuery(SQLQuery);
@@ -118,6 +119,7 @@ public class Database {
     }
 
     public static Map<Integer, Meni> ucitajMenije() throws SQLException {
+        meniji.clear();
         Statement statement = connection.createStatement();
         String SQLQuery = "SELECT * FROM meni";
         ResultSet resultSet = statement.executeQuery(SQLQuery);
@@ -128,48 +130,136 @@ public class Database {
         return meniji;
     }
 
-    public static ArrayList<Obavjestenje> ucitajObavjestenje() {
+    public static ArrayList<Obavjestenje> ucitajObavjestenje() throws SQLException {
+        Statement statement = connection.createStatement();
+        String SQLQuery = "SELECT * FROM obavjestenje";
+        ResultSet resultSet = statement.executeQuery(SQLQuery);
+        while (resultSet.next())
+            obavjestenja.add(new Obavjestenje(resultSet.getInt(1), objekti.get(resultSet.getInt(2)), resultSet.getString(3)));
+        statement.close();
+        return obavjestenja;
+    }
+
+    private static int procitajID(String SQLQuery) throws SQLException {
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(SQLQuery);
+        int id = 0;
+        if (resultSet.next())
+            id = resultSet.getInt(1);
+        statement.close();
+        return id;
+
+    }
+
+    public static int dodajNalogUBazu(String nalog, String ime, String prezime, String jmbg, String brojUBanci, String korisnickoIme, String lozinka) {
         try {
             Statement statement = connection.createStatement();
-            String SQLQuery = "SELECT * FROM obavjestenje";
-            ResultSet resultSet = statement.executeQuery(SQLQuery);
-            while (resultSet.next())
-                obavjestenja.add(new Obavjestenje(resultSet.getInt(1), objekti.get(resultSet.getInt(2)), resultSet.getString(3)));
+            String SQLQuery = "INSERT INTO `" + nalog + "`(`ime`, `prezime`, `jmbg`, `broj_racuna`, `korisnicko_ime`, `lozinka`) VALUES ('" + ime + "','"
+                    + prezime + "','" + jmbg + "','" + brojUBanci + "','" + korisnickoIme + "','" + lozinka + "')";
+            statement.executeUpdate(SQLQuery);
             statement.close();
-            return obavjestenja;
+
+            return procitajID("SELECT id FROM " + nalog + " WHERE korisnicko_ime = '" + korisnickoIme + "'");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static void izmjeniUBazi(String SQLQuery) {
-        /*try {
+    public static int dodajObjekatUBazu(int vlasnikID, String naziv, double cijenaRezervacije, String grad, String adresa, int brojMijesta, int brojStolova) {
+        try {
             Statement statement = connection.createStatement();
+            String SQLQuery = "INSERT INTO `objekat` (`Vlasnik_id`, `naziv`, `cijena_rezervacije`, `grad`, `adresa`, `broj_mjesta`, `broj_stolova`, `datumi`, `zarada`) VALUES ("
+                    + vlasnikID + ", '" + naziv + "', " + cijenaRezervacije + ", '" + grad + "', '" + adresa + "', "
+                    + brojMijesta + ", " + brojStolova + ", '', " + 0.0 + ")";
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+
+            return procitajID("SELECT id FROM objekat ORDER BY id DESC LIMIT 1");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int dodajMeniUBazu(int idObjekat, String meniOpis, double meniCijena) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "INSERT INTO `meni`(`Objekat_id`, `opis`, `cijena_po_osobi`) VALUES (" + idObjekat + ",'" + meniOpis + "'," + meniCijena + ")";
+
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+
+            return procitajID("SELECT id FROM meni ORDER BY id DESC LIMIT 1");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int dodajStoUBazu(int idObjekat, int brojMijesta) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "INSERT INTO `sto`(`Objekat_id`, `broj_mjesta`) VALUES (" + idObjekat + "," + brojMijesta + ")";
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+
+            return procitajID("SELECT id FROM sto ORDER BY id DESC LIMIT 1");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int dodajObavjestenjeUBazu(int idObjekat) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "INSERT INTO `obavjestenje`(`Objekat_id`, `tekst`) VALUES (" + idObjekat + ",'Novi objekat ceka na odobrenje!')";
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+
+            return procitajID("SELECT id FROM obavjestenje ORDER BY id DESC LIMIT 1");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void izmjeniLozinku(String nalog, String lozinka, String korisnickoIme) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "UPDATE `" + nalog + "` SET `lozinka`='" + lozinka + "' WHERE korisnicko_ime = '" + korisnickoIme + "'";
             statement.executeUpdate(SQLQuery);
             statement.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }*/
+        }
     }
 
-    public static void dodajUBazu(String SQLQuery) {
-        izmjeniUBazi(SQLQuery);
-    }
-
-
-    public static void izbrisiIzBaze(String SQLQuery) {
-        izmjeniUBazi(SQLQuery);
-    }
-
-    public static int procitajID(String SQLQuery) {
+    public static void izmjeniObjekatUBazi(Double cijenaRezervacije, int brojMijesta, int brojStolova, int idObjekat) {
         try {
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(SQLQuery);
-            int id = 0;
-            if (resultSet.next())
-                id = resultSet.getInt(1);
+            String SQLQuery = "UPDATE `objekat` SET `cijena_rezervacije`=" + cijenaRezervacije + ",`broj_mjesta`=" + brojMijesta
+                    + ",`broj_stolova`=" + brojStolova + ", `status`='" + StatusObjekta.NA_CEKANJU + "' WHERE id=" + idObjekat;
+            statement.executeUpdate(SQLQuery);
             statement.close();
-            return id;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void izbrisiIzBazeZaObjekatID(String tabela, int objekatID) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "DELETE FROM `" + tabela + "` WHERE Objekat_id =" + objekatID;
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void izbrisiObavjestenjeIzBaze(int obavjestenjeID) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "DELETE FROM `obavjestenje` WHERE id =" + obavjestenjeID;
+            statement.executeUpdate(SQLQuery);
+            statement.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

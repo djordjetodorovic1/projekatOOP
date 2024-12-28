@@ -39,7 +39,7 @@ public class Objekat {
         this.naziv = naziv;
     }
 
-    public void setCijena_rezervacije(double cijena_rezervacije) {
+    public void setCijenaRezervacije(double cijena_rezervacije) {
         this.cijena_rezervacije = cijena_rezervacije;
     }
 
@@ -51,11 +51,11 @@ public class Objekat {
         this.adresa = adresa;
     }
 
-    public void setBroj_mijesta(int broj_mijesta) {
+    public void setBrojMijesta(int broj_mijesta) {
         this.broj_mijesta = broj_mijesta;
     }
 
-    public void setBroj_stolova(int broj_stolova) {
+    public void setBrojStolova(int broj_stolova) {
         this.broj_stolova = broj_stolova;
     }
 
@@ -83,7 +83,7 @@ public class Objekat {
         return naziv;
     }
 
-    public double getCijena_rezervacije() {
+    public double getCijenaRezervacije() {
         return cijena_rezervacije;
     }
 
@@ -95,11 +95,11 @@ public class Objekat {
         return adresa;
     }
 
-    public int getBroj_mijesta() {
+    public int getBrojMijesta() {
         return broj_mijesta;
     }
 
-    public int getBroj_stolova() {
+    public int getBrojStolova() {
         return broj_stolova;
     }
 
@@ -119,7 +119,7 @@ public class Objekat {
     public String toString() {
         return "Objekat{" +
                 "id=" + id +
-                ", vlasnik=" + vlasnik.getKorisnicko_ime() +
+                ", vlasnik=" + vlasnik.getKorisnickoIme() +
                 ", naziv='" + naziv + '\'' +
                 ", cijena_rezervacije=" + cijena_rezervacije +
                 ", grad='" + grad + '\'' +

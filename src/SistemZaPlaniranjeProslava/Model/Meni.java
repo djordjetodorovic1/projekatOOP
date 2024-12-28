@@ -13,6 +13,22 @@ public class Meni {
         this.cijena_po_osobi = cijena_po_osobi;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public Objekat getObjekat() {
+        return objekat;
+    }
+
+    public String getOpis() {
+        return opis;
+    }
+
+    public double getCijenaPoOsobi() {
+        return cijena_po_osobi;
+    }
+
     @Override
     public String toString() {
         return "Meni{" +

@@ -27,7 +27,7 @@ public class Admin {
         return prezime;
     }
 
-    public String getKorisnicko_ime() {
+    public String getKorisnickoIme() {
         return korisnicko_ime;
     }
 

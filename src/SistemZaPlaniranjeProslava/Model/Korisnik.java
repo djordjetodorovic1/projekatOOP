@@ -9,9 +9,9 @@ public interface Korisnik {
 
     String getJmbg();
 
-    String getBroj_racuna();
+    String getBrojRacuna();
 
-    String getKorisnicko_ime();
+    String getKorisnickoIme();
 
     String getLozinka();
 

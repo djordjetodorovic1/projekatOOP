@@ -1,5 +1,5 @@
 package SistemZaPlaniranjeProslava.Model;
 
 public enum StatusObjekta {
-    NA_CEKANJU, ODOBREN, ODBIJEN;
+    NA_CEKANJU, ODOBREN, ODBIJEN
 }

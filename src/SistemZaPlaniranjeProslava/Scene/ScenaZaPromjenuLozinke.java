@@ -34,7 +34,7 @@ public class ScenaZaPromjenuLozinke {
         Label lblPotvrdaLozinke = new Label("Potvrdite novu lozinku:");
         lblNaslov.setStyle("-fx-font: 32 'Comic Sans MS';");
 
-        TextField tfKorisnickoIme = new TextField(korisnik.getKorisnicko_ime());
+        TextField tfKorisnickoIme = new TextField(korisnik.getKorisnickoIme());
         tfKorisnickoIme.setEditable(false);
         TextField tfStaraLozinka = new TextField();
         PasswordField pfNovaLozinka = new PasswordField();

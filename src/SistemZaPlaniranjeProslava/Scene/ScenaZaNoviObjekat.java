@@ -2,6 +2,7 @@ package SistemZaPlaniranjeProslava.Scene;
 
 import SistemZaPlaniranjeProslava.Controller;
 import SistemZaPlaniranjeProslava.Main;
+import SistemZaPlaniranjeProslava.Model.Obavjestenje;
 import SistemZaPlaniranjeProslava.Model.Objekat;
 import SistemZaPlaniranjeProslava.Validator;
 import SistemZaPlaniranjeProslava.Model.Vlasnik;
@@ -33,9 +34,9 @@ public class ScenaZaNoviObjekat {
     private static ArrayList<Double> meniCijene = new ArrayList<>();
 
     private static void scenaZaUnosStolova(int brojStolova) {
-        Stage stage = new Stage();
-        stage.setTitle("Kreiraj novi objekat");
-        stage.setOnCloseRequest(e -> scenaZaStoAktivna = false);
+        Stage stageSto = new Stage();
+        stageSto.setTitle("Kreiraj novi objekat");
+        stageSto.setOnCloseRequest(e -> scenaZaStoAktivna = false);
 
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
@@ -54,20 +55,19 @@ public class ScenaZaNoviObjekat {
             Label lblSto = new Label("Sto broj " + (i + 1));
             Spinner<Integer> newSpinner = new Spinner<>(1, 100, 5);
             newSpinner.setPromptText("Sto broj " + (i + 1));
-
-            //Ukloniti
             newSpinner.setMaxWidth(250);
-
+            //Ukloniti
             newSpinner.setEditable(true);
             vBoxtf.getChildren().addAll(lblSto, newSpinner);
-            ScenaZaNoviObjekat.spinnerBrojMijestaPoStolovima.add(newSpinner);
+            spinnerBrojMijestaPoStolovima.add(newSpinner);
         }
 
         Button btnSacuvaj = new Button("Sacuvaj izmjene");
         btnSacuvaj.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                stage.close();
+                scenaZaStoAktivna = false;
+                stageSto.close();
             }
         });
 
@@ -77,14 +77,14 @@ public class ScenaZaNoviObjekat {
         root.setStyle("-fx-font: 16 'Comic Sans MS';");
         Platform.runLater(root::requestFocus);
         Scene scena = new Scene(root, 750, 600);
-        stage.setScene(scena);
-        stage.show();
+        stageSto.setScene(scena);
+        stageSto.show();
     }
 
     private static void scenaZaUnosMenija() {
-        Stage stage = new Stage();
-        stage.setTitle("Kreiraj novi objekat");
-        stage.setOnCloseRequest(e -> scenaZaMeniAktivna = false);
+        Stage stageMeni = new Stage();
+        stageMeni.setTitle("Kreiraj novi objekat");
+        stageMeni.setOnCloseRequest(e -> scenaZaMeniAktivna = false);
 
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
@@ -125,16 +125,15 @@ public class ScenaZaNoviObjekat {
         root.setStyle("-fx-font: 16 'Comic Sans MS';");
         Platform.runLater(root::requestFocus);
         Scene scena = new Scene(root, 550, 400);
-        stage.setScene(scena);
-        stage.show();
+        stageMeni.setScene(scena);
+        stageMeni.show();
     }
 
     public static void scenaNoviObjekat(Stage stageNoviObjekat, Vlasnik vlasnik, Map<Integer, Objekat> objekti) {
-        scenaNoviObjekatPonovo(stageNoviObjekat, vlasnik, objekti, 0, () -> {
-        });
+        scenaIzmjenaObjekta(stageNoviObjekat, vlasnik, objekti, null);
     }
-//Popraviti
-    public static void scenaNoviObjekatPonovo(Stage stageNoviObjekat, Vlasnik vlasnik, Map<Integer, Objekat> objekti, int idObjekta, Runnable onComplete) {
+
+    public static void scenaIzmjenaObjekta(Stage stageNoviObjekat, Vlasnik vlasnik, Map<Integer, Objekat> objekti, Obavjestenje obavjestenje) {
         meniOpis.clear();
         meniCijene.clear();
 
@@ -172,17 +171,16 @@ public class ScenaZaNoviObjekat {
         btnBrojStolica.setPadding(new Insets(5, 50, 5, 50));
         btnMeni.setPadding(new Insets(5, 50, 5, 50));
 
-        if (idObjekta > 0) {
-            tfNaziv.setText(objekti.get(idObjekta).getNaziv());
-            tfCijenaRezervacije.setText("" + objekti.get(idObjekta).getCijena_rezervacije());
-            tfGrad.setText(objekti.get(idObjekta).getGrad());
-            tfAdresa.setText(objekti.get(idObjekta).getAdresa());
-            tfBrojMijesta.setText("" + objekti.get(idObjekta).getBroj_mijesta());
-            tfBrojStolova.setText("" + objekti.get(idObjekta).getBroj_stolova());
+        if (obavjestenje != null) {
+            tfNaziv.setText(obavjestenje.getObjekat().getNaziv());
+            tfCijenaRezervacije.setText("" + obavjestenje.getObjekat().getCijenaRezervacije());
+            tfGrad.setText(obavjestenje.getObjekat().getGrad());
+            tfAdresa.setText(obavjestenje.getObjekat().getAdresa());
+            tfBrojMijesta.setText("" + obavjestenje.getObjekat().getBrojMijesta());
+            tfBrojStolova.setText("" + obavjestenje.getObjekat().getBrojStolova());
             tfNaziv.setEditable(false);
             tfGrad.setEditable(false);
             tfAdresa.setEditable(false);
-            btnNazad.setVisible(false);
         } else {
             tfNaziv.setPromptText("Caffe Renas");
             tfCijenaRezervacije.setPromptText("200.00");
@@ -195,7 +193,10 @@ public class ScenaZaNoviObjekat {
         btnNazad.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                ScenaVlasnik.scenaVlasnik(stageNoviObjekat, vlasnik, objekti);
+                if (obavjestenje != null)
+                    stageNoviObjekat.close();
+                else
+                    ScenaVlasnik.scenaVlasnik(stageNoviObjekat, vlasnik, objekti);
             }
         });
 
@@ -229,11 +230,13 @@ public class ScenaZaNoviObjekat {
                 ArrayList<Integer> brojMijestaPoStolovima = spinnerBrojMijestaPoStolovima.stream()
                         .map(spinner -> Integer.parseInt(spinner.getValue().toString()))
                         .collect(Collectors.toCollection(ArrayList::new));
-                if (Controller.kreirajNoviObjekat(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
-                        tfBrojMijesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMijestaPoStolovima, idObjekta)) {
-                    if (idObjekta == 0)
+                if (obavjestenje == null) {
+                    if (Controller.kreirajNoviObjekat(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
+                            tfBrojMijesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMijestaPoStolovima, 0))
                         ScenaVlasnik.scenaVlasnik(stageNoviObjekat, vlasnik, objekti);
-                    else
+                } else {
+                    if (Controller.kreirajNoviObjekat(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
+                            tfBrojMijesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMijestaPoStolovima, obavjestenje.getObjekat().getId()))
                         stageNoviObjekat.close();
                 }
             }
@@ -262,9 +265,6 @@ public class ScenaZaNoviObjekat {
         root.setStyle("-fx-font: 16 'Comic Sans MS';");
         Scene scena = new Scene(root, 750, 600);
         stageNoviObjekat.setScene(scena);
-        stageNoviObjekat.setOnHidden(e -> {
-            Platform.runLater(onComplete);  // Obezbeđuje da se scena ne zatvori odmah
-        });
         stageNoviObjekat.show();
     }
 }
