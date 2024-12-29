@@ -31,11 +31,6 @@ public class Meni {
 
     @Override
     public String toString() {
-        return "Meni{" +
-                "id=" + id +
-                ", objekat=" + objekat.getId() + " " + objekat.getNaziv() +
-                ", opis='" + opis + '\'' +
-                ", cijena_po_osobi=" + cijena_po_osobi +
-                '}';
+        return this.opis;
     }
 }

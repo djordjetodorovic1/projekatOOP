@@ -127,7 +127,7 @@ public class Validator {
     }
 
     public static boolean provjeraObjektaZaUnos(TextField tfGrad, TextField tfAdresa,
-                                                TextField tfCijenaRezervacije, TextField tfBrojMijesta, TextField tfBrojStolova) {
+                                                TextField tfCijenaRezervacije, TextField tfBrojMjesta, TextField tfBrojStolova) {
         boolean detektorGreske = false;
         if (!validacijaIme(tfGrad.getText())) {
             Main.ocistiPolje(tfGrad);
@@ -146,9 +146,9 @@ public class Validator {
         }
 
         try {
-            Double.parseDouble(tfBrojMijesta.getText());
+            Double.parseDouble(tfBrojMjesta.getText());
         } catch (NumberFormatException e) {
-            Main.ocistiPolje(tfBrojMijesta);
+            Main.ocistiPolje(tfBrojMjesta);
             detektorGreske = true;
         }
 

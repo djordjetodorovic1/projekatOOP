@@ -2,6 +2,8 @@ package SistemZaPlaniranjeProslava.Scene;
 
 import SistemZaPlaniranjeProslava.Controller;
 import SistemZaPlaniranjeProslava.Model.Objekat;
+import SistemZaPlaniranjeProslava.Model.Proslava;
+import SistemZaPlaniranjeProslava.Model.Sto;
 import SistemZaPlaniranjeProslava.Model.Vlasnik;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -18,11 +20,12 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Objects;
 
 public class ScenaVlasnik {
     public static boolean scenaZaLozinkuAktivna = false;
 
-    public static void scenaVlasnik(Stage primaryStage, Vlasnik vlasnik, Map<Integer, Objekat> objekti) {
+    public static void scenaVlasnik(Stage primaryStage, Vlasnik vlasnik, Map<Integer, Objekat> objekti, Map<Integer, Sto> stolovi, Map<Integer, Proslava> proslave) {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 
@@ -66,7 +69,7 @@ public class ScenaVlasnik {
         cbObjekti.setPadding(new Insets(5, 5, 5, 5));
         cbObjekti.setPrefWidth(250);
 
-        //dodati eventListener za ChoiceBox i prikaz informacija za objekat
+        cbObjekti.setOnAction(event -> ScenaObjekatZaVlasnika.scenaObjekatZaVlasnika(primaryStage, Objects.requireNonNull(Controller.getObjekat(cbObjekti.getValue())), stolovi, proslave));
 
         btnNazad.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -88,7 +91,7 @@ public class ScenaVlasnik {
         btnNoviObjekat.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                ScenaZaNoviObjekat.scenaNoviObjekat(primaryStage, vlasnik, objekti);
+                ScenaZaNoviObjekat.scenaNoviObjekat(primaryStage, vlasnik, objekti, proslave);
             }
         });
 

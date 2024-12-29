@@ -7,20 +7,20 @@ public class Objekat {
     private double cijena_rezervacije;
     private String grad;
     private String adresa;
-    private int broj_mijesta;
+    private int broj_mjesta;
     private int broj_stolova;
     private String datumi;
     private double zarada;
     private StatusObjekta status;
 
-    public Objekat(int id, Vlasnik vlasnik, String naziv, double cijena_rezervacije, String grad, String adresa, int broj_mijesta, int broj_stolova, String datumi, double zarada, StatusObjekta statusObjekta) {
+    public Objekat(int id, Vlasnik vlasnik, String naziv, double cijena_rezervacije, String grad, String adresa, int broj_mjesta, int broj_stolova, String datumi, double zarada, StatusObjekta statusObjekta) {
         this.id = id;
         this.vlasnik = vlasnik;
         this.naziv = naziv;
         this.cijena_rezervacije = cijena_rezervacije;
         this.grad = grad;
         this.adresa = adresa;
-        this.broj_mijesta = broj_mijesta;
+        this.broj_mjesta = broj_mjesta;
         this.broj_stolova = broj_stolova;
         this.datumi = datumi;
         this.zarada = zarada;
@@ -51,8 +51,8 @@ public class Objekat {
         this.adresa = adresa;
     }
 
-    public void setBrojMijesta(int broj_mijesta) {
-        this.broj_mijesta = broj_mijesta;
+    public void setBrojMjesta(int broj_mjesta) {
+        this.broj_mjesta = broj_mjesta;
     }
 
     public void setBrojStolova(int broj_stolova) {
@@ -95,8 +95,8 @@ public class Objekat {
         return adresa;
     }
 
-    public int getBrojMijesta() {
-        return broj_mijesta;
+    public int getBrojMjesta() {
+        return broj_mjesta;
     }
 
     public int getBrojStolova() {
@@ -124,7 +124,7 @@ public class Objekat {
                 ", cijena_rezervacije=" + cijena_rezervacije +
                 ", grad='" + grad + '\'' +
                 ", adresa='" + adresa + '\'' +
-                ", broj_mijesta=" + broj_mijesta +
+                ", broj_mjesta=" + broj_mjesta +
                 ", broj_stolova=" + broj_stolova +
                 ", datumi='" + datumi + '\'' +
                 ", zarada=" + zarada +

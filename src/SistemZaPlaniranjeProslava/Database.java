@@ -21,6 +21,7 @@ public class Database {
     private static Map<Integer, Objekat> objekti = new HashMap<>();
     private static Map<Integer, Sto> stolovi = new HashMap<>();
     private static Map<Integer, Meni> meniji = new HashMap<>();
+    private static Map<Integer, Proslava> proslave = new HashMap<>();
 
     public static void connectWithDB() {
         try {
@@ -95,6 +96,13 @@ public class Database {
         return null;
     }
 
+    public static Klijent getKlijent(int id) {
+        for (Klijent klijent : klijenti.values())
+            if (klijent.getId() == id)
+                return klijent;
+        return null;
+    }
+
     public static Map<Integer, Objekat> ucitajObjekte() throws SQLException {
         Statement statement = connection.createStatement();
         String SQLQuery = "SELECT * FROM objekat";
@@ -140,6 +148,18 @@ public class Database {
         return obavjestenja;
     }
 
+    public static Map<Integer, Proslava> ucitajProslave() throws SQLException {
+        Statement statement = connection.createStatement();
+        String SQLQuery = "SELECT * FROM proslava";
+        ResultSet resultSet = statement.executeQuery(SQLQuery);
+        while (resultSet.next())
+            proslave.put(resultSet.getInt(1), new Proslava(resultSet.getInt(1), objekti.get(resultSet.getInt(2)),
+                    getKlijent(resultSet.getInt(3)), meniji.get(resultSet.getInt(4)), resultSet.getDate(5).toLocalDate(), resultSet.getInt(6),
+                    resultSet.getDouble(7), resultSet.getDouble(8)));
+        statement.close();
+        return proslave;
+    }
+
     private static int procitajID(String SQLQuery) throws SQLException {
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(SQLQuery);
@@ -165,12 +185,12 @@ public class Database {
         }
     }
 
-    public static int dodajObjekatUBazu(int vlasnikID, String naziv, double cijenaRezervacije, String grad, String adresa, int brojMijesta, int brojStolova) {
+    public static int dodajObjekatUBazu(int vlasnikID, String naziv, double cijenaRezervacije, String grad, String adresa, int brojMjesta, int brojStolova) {
         try {
             Statement statement = connection.createStatement();
             String SQLQuery = "INSERT INTO `objekat` (`Vlasnik_id`, `naziv`, `cijena_rezervacije`, `grad`, `adresa`, `broj_mjesta`, `broj_stolova`, `datumi`, `zarada`) VALUES ("
                     + vlasnikID + ", '" + naziv + "', " + cijenaRezervacije + ", '" + grad + "', '" + adresa + "', "
-                    + brojMijesta + ", " + brojStolova + ", '', " + 0.0 + ")";
+                    + brojMjesta + ", " + brojStolova + ", '', " + 0.0 + ")";
             statement.executeUpdate(SQLQuery);
             statement.close();
 
@@ -194,10 +214,10 @@ public class Database {
         }
     }
 
-    public static int dodajStoUBazu(int idObjekat, int brojMijesta) {
+    public static int dodajStoUBazu(int idObjekat, int brojMjesta) {
         try {
             Statement statement = connection.createStatement();
-            String SQLQuery = "INSERT INTO `sto`(`Objekat_id`, `broj_mjesta`) VALUES (" + idObjekat + "," + brojMijesta + ")";
+            String SQLQuery = "INSERT INTO `sto`(`Objekat_id`, `broj_mjesta`) VALUES (" + idObjekat + "," + brojMjesta + ")";
             statement.executeUpdate(SQLQuery);
             statement.close();
 
@@ -231,10 +251,10 @@ public class Database {
         }
     }
 
-    public static void izmjeniObjekatUBazi(Double cijenaRezervacije, int brojMijesta, int brojStolova, int idObjekat) {
+    public static void izmjeniObjekatUBazi(Double cijenaRezervacije, int brojMjesta, int brojStolova, int idObjekat) {
         try {
             Statement statement = connection.createStatement();
-            String SQLQuery = "UPDATE `objekat` SET `cijena_rezervacije`=" + cijenaRezervacije + ",`broj_mjesta`=" + brojMijesta
+            String SQLQuery = "UPDATE `objekat` SET `cijena_rezervacije`=" + cijenaRezervacije + ",`broj_mjesta`=" + brojMjesta
                     + ",`broj_stolova`=" + brojStolova + ", `status`='" + StatusObjekta.NA_CEKANJU + "' WHERE id=" + idObjekat;
             statement.executeUpdate(SQLQuery);
             statement.close();

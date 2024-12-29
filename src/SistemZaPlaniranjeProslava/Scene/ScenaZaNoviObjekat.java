@@ -4,6 +4,7 @@ import SistemZaPlaniranjeProslava.Controller;
 import SistemZaPlaniranjeProslava.Main;
 import SistemZaPlaniranjeProslava.Model.Obavjestenje;
 import SistemZaPlaniranjeProslava.Model.Objekat;
+import SistemZaPlaniranjeProslava.Model.Proslava;
 import SistemZaPlaniranjeProslava.Validator;
 import SistemZaPlaniranjeProslava.Model.Vlasnik;
 import javafx.application.Platform;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 public class ScenaZaNoviObjekat {
     private static boolean scenaZaMeniAktivna = false;
     private static boolean scenaZaStoAktivna = false;
-    private static List<Spinner<Integer>> spinnerBrojMijestaPoStolovima = new ArrayList<>();
+    private static List<Spinner<Integer>> spinnerBrojMjestaPoStolovima = new ArrayList<>();
     private static ArrayList<String> meniOpis = new ArrayList<>();
     private static ArrayList<Double> meniCijene = new ArrayList<>();
 
@@ -42,7 +43,7 @@ public class ScenaZaNoviObjekat {
         root.setPadding(new Insets(20, 20, 20, 20));
         root.setAlignment(Pos.CENTER);
 
-        Label lblNaslov = new Label("Unesite broj mijesta za svaki od stolova");
+        Label lblNaslov = new Label("Unesite broj mjesta za svaki od stolova");
         lblNaslov.setStyle("-fx-font: 24 'Comic Sans MS';");
         root.getChildren().add(lblNaslov);
 
@@ -50,7 +51,7 @@ public class ScenaZaNoviObjekat {
         vBoxtf.setAlignment(Pos.CENTER);
         vBoxtf.setPadding(new Insets(10, 40, 10, 40));
 
-        spinnerBrojMijestaPoStolovima.clear();
+        spinnerBrojMjestaPoStolovima.clear();
         for (int i = 0; i < brojStolova; i++) {
             Label lblSto = new Label("Sto broj " + (i + 1));
             Spinner<Integer> newSpinner = new Spinner<>(1, 100, 5);
@@ -59,7 +60,7 @@ public class ScenaZaNoviObjekat {
             //Ukloniti
             newSpinner.setEditable(true);
             vBoxtf.getChildren().addAll(lblSto, newSpinner);
-            spinnerBrojMijestaPoStolovima.add(newSpinner);
+            spinnerBrojMjestaPoStolovima.add(newSpinner);
         }
 
         Button btnSacuvaj = new Button("Sacuvaj izmjene");
@@ -129,11 +130,12 @@ public class ScenaZaNoviObjekat {
         stageMeni.show();
     }
 
-    public static void scenaNoviObjekat(Stage stageNoviObjekat, Vlasnik vlasnik, Map<Integer, Objekat> objekti) {
-        scenaIzmjenaObjekta(stageNoviObjekat, vlasnik, objekti, null);
+    public static void scenaNoviObjekat(Stage stageNoviObjekat, Vlasnik vlasnik, Map<Integer, Objekat> objekti, Map<Integer, Proslava> proslave) {
+        scenaIzmjenaObjekta(stageNoviObjekat, vlasnik, objekti, proslave, null);
     }
 
-    public static void scenaIzmjenaObjekta(Stage stageNoviObjekat, Vlasnik vlasnik, Map<Integer, Objekat> objekti, Obavjestenje obavjestenje) {
+    public static void scenaIzmjenaObjekta(Stage stageNoviObjekat, Vlasnik vlasnik, Map<Integer, Objekat> objekti,
+                                           Map<Integer, Proslava> proslave, Obavjestenje obavjestenje) {
         meniOpis.clear();
         meniCijene.clear();
 
@@ -146,9 +148,9 @@ public class ScenaZaNoviObjekat {
         Label lblCijenaRezervacije = new Label("Unesite cijenu rezervacije");
         Label lblGrad = new Label("Unesite grad");
         Label lblAdresa = new Label("Unesite adresu");
-        Label lblBrojMijesta = new Label("Unesite broj mijesta");
+        Label lblBrojMjesta = new Label("Unesite broj mjesta");
         Label lblBrojStolova = new Label("Unesite broj stolova");
-        Label lblMijestaZaStolom = new Label("Unesite broj mijesta za svaki sto");
+        Label lblMjestaZaStolom = new Label("Unesite broj mjesta za svaki sto");
         Label lblMeni = new Label("Unesite menije");
         lblNaslov.setStyle("-fx-font: 32 'Comic Sans MS';");
 
@@ -156,7 +158,7 @@ public class ScenaZaNoviObjekat {
         TextField tfCijenaRezervacije = new TextField();
         TextField tfGrad = new TextField();
         TextField tfAdresa = new TextField();
-        TextField tfBrojMijesta = new TextField();
+        TextField tfBrojMjesta = new TextField();
         TextField tfBrojStolova = new TextField();
 
         Image strelica = new Image((new File("resursi/backArrow.png")).toURI().toString());
@@ -176,7 +178,7 @@ public class ScenaZaNoviObjekat {
             tfCijenaRezervacije.setText("" + obavjestenje.getObjekat().getCijenaRezervacije());
             tfGrad.setText(obavjestenje.getObjekat().getGrad());
             tfAdresa.setText(obavjestenje.getObjekat().getAdresa());
-            tfBrojMijesta.setText("" + obavjestenje.getObjekat().getBrojMijesta());
+            tfBrojMjesta.setText("" + obavjestenje.getObjekat().getBrojMjesta());
             tfBrojStolova.setText("" + obavjestenje.getObjekat().getBrojStolova());
             tfNaziv.setEditable(false);
             tfGrad.setEditable(false);
@@ -186,7 +188,7 @@ public class ScenaZaNoviObjekat {
             tfCijenaRezervacije.setPromptText("200.00");
             tfGrad.setPromptText("Banja Luka");
             tfAdresa.setPromptText("Mladena Stojanovica 2");
-            tfBrojMijesta.setPromptText("50");
+            tfBrojMjesta.setPromptText("50");
             tfBrojStolova.setPromptText("10");
         }
 
@@ -196,7 +198,7 @@ public class ScenaZaNoviObjekat {
                 if (obavjestenje != null)
                     stageNoviObjekat.close();
                 else
-                    ScenaVlasnik.scenaVlasnik(stageNoviObjekat, vlasnik, objekti);
+                    Controller.scenaVlasnik(stageNoviObjekat, vlasnik);
             }
         });
 
@@ -227,16 +229,16 @@ public class ScenaZaNoviObjekat {
         btnNoviObjekat.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                ArrayList<Integer> brojMijestaPoStolovima = spinnerBrojMijestaPoStolovima.stream()
+                ArrayList<Integer> brojMjestaPoStolovima = spinnerBrojMjestaPoStolovima.stream()
                         .map(spinner -> Integer.parseInt(spinner.getValue().toString()))
                         .collect(Collectors.toCollection(ArrayList::new));
                 if (obavjestenje == null) {
                     if (Controller.kreirajNoviObjekat(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
-                            tfBrojMijesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMijestaPoStolovima, 0))
-                        ScenaVlasnik.scenaVlasnik(stageNoviObjekat, vlasnik, objekti);
+                            tfBrojMjesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMjestaPoStolovima, 0))
+                        Controller.scenaVlasnik(stageNoviObjekat, vlasnik);
                 } else {
                     if (Controller.kreirajNoviObjekat(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
-                            tfBrojMijesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMijestaPoStolovima, obavjestenje.getObjekat().getId()))
+                            tfBrojMjesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMjestaPoStolovima, obavjestenje.getObjekat().getId()))
                         stageNoviObjekat.close();
                 }
             }
@@ -250,7 +252,7 @@ public class ScenaZaNoviObjekat {
         VBox vBoxLijevi = new VBox(10);
         vBoxLijevi.getChildren().addAll(lblNaziv, tfNaziv, lblGrad, tfGrad, lblAdresa, tfAdresa, lblCijenaRezervacije, tfCijenaRezervacije);
         VBox vBoxDesni = new VBox(10);
-        vBoxDesni.getChildren().addAll(lblBrojMijesta, tfBrojMijesta, lblBrojStolova, tfBrojStolova, lblMijestaZaStolom, btnBrojStolica, lblMeni, btnMeni);
+        vBoxDesni.getChildren().addAll(lblBrojMjesta, tfBrojMjesta, lblBrojStolova, tfBrojStolova, lblMjestaZaStolom, btnBrojStolica, lblMeni, btnMeni);
 
         HBox hBox = new HBox(40);
         hBox.setAlignment(Pos.CENTER);

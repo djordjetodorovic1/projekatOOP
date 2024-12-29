@@ -6,8 +6,10 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
 import java.sql.SQLException;
 import java.util.*;
+import java.time.LocalDate;
 
 public class Controller {
     private static Admin admin = null;
@@ -18,6 +20,7 @@ public class Controller {
     private static Map<Integer, Objekat> objekti = new HashMap<>();
     private static Map<Integer, Sto> stolovi = new HashMap<>();
     private static Map<Integer, Meni> meniji = new HashMap<>();
+    private static Map<Integer, Proslava> proslave = new HashMap<>();
 
     public static void connectDB() {
         Database.connectWithDB();
@@ -37,6 +40,11 @@ public class Controller {
             stolovi = Database.ucitajStolove();
             meniji = Database.ucitajMenije();
             obavjestenja = Database.ucitajObavjestenje();
+            proslave = Database.ucitajProslave();
+
+            proslave.put(1, new Proslava(1, objekti.get(16),
+                    Database.getKlijent(4), meniji.get(27), LocalDate.of(2025, 2, 5), 10,
+                    300, 250));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -52,6 +60,7 @@ public class Controller {
         meniji.values().forEach(System.out::println);
         for (Obavjestenje ob : obavjestenja)
             System.out.println(ob);
+        proslave.values().forEach(System.out::println);
     }
 
     private static void prijavaVlasnika(Stage primaryStage, String korisnickoIme) {
@@ -65,12 +74,16 @@ public class Controller {
                 if (ob.getObjekat().getStatus() == StatusObjekta.ODOBREN)
                     Main.informacija(ob.getTekst());
                 else if (Main.potvrda(ob.getTekst()))
-                    ScenaZaNoviObjekat.scenaIzmjenaObjekta(stagePonoviObjekat, vlasnici.get(korisnickoIme), objekti, ob);
+                    ScenaZaNoviObjekat.scenaIzmjenaObjekta(stagePonoviObjekat, vlasnici.get(korisnickoIme), objekti, proslave, ob);
                 Database.izbrisiObavjestenjeIzBaze(ob.getId());
                 obavjestenja.remove(ob);
             }
         }
-        ScenaVlasnik.scenaVlasnik(primaryStage, vlasnici.get(korisnickoIme), objekti);
+        scenaVlasnik(primaryStage, vlasnici.get(korisnickoIme));
+    }
+
+    public static void scenaVlasnik(Stage primaryStage, Vlasnik vlasnik) {
+        ScenaVlasnik.scenaVlasnik(primaryStage, vlasnik, objekti, stolovi, proslave);
     }
 
     public static void prijava(Stage primaryStage, TextField tfKorisnickoIme, PasswordField pfLozinka) {
@@ -118,7 +131,6 @@ public class Controller {
             String nalog = "klijent";
             if (cbTipNaloga.getValue().equals("Vlasnik"))
                 nalog = "vlasnik";
-
             int id = Database.dodajNalogUBazu(nalog, tfIme.getText(), tfPrezime.getText(), tfJMBG.getText(), tfBrojUBanci.getText(), tfKorisnickoIme.getText(), pfLozinka.getText());
 
             if (nalog.equals("klijent"))
@@ -153,17 +165,17 @@ public class Controller {
         return false;
     }
 
-    public static boolean kreirajNoviObjekat(TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMijesta,
-                                             TextField tfBrojStolova, ArrayList<String> meniOpis, ArrayList<Double> meniCijene, Vlasnik vlasnik, ArrayList<Integer> brojMijestaPoStolovima, int idObjekat) {
+    public static boolean kreirajNoviObjekat(TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMjesta,
+                                             TextField tfBrojStolova, ArrayList<String> meniOpis, ArrayList<Double> meniCijene, Vlasnik vlasnik, ArrayList<Integer> brojMjestaPoStolovima, int idObjekat) {
         if (meniOpis.isEmpty()) {
             Main.upozorenje("Niste popunili meni! Pokusajte ponovo");
-        } else if (brojMijestaPoStolovima.isEmpty()) {
+        } else if (brojMjestaPoStolovima.isEmpty()) {
             Main.upozorenje("Niste popunili podatke o stolovima! Pokusajte ponovo");
-        } else if (!Validator.provjeraObjektaZaUnos(tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMijesta, tfBrojStolova)) {
+        } else if (!Validator.provjeraObjektaZaUnos(tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMjesta, tfBrojStolova)) {
             Main.upozorenje("Neka od polja nisu pravilno popunjena! Pokusajte ponovo");
         } else {
             if (idObjekat > 0) {
-                Database.izmjeniObjekatUBazi(Double.parseDouble(tfCijenaRezervacije.getText()), Integer.parseInt(tfBrojMijesta.getText()), Integer.parseInt(tfBrojStolova.getText()), idObjekat);
+                Database.izmjeniObjekatUBazi(Double.parseDouble(tfCijenaRezervacije.getText()), Integer.parseInt(tfBrojMjesta.getText()), Integer.parseInt(tfBrojStolova.getText()), idObjekat);
                 Database.izbrisiIzBazeZaObjekatID("meni", idObjekat);
                 Database.izbrisiIzBazeZaObjekatID("sto", idObjekat);
                 try {
@@ -173,12 +185,12 @@ public class Controller {
                     e.printStackTrace();
                 }
                 Objekat objekatZaIzmjenu = new Objekat(idObjekat, vlasnik, tfNaziv.getText(), Double.parseDouble(tfCijenaRezervacije.getText()), tfGrad.getText(), tfAdresa.getText(),
-                        Integer.parseInt(tfBrojMijesta.getText()), Integer.parseInt(tfBrojStolova.getText()), "", 0.0, StatusObjekta.NA_CEKANJU);
+                        Integer.parseInt(tfBrojMjesta.getText()), Integer.parseInt(tfBrojStolova.getText()), "", 0.0, StatusObjekta.NA_CEKANJU);
                 objekti.put(idObjekat, objekatZaIzmjenu);
             } else if (idObjekat == 0) {
-                idObjekat = Database.dodajObjekatUBazu(vlasnik.getId(), tfNaziv.getText(), Double.parseDouble(tfCijenaRezervacije.getText()), tfGrad.getText(), tfAdresa.getText(), Integer.parseInt(tfBrojMijesta.getText()), Integer.parseInt(tfBrojStolova.getText()));
+                idObjekat = Database.dodajObjekatUBazu(vlasnik.getId(), tfNaziv.getText(), Double.parseDouble(tfCijenaRezervacije.getText()), tfGrad.getText(), tfAdresa.getText(), Integer.parseInt(tfBrojMjesta.getText()), Integer.parseInt(tfBrojStolova.getText()));
                 objekti.put(idObjekat, new Objekat(idObjekat, vlasnik, tfNaziv.getText(), Double.parseDouble(tfCijenaRezervacije.getText()), tfGrad.getText(), tfAdresa.getText(),
-                        Integer.parseInt(tfBrojMijesta.getText()), Integer.parseInt(tfBrojStolova.getText()), "", 0.0, StatusObjekta.NA_CEKANJU));
+                        Integer.parseInt(tfBrojMjesta.getText()), Integer.parseInt(tfBrojStolova.getText()), "", 0.0, StatusObjekta.NA_CEKANJU));
             }
 
             int idMeni, idSto, idObavjestenje;
@@ -188,9 +200,9 @@ public class Controller {
                 meniji.put(idMeni, new Meni(idMeni, objekti.get(idObjekat), meniOpis.get(i), meniCijene.get(i)));
             }
 
-            for (Integer brMijesta : brojMijestaPoStolovima) {
-                idSto = Database.dodajStoUBazu(idObjekat, brMijesta);
-                stolovi.put(idSto, new Sto(idSto, objekti.get(idObjekat), brMijesta));
+            for (Integer brMjesta : brojMjestaPoStolovima) {
+                idSto = Database.dodajStoUBazu(idObjekat, brMjesta);
+                stolovi.put(idSto, new Sto(idSto, objekti.get(idObjekat), brMjesta));
             }
 
             idObavjestenje = Database.dodajObavjestenjeUBazu(idObjekat);
@@ -208,5 +220,12 @@ public class Controller {
 
     public static double getStanjeRacuna(String brojRacuna) {
         return bankovniRacuni.get(brojRacuna).getStanje();
+    }
+
+    public static Objekat getObjekat(String nazivObjekta) {
+        for (Objekat obj : objekti.values())
+            if (obj.getNaziv().equals(nazivObjekta))
+                return obj;
+        return null;
     }
 }
