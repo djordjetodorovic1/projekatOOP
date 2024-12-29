@@ -1,9 +1,6 @@
 package SistemZaPlaniranjeProslava;
 
-import SistemZaPlaniranjeProslava.Model.BankovniRacun;
-import SistemZaPlaniranjeProslava.Model.Klijent;
-import SistemZaPlaniranjeProslava.Model.Korisnik;
-import SistemZaPlaniranjeProslava.Model.Vlasnik;
+import SistemZaPlaniranjeProslava.Model.*;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -156,5 +153,33 @@ public class Validator {
             detektorGreske = true;
 
         return !detektorGreske;
+    }
+
+    public static boolean provjeraCijeneMenijaZaOdobrenje(Objekat objekat, Map<Integer, Meni> meniji) {
+        int brojMenija = 0;
+        int brojMenijaObjekta = 0;
+        double ukupnaCijenaSvihMenija = 0.0;
+        double ukupnaCijenaMenijaObjekta = 0.0;
+
+        for (Meni meni : meniji.values()) {
+            if (meni.getObjekat().getId() == objekat.getId()) {
+                brojMenijaObjekta++;
+                ukupnaCijenaMenijaObjekta += meni.getCijenaPoOsobi();
+            } else {
+                brojMenija++;
+                ukupnaCijenaSvihMenija += meni.getCijenaPoOsobi();
+            }
+        }
+        double prosjecnaCijenaSvihMenija = ukupnaCijenaSvihMenija / brojMenija;
+        double prosjecnaCijenaMenijaObjekta = ukupnaCijenaMenijaObjekta / brojMenijaObjekta;
+        return Math.floor(prosjecnaCijenaMenijaObjekta / prosjecnaCijenaSvihMenija) < 10;
+    }
+
+    public static boolean provjeraMjestaZaOdobrenje(Objekat objekat, Map<Integer, Sto> stolovi) {
+        int sumaMjesta = 0;
+        for (Sto sto : stolovi.values())
+            if (sto.getObjekat().getId() == objekat.getId())
+                sumaMjesta += sto.getBrojMjesta();
+        return sumaMjesta == objekat.getBrojMjesta();
     }
 }

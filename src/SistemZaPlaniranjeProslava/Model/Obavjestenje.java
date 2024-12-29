@@ -30,10 +30,6 @@ public class Obavjestenje implements Comparable<Obavjestenje> {
 
     @Override
     public String toString() {
-        return "Obavjestenje{" +
-                "id=" + id +
-                ", objekat=" + objekat.getId() + " " + objekat.getNaziv() +
-                ", tekst='" + tekst + '\'' +
-                '}';
+        return "\"" + objekat.getNaziv() + "\" " + tekst;
     }
 }

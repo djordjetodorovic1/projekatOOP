@@ -43,7 +43,7 @@ public class Controller {
             proslave = Database.ucitajProslave();
 
             proslave.put(1, new Proslava(1, objekti.get(16),
-                    Database.getKlijent(4), meniji.get(27), LocalDate.of(2025, 2, 5), 10,
+                    Database.getKlijent(4), meniji.get(30), LocalDate.of(2025, 2, 5), 10,
                     300, 250));
         } catch (SQLException e) {
             e.printStackTrace();
@@ -61,6 +61,10 @@ public class Controller {
         for (Obavjestenje ob : obavjestenja)
             System.out.println(ob);
         proslave.values().forEach(System.out::println);
+    }
+
+    public static void scenaVlasnik(Stage primaryStage, Vlasnik vlasnik) {
+        ScenaVlasnik.scenaVlasnik(primaryStage, vlasnik, objekti, stolovi, proslave);
     }
 
     private static void prijavaVlasnika(Stage primaryStage, String korisnickoIme) {
@@ -82,8 +86,11 @@ public class Controller {
         scenaVlasnik(primaryStage, vlasnici.get(korisnickoIme));
     }
 
-    public static void scenaVlasnik(Stage primaryStage, Vlasnik vlasnik) {
-        ScenaVlasnik.scenaVlasnik(primaryStage, vlasnik, objekti, stolovi, proslave);
+    public static void prijavaAdmin(Stage primaryStage) {
+        ArrayList<Obavjestenje> obavjestenjaZaAdmina = new ArrayList<>(obavjestenja.stream()
+                .filter(ob -> (ob.getObjekat().getStatus() == StatusObjekta.NA_CEKANJU))
+                .toList());
+        ScenaAdmin.scenaAdmin(primaryStage, admin, obavjestenjaZaAdmina, stolovi, meniji);
     }
 
     public static void prijava(Stage primaryStage, TextField tfKorisnickoIme, PasswordField pfLozinka) {
@@ -92,7 +99,7 @@ public class Controller {
         } else if (Validator.provjeriPrijavu(tfKorisnickoIme.getText(), pfLozinka.getText())) {
             if (admin.getKorisnickoIme().equals(tfKorisnickoIme.getText())) {
                 if (admin.getLozinka().equals(pfLozinka.getText())) {
-                    //admin se ulogovao
+                    prijavaAdmin(primaryStage);
                 } else {
                     Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
                     Main.ocistiPolje(pfLozinka);
@@ -142,15 +149,18 @@ public class Controller {
         }
     }
 
-    public static boolean promjenaLozinke(Korisnik korisnik, TextField tfStaraLozinka, PasswordField pfLozinka, PasswordField pfPotvrdaLozinke) {
-        if (korisnik.getLozinka().equals(tfStaraLozinka.getText())) {
+    public static boolean promjenaLozinke(Osoba osoba, TextField tfStaraLozinka, PasswordField pfLozinka, PasswordField pfPotvrdaLozinke) {
+        if (osoba.getLozinka().equals(tfStaraLozinka.getText())) {
             if (Validator.verifikujLozinku(pfLozinka.getText(), pfPotvrdaLozinke.getText())) {
-                korisnik.setLozinka(pfLozinka.getText());
-                String nalog = "vlasnik";
-                if (korisnik instanceof Klijent)
-                    nalog = "klijent";
-                Database.izmjeniLozinku(nalog, pfLozinka.getText(), korisnik.getKorisnickoIme());
-                korisnik.setLozinka(pfLozinka.getText());
+                osoba.setLozinka(pfLozinka.getText());
+                String nalog = "klijent";
+                if (osoba instanceof Vlasnik)
+                    nalog = "vlasnik";
+                else if (osoba instanceof Admin) {
+                    nalog = "admin";
+                }
+                Database.izmjeniLozinku(nalog, pfLozinka.getText(), osoba.getKorisnickoIme());
+                osoba.setLozinka(pfLozinka.getText());
                 return true;
 
             } else {
@@ -205,13 +215,46 @@ public class Controller {
                 stolovi.put(idSto, new Sto(idSto, objekti.get(idObjekat), brMjesta));
             }
 
-            idObavjestenje = Database.dodajObavjestenjeUBazu(idObjekat);
+            idObavjestenje = Database.dodajObavjestenjeUBazu(idObjekat, "Novi objekat ceka na odobrenje!");
             obavjestenja.add(new Obavjestenje(idObavjestenje, objekti.get(idObjekat), "Novi objekat ceka na odobreneje!"));
 
             Main.informacija("Objekat uspjesno kreiran!");
             return true;
         }
         return false;
+    }
+
+    public static String provjeriObjekatZaOdobrenje(Objekat objekat) {
+        boolean detektorGreske = false;
+        StringBuilder poruka = new StringBuilder();
+        poruka.append("\"" + objekat.getNaziv() + "\" - ");
+        if (!Validator.provjeraCijeneMenijaZaOdobrenje(objekat, meniji)) {
+            Main.upozorenje("Cijene menija nisu uskladjene sa cijenama u ostalim objektima!");
+            poruka.append("Cijene menija nisu uskladjene sa cijenama u ostalim objektima!");
+            detektorGreske = true;
+        }
+        if (!Validator.provjeraMjestaZaOdobrenje(objekat, stolovi)) {
+            Main.upozorenje("Maksimalan broj mjesta u salonu se ne podudara sa ukupnim brojem mjesta svih stolova!");
+            if (detektorGreske)
+                poruka.append("\n");
+            poruka.append("Maksimalan broj mjesta u salonu se ne podudara sa ukupnim brojem mjesta svih stolova!");
+            detektorGreske = true;
+        }
+        if (!detektorGreske) {
+            Main.informacija("Objekat zadovoljava sve uslove!");
+            poruka.append("Objekat zadovoljava sve uslova");
+        }
+        return poruka.toString();
+    }
+
+    public static void promjenaStatusaObjekta(Objekat objekat, StatusObjekta statusObjekta, String poruka, Obavjestenje obavjestenje) {
+        objekti.get(objekat.getId()).setStatus(statusObjekta);
+        Database.objekatObradjen(objekat.getId(), statusObjekta);
+
+        obavjestenja.remove(obavjestenje);
+        Database.izbrisiObavjestenjeIzBaze(obavjestenje.getId());
+        int idObavjestenje = Database.dodajObavjestenjeUBazu(objekat.getId(), poruka);
+        obavjestenja.add(new Obavjestenje(idObavjestenje, objekat, poruka));
     }
 
     public static boolean dodavanjeMenija(TextField tfMeni, TextField tfCijenaMenija) {

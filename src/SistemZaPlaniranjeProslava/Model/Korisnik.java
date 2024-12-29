@@ -1,19 +1,25 @@
 package SistemZaPlaniranjeProslava.Model;
 
-public interface Korisnik {
-    int getId();
+public class Korisnik extends Osoba {
+    private String jmbg;
+    private String broj_racuna;
 
-    String getIme();
+    public Korisnik(int id, String ime, String prezime, String jmbg, String broj_racuna, String korisnicko_ime, String lozinka) {
+        super(id, ime, prezime, korisnicko_ime, lozinka);
+        this.jmbg = jmbg;
+        this.broj_racuna = broj_racuna;
+    }
 
-    String getPrezime();
+    public String getJmbg() {
+        return this.jmbg;
+    }
 
-    String getJmbg();
+    public String getBrojRacuna() {
+        return this.broj_racuna;
+    }
 
-    String getBrojRacuna();
-
-    String getKorisnickoIme();
-
-    String getLozinka();
-
-    void setLozinka(String novaLozinka);
+    @Override
+    public String toString() {
+        return super.toString() + ", jmbg=" + this.jmbg + ", broj_racuna=" + this.broj_racuna;
+    }
 }

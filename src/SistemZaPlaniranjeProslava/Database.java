@@ -227,10 +227,10 @@ public class Database {
         }
     }
 
-    public static int dodajObavjestenjeUBazu(int idObjekat) {
+    public static int dodajObavjestenjeUBazu(int idObjekat, String poruka) {
         try {
             Statement statement = connection.createStatement();
-            String SQLQuery = "INSERT INTO `obavjestenje`(`Objekat_id`, `tekst`) VALUES (" + idObjekat + ",'Novi objekat ceka na odobrenje!')";
+            String SQLQuery = "INSERT INTO `obavjestenje`(`Objekat_id`, `tekst`) VALUES (" + idObjekat + ",'" + poruka + "')";
             statement.executeUpdate(SQLQuery);
             statement.close();
 
@@ -256,6 +256,17 @@ public class Database {
             Statement statement = connection.createStatement();
             String SQLQuery = "UPDATE `objekat` SET `cijena_rezervacije`=" + cijenaRezervacije + ",`broj_mjesta`=" + brojMjesta
                     + ",`broj_stolova`=" + brojStolova + ", `status`='" + StatusObjekta.NA_CEKANJU + "' WHERE id=" + idObjekat;
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void objekatObradjen(int idObjekat, StatusObjekta statusObjekta) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "UPDATE `objekat` SET `status`='" + statusObjekta + "' WHERE id=" + idObjekat;
             statement.executeUpdate(SQLQuery);
             statement.close();
         } catch (SQLException e) {

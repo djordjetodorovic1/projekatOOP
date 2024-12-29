@@ -1,7 +1,7 @@
 package SistemZaPlaniranjeProslava.Scene;
 
 import SistemZaPlaniranjeProslava.Controller;
-import SistemZaPlaniranjeProslava.Model.Korisnik;
+import SistemZaPlaniranjeProslava.Model.Osoba;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -19,10 +19,13 @@ import javafx.stage.Stage;
 import java.io.File;
 
 public class ScenaZaPromjenuLozinke {
-    public static void scenaZaPromjenuLozinke(Korisnik korisnik) {
+    public static void scenaZaPromjenuLozinke(Osoba osoba) {
         Stage stageLozinka = new Stage();
         stageLozinka.setTitle("Promjena lozinke");
-        stageLozinka.setOnCloseRequest(e -> ScenaVlasnik.scenaZaLozinkuAktivna = false);
+        stageLozinka.setOnCloseRequest(e -> {
+            ScenaVlasnik.scenaZaLozinkuAktivna = false;
+            ScenaAdmin.scenaZaLozinkuAktivna = false;
+        });
 
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
@@ -34,7 +37,7 @@ public class ScenaZaPromjenuLozinke {
         Label lblPotvrdaLozinke = new Label("Potvrdite novu lozinku:");
         lblNaslov.setStyle("-fx-font: 32 'Comic Sans MS';");
 
-        TextField tfKorisnickoIme = new TextField(korisnik.getKorisnickoIme());
+        TextField tfKorisnickoIme = new TextField(osoba.getKorisnickoIme());
         tfKorisnickoIme.setEditable(false);
         TextField tfStaraLozinka = new TextField();
         PasswordField pfNovaLozinka = new PasswordField();
@@ -52,6 +55,7 @@ public class ScenaZaPromjenuLozinke {
             @Override
             public void handle(ActionEvent actionEvent) {
                 ScenaVlasnik.scenaZaLozinkuAktivna = false;
+                ScenaAdmin.scenaZaLozinkuAktivna = false;
                 stageLozinka.close();
             }
         });
@@ -59,8 +63,9 @@ public class ScenaZaPromjenuLozinke {
         btnPromjeniLozinku.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                if (Controller.promjenaLozinke(korisnik, tfStaraLozinka, pfNovaLozinka, pfPotvrdaLozinke)) {
+                if (Controller.promjenaLozinke(osoba, tfStaraLozinka, pfNovaLozinka, pfPotvrdaLozinke)) {
                     ScenaVlasnik.scenaZaLozinkuAktivna = false;
+                    ScenaAdmin.scenaZaLozinkuAktivna = false;
                     stageLozinka.close();
                 }
             }
