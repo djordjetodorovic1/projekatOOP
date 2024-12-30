@@ -2,8 +2,6 @@ package SistemZaPlaniranjeProslava.Scene;
 
 import SistemZaPlaniranjeProslava.Controller;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -64,19 +62,9 @@ public class ScenaZaNoviNalog {
         cbTipNaloga.setValue("Klijent");
         cbTipNaloga.setPadding(new Insets(0, 53, 0, 53));
 
-        btnNazad.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                ScenaZaPrijavu.scenaPrijava(primaryStage);
-            }
-        });
+        btnNazad.setOnAction(actionEvent -> ScenaZaPrijavu.scenaPrijava(primaryStage));
 
-        btnNoviNalog.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                Controller.kreirajNoviNalog(primaryStage, tfIme, tfPrezime, tfJMBG, tfBrojUBanci, tfKorisnickoIme, pfLozinka, pfPotvrdaLozinke, cbTipNaloga);
-            }
-        });
+        btnNoviNalog.setOnAction(event -> Controller.kreirajNoviNalog(primaryStage, tfIme, tfPrezime, tfJMBG, tfBrojUBanci, tfKorisnickoIme, pfLozinka, pfPotvrdaLozinke, cbTipNaloga));
         root.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 btnNoviNalog.fire();

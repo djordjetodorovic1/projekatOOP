@@ -67,7 +67,7 @@ public class Controller {
         ScenaVlasnik.scenaVlasnik(primaryStage, vlasnik, objekti, stolovi, proslave);
     }
 
-    private static void prijavaVlasnika(Stage primaryStage, String korisnickoIme) {
+    private static void prijavaVlasnik(Stage primaryStage, String korisnickoIme) {
         ArrayList<Obavjestenje> obavjestenjaZaVlansika = new ArrayList<>(obavjestenja.stream()
                 .filter(ob -> (ob.getObjekat().getVlasnik().getKorisnickoIme().equals(korisnickoIme) && ob.getObjekat().getStatus() != StatusObjekta.NA_CEKANJU))
                 .toList());
@@ -78,7 +78,7 @@ public class Controller {
                 if (ob.getObjekat().getStatus() == StatusObjekta.ODOBREN)
                     Main.informacija(ob.getTekst());
                 else if (Main.potvrda(ob.getTekst()))
-                    ScenaZaNoviObjekat.scenaIzmjenaObjekta(stagePonoviObjekat, vlasnici.get(korisnickoIme), objekti, proslave, ob);
+                    ScenaZaNoviObjekat.scenaIzmjenaObjekta(stagePonoviObjekat, vlasnici.get(korisnickoIme), ob);
                 Database.izbrisiObavjestenjeIzBaze(ob.getId());
                 obavjestenja.remove(ob);
             }
@@ -91,6 +91,23 @@ public class Controller {
                 .filter(ob -> (ob.getObjekat().getStatus() == StatusObjekta.NA_CEKANJU))
                 .toList());
         ScenaAdmin.scenaAdmin(primaryStage, admin, obavjestenjaZaAdmina, stolovi, meniji);
+    }
+
+    public static void scenaKlijent(Stage primaryStage, Klijent klijent) {
+        ScenaKlijent.scenaKlijent(primaryStage, klijent);
+    }
+
+    public static void scenaBiranjeObjekta(Stage primaryStage, Klijent klijent) {
+        ArrayList<Objekat> objektiZaKlijenta = new ArrayList<>();
+        for (Objekat objekat : objekti.values())
+            if (objekat.getStatus() == StatusObjekta.ODOBREN)
+                objektiZaKlijenta.add(objekat);
+        objektiZaKlijenta.sort(Objekat::compareTo);
+        ScenaBiranjeObjekta.scenaBiranjeObjekta(primaryStage, objektiZaKlijenta, klijent);
+    }
+
+    public static void prijavaKlijent(Stage primaryStage, String korisnickoIme) {
+        scenaKlijent(primaryStage, klijenti.get(korisnickoIme));
     }
 
     public static void prijava(Stage primaryStage, TextField tfKorisnickoIme, PasswordField pfLozinka) {
@@ -106,14 +123,14 @@ public class Controller {
                 }
             } else if (klijenti.containsKey(tfKorisnickoIme.getText())) {
                 if (klijenti.get(tfKorisnickoIme.getText()).getLozinka().equals(pfLozinka.getText())) {
-                    //Klijent se ulogovao
+                    prijavaKlijent(primaryStage, tfKorisnickoIme.getText());
                 } else {
                     Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
                     Main.ocistiPolje(pfLozinka);
                 }
             } else if (vlasnici.containsKey(tfKorisnickoIme.getText())) {
                 if (vlasnici.get(tfKorisnickoIme.getText()).getLozinka().equals(pfLozinka.getText())) {
-                    prijavaVlasnika(primaryStage, tfKorisnickoIme.getText());
+                    prijavaVlasnik(primaryStage, tfKorisnickoIme.getText());
                 } else {
                     Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
                     Main.ocistiPolje(pfLozinka);
@@ -177,13 +194,13 @@ public class Controller {
 
     public static boolean kreirajNoviObjekat(TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMjesta,
                                              TextField tfBrojStolova, ArrayList<String> meniOpis, ArrayList<Double> meniCijene, Vlasnik vlasnik, ArrayList<Integer> brojMjestaPoStolovima, int idObjekat) {
-        if (meniOpis.isEmpty()) {
-            Main.upozorenje("Niste popunili meni! Pokusajte ponovo");
-        } else if (brojMjestaPoStolovima.isEmpty()) {
-            Main.upozorenje("Niste popunili podatke o stolovima! Pokusajte ponovo");
-        } else if (!Validator.provjeraObjektaZaUnos(tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMjesta, tfBrojStolova)) {
+        if (!Validator.provjeraObjektaZaUnos(tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMjesta, tfBrojStolova))
             Main.upozorenje("Neka od polja nisu pravilno popunjena! Pokusajte ponovo");
-        } else {
+        else if (meniOpis.isEmpty())
+            Main.upozorenje("Niste popunili meni! Pokusajte ponovo");
+        else if (brojMjestaPoStolovima.isEmpty() || brojMjestaPoStolovima.size() != Integer.parseInt(tfBrojMjesta.getText()))
+            Main.upozorenje("Niste popunili podatke o stolovima! Pokusajte ponovo");
+        else {
             if (idObjekat > 0) {
                 Database.izmjeniObjekatUBazi(Double.parseDouble(tfCijenaRezervacije.getText()), Integer.parseInt(tfBrojMjesta.getText()), Integer.parseInt(tfBrojStolova.getText()), idObjekat);
                 Database.izbrisiIzBazeZaObjekatID("meni", idObjekat);
@@ -198,7 +215,8 @@ public class Controller {
                         Integer.parseInt(tfBrojMjesta.getText()), Integer.parseInt(tfBrojStolova.getText()), "", 0.0, StatusObjekta.NA_CEKANJU);
                 objekti.put(idObjekat, objekatZaIzmjenu);
             } else if (idObjekat == 0) {
-                idObjekat = Database.dodajObjekatUBazu(vlasnik.getId(), tfNaziv.getText(), Double.parseDouble(tfCijenaRezervacije.getText()), tfGrad.getText(), tfAdresa.getText(), Integer.parseInt(tfBrojMjesta.getText()), Integer.parseInt(tfBrojStolova.getText()));
+                idObjekat = Database.dodajObjekatUBazu(vlasnik.getId(), tfNaziv.getText(), Double.parseDouble(tfCijenaRezervacije.getText()), tfGrad.getText(),
+                        tfAdresa.getText(), Integer.parseInt(tfBrojMjesta.getText()), Integer.parseInt(tfBrojStolova.getText()));
                 objekti.put(idObjekat, new Objekat(idObjekat, vlasnik, tfNaziv.getText(), Double.parseDouble(tfCijenaRezervacije.getText()), tfGrad.getText(), tfAdresa.getText(),
                         Integer.parseInt(tfBrojMjesta.getText()), Integer.parseInt(tfBrojStolova.getText()), "", 0.0, StatusObjekta.NA_CEKANJU));
             }
@@ -224,27 +242,18 @@ public class Controller {
         return false;
     }
 
-    public static String provjeriObjekatZaOdobrenje(Objekat objekat) {
+    public static void provjeriObjekatZaOdobrenje(Objekat objekat) {
         boolean detektorGreske = false;
-        StringBuilder poruka = new StringBuilder();
-        poruka.append("\"" + objekat.getNaziv() + "\" - ");
         if (!Validator.provjeraCijeneMenijaZaOdobrenje(objekat, meniji)) {
             Main.upozorenje("Cijene menija nisu uskladjene sa cijenama u ostalim objektima!");
-            poruka.append("Cijene menija nisu uskladjene sa cijenama u ostalim objektima!");
             detektorGreske = true;
         }
         if (!Validator.provjeraMjestaZaOdobrenje(objekat, stolovi)) {
             Main.upozorenje("Maksimalan broj mjesta u salonu se ne podudara sa ukupnim brojem mjesta svih stolova!");
-            if (detektorGreske)
-                poruka.append("\n");
-            poruka.append("Maksimalan broj mjesta u salonu se ne podudara sa ukupnim brojem mjesta svih stolova!");
             detektorGreske = true;
         }
-        if (!detektorGreske) {
+        if (!detektorGreske)
             Main.informacija("Objekat zadovoljava sve uslove!");
-            poruka.append("Objekat zadovoljava sve uslova");
-        }
-        return poruka.toString();
     }
 
     public static void promjenaStatusaObjekta(Objekat objekat, StatusObjekta statusObjekta, String poruka, Obavjestenje obavjestenje) {
@@ -270,5 +279,11 @@ public class Controller {
             if (obj.getNaziv().equals(nazivObjekta))
                 return obj;
         return null;
+    }
+
+    public static boolean zauzetObjekatZaDatum(LocalDate datum, Objekat objekat) {
+        for (Proslava proslava : proslave.values())
+            return proslava.getObjekat().getId() == objekat.getId() && proslava.getDatum().equals(datum);
+        return false;
     }
 }

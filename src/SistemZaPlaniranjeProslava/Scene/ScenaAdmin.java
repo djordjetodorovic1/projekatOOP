@@ -1,10 +1,9 @@
 package SistemZaPlaniranjeProslava.Scene;
 
 import SistemZaPlaniranjeProslava.Controller;
+import SistemZaPlaniranjeProslava.Main;
 import SistemZaPlaniranjeProslava.Model.*;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,7 +14,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -28,7 +27,61 @@ import java.util.Map;
 
 public class ScenaAdmin {
     public static boolean scenaZaLozinkuAktivna = false;
+    public static boolean scenaZaPorukuAktivna = false;
     private static String poruka;
+
+    public static void scenaUnosPoruke(Runnable nakonUnosaPoruke) {
+        Stage stagePoruka = new Stage();
+        stagePoruka.setTitle("Pregled objekta");
+        stagePoruka.setOnCloseRequest(e -> scenaZaPorukuAktivna = false);
+
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(20, 20, 20, 20));
+
+        Label lblNaslov = new Label("Unesite razlog odbijanja objekta");
+        lblNaslov.setStyle("-fx-font: 20 'Comic Sans MS';");
+
+        TextField tfPoruka = new TextField();
+
+        Image strelica = new Image((new File("resursi/backArrow.png")).toURI().toString());
+        ImageView prikazStrelice = new ImageView(strelica);
+        prikazStrelice.setFitWidth(20);
+        prikazStrelice.setFitHeight(20);
+
+        Button btnNazad = new Button("", prikazStrelice);
+        Button btnProvjera = new Button("Posalji poruku");
+
+        btnNazad.setOnAction(actionEvent -> {
+            scenaZaPorukuAktivna = false;
+            stagePoruka.close();
+        });
+
+        btnProvjera.setOnAction(event -> {
+            scenaZaPorukuAktivna = false;
+            if (!tfPoruka.getText().isEmpty()) {
+                poruka = tfPoruka.getText();
+                stagePoruka.close();
+                nakonUnosaPoruke.run();
+            } else
+                Main.upozorenje("Polje za unos poruke je prazno");
+        });
+        root.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                btnProvjera.fire();
+            }
+        });
+
+        VBox vBox = new VBox(10);
+        vBox.getChildren().addAll(lblNaslov, tfPoruka, btnProvjera);
+        vBox.setAlignment(Pos.CENTER);
+        vBox.setPadding(new Insets(100));
+
+        root.getChildren().addAll(btnNazad, vBox);
+        root.setStyle("-fx-font: 16 'Comic Sans MS';");
+        Scene scena = new Scene(root, 750, 600);
+        stagePoruka.setScene(scena);
+        stagePoruka.show();
+    }
 
     public static void scenaObjekatAdmin(Obavjestenje obavjestenje, Map<Integer, Sto> stolovi, Map<Integer, Meni> meniji, Runnable nakonObrade) {
         Stage stageObjekatAdmin = new Stage();
@@ -100,49 +153,35 @@ public class ScenaAdmin {
         btnOdbij.setTextFill(Color.WHITE);
         btnOdbij.setPadding(new Insets(8, 10, 8, 10));
 
-        btnNazad.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                stageObjekatAdmin.close();
-            }
+        btnNazad.setOnAction(actionEvent -> stageObjekatAdmin.close());
+
+        btnProvjera.setOnAction(event -> Controller.provjeriObjekatZaOdobrenje(obavjestenje.getObjekat()));
+
+        btnOdobri.setOnMouseEntered(mouseEvent -> btnOdobri.setBackground(Background.fill(Color.LIGHTGREEN)));
+
+        btnOdobri.setOnMouseExited(mouseEvent -> btnOdobri.setBackground(Background.fill(Color.GREEN)));
+
+        btnOdobri.setOnAction(event -> {
+            poruka = "\"" + obavjestenje.getObjekat().getNaziv() + "\" - Objekat zadovoljava sve uslove!";
+            Controller.promjenaStatusaObjekta(obavjestenje.getObjekat(), StatusObjekta.ODOBREN, poruka, obavjestenje);
+            stageObjekatAdmin.close();
+            nakonObrade.run();
         });
 
-        btnProvjera.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                poruka = Controller.provjeriObjekatZaOdobrenje(obavjestenje.getObjekat());
-            }
-        });
+        btnOdbij.setOnMouseEntered(mouseEvent -> btnOdbij.setBackground(Background.fill(Color.ORANGERED)));
 
-        btnOdobri.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                btnOdobri.setBackground(Background.fill(Color.LIGHTGREEN));
-            }
-        });
+        btnOdbij.setOnMouseExited(mouseEvent -> btnOdbij.setBackground(Background.fill(Color.RED)));
 
-        btnOdobri.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                Controller.promjenaStatusaObjekta(obavjestenje.getObjekat(), StatusObjekta.ODOBREN, poruka, obavjestenje);
-                stageObjekatAdmin.close();
-                nakonObrade.run();
-            }
-        });
+        btnOdbij.setOnAction(event -> {
+            if (!scenaZaPorukuAktivna) {
+                scenaZaPorukuAktivna = true;
+                scenaUnosPoruke(() -> Platform.runLater(() -> {
+                    String potpupnaPoruka = "\"" + obavjestenje.getObjekat().getNaziv() + "\" - " + poruka;
+                    Controller.promjenaStatusaObjekta(obavjestenje.getObjekat(), StatusObjekta.ODBIJEN, potpupnaPoruka, obavjestenje);
+                    stageObjekatAdmin.close();
+                    nakonObrade.run();
+                }));
 
-        btnOdbij.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                btnOdbij.setBackground(Background.fill(Color.ORANGERED));
-            }
-        });
-
-        btnOdbij.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                Controller.promjenaStatusaObjekta(obavjestenje.getObjekat(), StatusObjekta.ODBIJEN, poruka, obavjestenje);
-                stageObjekatAdmin.close();
-                nakonObrade.run();
             }
         });
 
@@ -198,20 +237,12 @@ public class ScenaAdmin {
         Button btnNazad = new Button("", prikazStrelice);
         Button btnPromjeniLozinku = new Button("Nova lozinka");
 
-        btnNazad.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                ScenaZaPrijavu.scenaPrijava(primaryStage);
-            }
-        });
+        btnNazad.setOnAction(actionEvent -> ScenaZaPrijavu.scenaPrijava(primaryStage));
 
-        btnPromjeniLozinku.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if (!scenaZaLozinkuAktivna) {
-                    scenaZaLozinkuAktivna = true;
-                    ScenaZaPromjenuLozinke.scenaZaPromjenuLozinke(admin);
-                }
+        btnPromjeniLozinku.setOnAction(actionEvent -> {
+            if (!scenaZaLozinkuAktivna) {
+                scenaZaLozinkuAktivna = true;
+                ScenaZaPromjenuLozinke.scenaZaPromjenuLozinke(admin);
             }
         });
 

@@ -1,6 +1,6 @@
 package SistemZaPlaniranjeProslava.Model;
 
-public class Objekat {
+public class Objekat implements Comparable<Objekat> {
     private int id;
     private Vlasnik vlasnik;
     private String naziv;
@@ -116,19 +116,12 @@ public class Objekat {
     }
 
     @Override
+    public int compareTo(Objekat o) {
+        return this.getNaziv().compareTo(o.getNaziv());
+    }
+
+    @Override
     public String toString() {
-        return "Objekat{" +
-                "id=" + id +
-                ", vlasnik=" + vlasnik.getKorisnickoIme() +
-                ", naziv='" + naziv + '\'' +
-                ", cijena_rezervacije=" + cijena_rezervacije +
-                ", grad='" + grad + '\'' +
-                ", adresa='" + adresa + '\'' +
-                ", broj_mjesta=" + broj_mjesta +
-                ", broj_stolova=" + broj_stolova +
-                ", datumi='" + datumi + '\'' +
-                ", zarada=" + zarada +
-                ", status=" + status +
-                '}';
+        return naziv + " - " + cijena_rezervacije + " KM";
     }
 }

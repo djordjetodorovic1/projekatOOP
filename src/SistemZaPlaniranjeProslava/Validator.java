@@ -50,12 +50,28 @@ public class Validator {
         return provjeraRegIzraza(adresa, "^[A-Z][a-zA-Z]+([a-zA-Z\\s]+)*(\\d|bb|BB)?");
     }
 
-    public static boolean validacijaBroj(TextField tfBrojStolova) {
+    public static boolean validacijaIntBroj(TextField tfBrojStolova) {
         try {
-            Integer.parseInt(tfBrojStolova.getText());
-            return true;
+            int br = Integer.parseInt(tfBrojStolova.getText());
+            if (br > 0)
+                return true;
+            Main.ocistiPolje(tfBrojStolova);
+            return false;
         } catch (NumberFormatException e) {
             Main.ocistiPolje(tfBrojStolova);
+            return false;
+        }
+    }
+
+    public static boolean validacijaDoubleBroj(TextField tfDoubleBroj) {
+        try {
+            double dbl = Double.parseDouble(tfDoubleBroj.getText());
+            if (dbl > 0)
+                return true;
+            Main.ocistiPolje(tfDoubleBroj);
+            return false;
+        } catch (NumberFormatException e) {
+            Main.ocistiPolje(tfDoubleBroj);
             return false;
         }
     }
@@ -66,14 +82,8 @@ public class Validator {
             Main.ocistiPolje(meni);
             detektorGreske = true;
         }
-
-        try {
-            Double.parseDouble(cijena.getText());
-        } catch (NumberFormatException e) {
-            Main.ocistiPolje(cijena);
+        if (!validacijaDoubleBroj(cijena))
             detektorGreske = true;
-        }
-
         if (detektorGreske)
             Main.upozorenje("Nekorektan unos! Pokusajte ponovo");
         return !detektorGreske;
@@ -134,24 +144,12 @@ public class Validator {
             Main.ocistiPolje(tfAdresa);
             detektorGreske = true;
         }
-
-        try {
-            Double.parseDouble(tfCijenaRezervacije.getText());
-        } catch (NumberFormatException e) {
-            Main.ocistiPolje(tfCijenaRezervacije);
+        if (!validacijaDoubleBroj(tfCijenaRezervacije))
             detektorGreske = true;
-        }
-
-        try {
-            Double.parseDouble(tfBrojMjesta.getText());
-        } catch (NumberFormatException e) {
-            Main.ocistiPolje(tfBrojMjesta);
+        if (!validacijaIntBroj(tfBrojMjesta))
             detektorGreske = true;
-        }
-
-        if (!validacijaBroj(tfBrojStolova))
+        if (!validacijaIntBroj(tfBrojStolova))
             detektorGreske = true;
-
         return !detektorGreske;
     }
 

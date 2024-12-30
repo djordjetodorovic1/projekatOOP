@@ -3,8 +3,6 @@ package SistemZaPlaniranjeProslava.Scene;
 import SistemZaPlaniranjeProslava.Controller;
 import SistemZaPlaniranjeProslava.Model.Osoba;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -25,6 +23,7 @@ public class ScenaZaPromjenuLozinke {
         stageLozinka.setOnCloseRequest(e -> {
             ScenaVlasnik.scenaZaLozinkuAktivna = false;
             ScenaAdmin.scenaZaLozinkuAktivna = false;
+            ScenaKlijent.scenaZaLozinkuAktivna = false;
         });
 
         VBox root = new VBox(10);
@@ -51,23 +50,19 @@ public class ScenaZaPromjenuLozinke {
         Button btnNazad = new Button("", prikazStrelice);
         Button btnPromjeniLozinku = new Button("Potvrdi");
 
-        btnNazad.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                ScenaVlasnik.scenaZaLozinkuAktivna = false;
-                ScenaAdmin.scenaZaLozinkuAktivna = false;
-                stageLozinka.close();
-            }
+        btnNazad.setOnAction(actionEvent -> {
+            ScenaVlasnik.scenaZaLozinkuAktivna = false;
+            ScenaAdmin.scenaZaLozinkuAktivna = false;
+            ScenaKlijent.scenaZaLozinkuAktivna = false;
+            stageLozinka.close();
         });
 
-        btnPromjeniLozinku.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if (Controller.promjenaLozinke(osoba, tfStaraLozinka, pfNovaLozinka, pfPotvrdaLozinke)) {
-                    ScenaVlasnik.scenaZaLozinkuAktivna = false;
-                    ScenaAdmin.scenaZaLozinkuAktivna = false;
-                    stageLozinka.close();
-                }
+        btnPromjeniLozinku.setOnAction(actionEvent -> {
+            if (Controller.promjenaLozinke(osoba, tfStaraLozinka, pfNovaLozinka, pfPotvrdaLozinke)) {
+                ScenaVlasnik.scenaZaLozinkuAktivna = false;
+                ScenaAdmin.scenaZaLozinkuAktivna = false;
+                ScenaKlijent.scenaZaLozinkuAktivna = false;
+                stageLozinka.close();
             }
         });
         root.setOnKeyPressed(event -> {

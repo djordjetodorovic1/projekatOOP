@@ -3,13 +3,9 @@ package SistemZaPlaniranjeProslava.Scene;
 import SistemZaPlaniranjeProslava.Controller;
 import SistemZaPlaniranjeProslava.Main;
 import SistemZaPlaniranjeProslava.Model.Obavjestenje;
-import SistemZaPlaniranjeProslava.Model.Objekat;
-import SistemZaPlaniranjeProslava.Model.Proslava;
 import SistemZaPlaniranjeProslava.Validator;
 import SistemZaPlaniranjeProslava.Model.Vlasnik;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -24,7 +20,6 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ScenaZaNoviObjekat {
@@ -57,19 +52,14 @@ public class ScenaZaNoviObjekat {
             Spinner<Integer> newSpinner = new Spinner<>(1, 100, 5);
             newSpinner.setPromptText("Sto broj " + (i + 1));
             newSpinner.setMaxWidth(250);
-            //Ukloniti
-            newSpinner.setEditable(true);
             vBoxtf.getChildren().addAll(lblSto, newSpinner);
             spinnerBrojMjestaPoStolovima.add(newSpinner);
         }
 
         Button btnSacuvaj = new Button("Sacuvaj izmjene");
-        btnSacuvaj.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                scenaZaStoAktivna = false;
-                stageSto.close();
-            }
+        btnSacuvaj.setOnAction(actionEvent -> {
+            scenaZaStoAktivna = false;
+            stageSto.close();
         });
 
         ScrollPane scrollPane = new ScrollPane(vBoxtf);
@@ -104,16 +94,13 @@ public class ScenaZaNoviObjekat {
         Button btnDodajMeni = new Button("Dodaj meni");
         btnDodajMeni.setPadding(new Insets(5, 50, 5, 50));
 
-        btnDodajMeni.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if (Controller.dodavanjeMenija(tfMeni, tfCijenaMenija)) {
-                    meniOpis.add(tfMeni.getText());
-                    meniCijene.add(Double.parseDouble(tfCijenaMenija.getText()));
+        btnDodajMeni.setOnAction(actionEvent -> {
+            if (Controller.dodavanjeMenija(tfMeni, tfCijenaMenija)) {
+                meniOpis.add(tfMeni.getText());
+                meniCijene.add(Double.parseDouble(tfCijenaMenija.getText()));
 
-                    Main.ocistiPolje(tfMeni);
-                    Main.ocistiPolje(tfCijenaMenija);
-                }
+                Main.ocistiPolje(tfMeni);
+                Main.ocistiPolje(tfCijenaMenija);
             }
         });
         root.setOnKeyPressed(event -> {
@@ -130,12 +117,11 @@ public class ScenaZaNoviObjekat {
         stageMeni.show();
     }
 
-    public static void scenaNoviObjekat(Stage stageNoviObjekat, Vlasnik vlasnik, Map<Integer, Objekat> objekti, Map<Integer, Proslava> proslave) {
-        scenaIzmjenaObjekta(stageNoviObjekat, vlasnik, objekti, proslave, null);
+    public static void scenaNoviObjekat(Stage stageNoviObjekat, Vlasnik vlasnik) {
+        scenaIzmjenaObjekta(stageNoviObjekat, vlasnik, null);
     }
 
-    public static void scenaIzmjenaObjekta(Stage stageNoviObjekat, Vlasnik vlasnik, Map<Integer, Objekat> objekti,
-                                           Map<Integer, Proslava> proslave, Obavjestenje obavjestenje) {
+    public static void scenaIzmjenaObjekta(Stage stageNoviObjekat, Vlasnik vlasnik, Obavjestenje obavjestenje) {
         meniOpis.clear();
         meniCijene.clear();
 
@@ -192,55 +178,43 @@ public class ScenaZaNoviObjekat {
             tfBrojStolova.setPromptText("10");
         }
 
-        btnNazad.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                if (obavjestenje != null)
-                    stageNoviObjekat.close();
-                else
-                    Controller.scenaVlasnik(stageNoviObjekat, vlasnik);
-            }
+        btnNazad.setOnAction(actionEvent -> {
+            if (obavjestenje != null)
+                stageNoviObjekat.close();
+            else
+                Controller.scenaVlasnik(stageNoviObjekat, vlasnik);
         });
 
-        btnBrojStolica.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if (!scenaZaStoAktivna) {
-                    if (Validator.validacijaBroj(tfBrojStolova)) {
-                        scenaZaStoAktivna = true;
-                        scenaZaUnosStolova(Integer.parseInt(tfBrojStolova.getText()));
-                    } else {
-                        Main.upozorenje("Polje za broj stolova nije korektno popunjeno! Pokusajte ponovo");
-                    }
-                }
-            }
-        });
-
-        btnMeni.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if (!scenaZaMeniAktivna) {
-                    scenaZaMeniAktivna = true;
-                    scenaZaUnosMenija();
-                }
-            }
-        });
-
-        btnNoviObjekat.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                ArrayList<Integer> brojMjestaPoStolovima = spinnerBrojMjestaPoStolovima.stream()
-                        .map(spinner -> Integer.parseInt(spinner.getValue().toString()))
-                        .collect(Collectors.toCollection(ArrayList::new));
-                if (obavjestenje == null) {
-                    if (Controller.kreirajNoviObjekat(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
-                            tfBrojMjesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMjestaPoStolovima, 0))
-                        Controller.scenaVlasnik(stageNoviObjekat, vlasnik);
+        btnBrojStolica.setOnAction(event -> {
+            if (!scenaZaStoAktivna) {
+                if (Validator.validacijaIntBroj(tfBrojStolova)) {
+                    scenaZaStoAktivna = true;
+                    scenaZaUnosStolova(Integer.parseInt(tfBrojStolova.getText()));
                 } else {
-                    if (Controller.kreirajNoviObjekat(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
-                            tfBrojMjesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMjestaPoStolovima, obavjestenje.getObjekat().getId()))
-                        stageNoviObjekat.close();
+                    Main.upozorenje("Polje za broj stolova nije korektno popunjeno! Pokusajte ponovo");
                 }
+            }
+        });
+
+        btnMeni.setOnAction(event -> {
+            if (!scenaZaMeniAktivna) {
+                scenaZaMeniAktivna = true;
+                scenaZaUnosMenija();
+            }
+        });
+
+        btnNoviObjekat.setOnAction(event -> {
+            ArrayList<Integer> brojMjestaPoStolovima = spinnerBrojMjestaPoStolovima.stream()
+                    .map(spinner -> Integer.parseInt(spinner.getValue().toString()))
+                    .collect(Collectors.toCollection(ArrayList::new));
+            if (obavjestenje == null) {
+                if (Controller.kreirajNoviObjekat(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
+                        tfBrojMjesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMjestaPoStolovima, 0))
+                    Controller.scenaVlasnik(stageNoviObjekat, vlasnik);
+            } else {
+                if (Controller.kreirajNoviObjekat(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
+                        tfBrojMjesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMjestaPoStolovima, obavjestenje.getObjekat().getId()))
+                    stageNoviObjekat.close();
             }
         });
         root.setOnKeyPressed(event -> {

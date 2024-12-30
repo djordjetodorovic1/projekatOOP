@@ -2,8 +2,6 @@ package SistemZaPlaniranjeProslava.Scene;
 
 import SistemZaPlaniranjeProslava.Controller;
 import SistemZaPlaniranjeProslava.Model.*;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -69,12 +67,7 @@ public class ScenaObjekatZaVlasnika {
         prikazStrelice.setFitHeight(20);
 
         Button btnNazad = new Button("", prikazStrelice);
-        btnNazad.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                stageProslava.close();
-            }
-        });
+        btnNazad.setOnAction(actionEvent -> stageProslava.close());
         root.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 btnNazad.fire();
@@ -170,12 +163,7 @@ public class ScenaObjekatZaVlasnika {
         prikazStrelice.setFitHeight(20);
 
         Button btnNazad = new Button("", prikazStrelice);
-        btnNazad.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                Controller.scenaVlasnik(primaryStage, objekat.getVlasnik());
-            }
-        });
+        btnNazad.setOnAction(actionEvent -> Controller.scenaVlasnik(primaryStage, objekat.getVlasnik()));
         root.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 btnNazad.fire();

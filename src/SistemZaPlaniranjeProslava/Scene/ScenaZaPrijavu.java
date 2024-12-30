@@ -2,8 +2,6 @@ package SistemZaPlaniranjeProslava.Scene;
 
 import SistemZaPlaniranjeProslava.Controller;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -49,24 +47,14 @@ public class ScenaZaPrijavu {
         Button btnPrijava = new Button("Prijavi me");
         Button btnNoviNalog = new Button("Kreiraj novi nalog");
 
-        btnPrijava.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                Controller.prijava(primaryStage, tfKorisnickoIme, pfLozinka);
-            }
-        });
+        btnPrijava.setOnAction(event -> Controller.prijava(primaryStage, tfKorisnickoIme, pfLozinka));
         root.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 btnPrijava.fire();
             }
         });
 
-        btnNoviNalog.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                ScenaZaNoviNalog.scenaNoviNalog(primaryStage);
-            }
-        });
+        btnNoviNalog.setOnAction(event -> ScenaZaNoviNalog.scenaNoviNalog(primaryStage));
 
         VBox vBoxLogIn = new VBox();
         vBoxLogIn.getChildren().addAll(lblKorisnickoIme, tfKorisnickoIme, lblLozinka, pfLozinka);
