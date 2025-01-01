@@ -2,8 +2,6 @@ package SistemZaPlaniranjeProslava.Scene;
 
 import SistemZaPlaniranjeProslava.Controller;
 import SistemZaPlaniranjeProslava.Model.Objekat;
-import SistemZaPlaniranjeProslava.Model.Proslava;
-import SistemZaPlaniranjeProslava.Model.Sto;
 import SistemZaPlaniranjeProslava.Model.Vlasnik;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -23,7 +21,9 @@ import java.util.Objects;
 public class ScenaVlasnik {
     public static boolean scenaZaLozinkuAktivna = false;
 
-    public static void scenaVlasnik(Stage primaryStage, Vlasnik vlasnik, Map<Integer, Objekat> objekti, Map<Integer, Sto> stolovi, Map<Integer, Proslava> proslave) {
+    public static void scenaVlasnik(Stage primaryStage, Vlasnik vlasnik) {
+        Map<Integer, Objekat> objekti = Controller.getObjekti();
+
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 
@@ -67,7 +67,7 @@ public class ScenaVlasnik {
         cbObjekti.setPadding(new Insets(5, 5, 5, 5));
         cbObjekti.setPrefWidth(250);
 
-        cbObjekti.setOnAction(event -> ScenaObjekatZaVlasnika.scenaObjekatZaVlasnika(primaryStage, Objects.requireNonNull(Controller.getObjekat(cbObjekti.getValue())), stolovi, proslave));
+        cbObjekti.setOnAction(event -> ScenaObjekatZaVlasnika.scenaObjekatZaVlasnika(primaryStage, Objects.requireNonNull(Controller.getObjekat(cbObjekti.getValue()))));
 
         btnNazad.setOnAction(actionEvent -> ScenaZaPrijavu.scenaPrijava(primaryStage));
 

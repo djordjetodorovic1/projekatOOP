@@ -83,7 +83,10 @@ public class ScenaAdmin {
         stagePoruka.show();
     }
 
-    public static void scenaObjekatAdmin(Obavjestenje obavjestenje, Map<Integer, Sto> stolovi, Map<Integer, Meni> meniji, Runnable nakonObrade) {
+    public static void scenaObjekatAdmin(Obavjestenje obavjestenje, Runnable nakonObrade) {
+        Map<Integer, Sto> stolovi = Controller.getStolovi();
+        Map<Integer, Meni> meniji = Controller.getMeni();
+
         Stage stageObjekatAdmin = new Stage();
         stageObjekatAdmin.setTitle("Pregled objekta");
         VBox root = new VBox(10);
@@ -210,7 +213,7 @@ public class ScenaAdmin {
         stageObjekatAdmin.show();
     }
 
-    public static void scenaAdmin(Stage primaryStage, Admin admin, ArrayList<Obavjestenje> obavjestenja, Map<Integer, Sto> stolovi, Map<Integer, Meni> meniji) {
+    public static void scenaAdmin(Stage primaryStage, Admin admin, ArrayList<Obavjestenje> obavjestenja) {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 
@@ -254,7 +257,7 @@ public class ScenaAdmin {
         lvObavjestenja.setOnMouseClicked(event -> {
             Obavjestenje izabranoObavjestenje = lvObavjestenja.getSelectionModel().getSelectedItem();
             if (izabranoObavjestenje != null) {
-                scenaObjekatAdmin(izabranoObavjestenje, stolovi, meniji, () -> Platform.runLater(() -> lvObavjestenja.getItems().remove(izabranoObavjestenje)));
+                scenaObjekatAdmin(izabranoObavjestenje, () -> Platform.runLater(() -> lvObavjestenja.getItems().remove(izabranoObavjestenje)));
             }
         });
 

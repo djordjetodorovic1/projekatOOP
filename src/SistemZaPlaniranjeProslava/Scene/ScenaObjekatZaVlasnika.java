@@ -21,7 +21,6 @@ import javafx.util.Callback;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,7 +33,9 @@ public class ScenaObjekatZaVlasnika {
         tf.setEditable(false);
     }
 
-    public static void scenaInformacijeOProslavi(Proslava proslava, Map<Integer, Sto> stolovi) {
+    public static void scenaInformacijeOProslavi(Proslava proslava) {
+        Map<Integer, Sto> stolovi = Controller.getStolovi();
+
         Stage stageProslava = new Stage();
         stageProslava.setTitle("Informacije o proslavi");
 
@@ -42,10 +43,18 @@ public class ScenaObjekatZaVlasnika {
         root.setPadding(new Insets(20, 20, 20, 20));
 
         TextField tfBrojGostiju = new TextField("Broj gostiju: " + proslava.getBrojGostiju());
-        TextField tfMeni = new TextField("Meni: " + proslava.getMeni());
-        TextField tfUkupnaCijena = new TextField("Ukupna cijena proslave: " + (proslava.getBrojGostiju() * proslava.getMeni().getCijenaPoOsobi()));
+        TextField tfMeni = new TextField();
+        TextField tfUkupnaCijena = new TextField();
         TextField tfPotvrdaUplate = new TextField("Uplacen ukupan iznos: " + proslava.getPotpunaUplata());
         Label lblStolovi = new Label("Broj gostiju po stolovima");
+
+        if (proslava.getMeni() == null) {
+            tfMeni.setText("Meni nije izabran");
+            tfUkupnaCijena.setText("Meni nije izabran");
+        } else {
+            tfMeni.setText("Meni: " + proslava.getMeni());
+            tfUkupnaCijena.setText("Ukupna cijena proslave: " + (proslava.getBrojGostiju() * proslava.getMeni().getCijenaPoOsobi()));
+        }
 
         podesiTF(tfBrojGostiju);
         podesiTF(tfMeni);
@@ -55,11 +64,9 @@ public class ScenaObjekatZaVlasnika {
         TextArea taStolovi = new TextArea();
         taStolovi.setEditable(false);
         int brojStola = 1;
-        for (Sto sto : stolovi.values()) {
-            if (sto.getObjekat().getId() == proslava.getObjekat().getId()) {
+        for (Sto sto : stolovi.values())
+            if (sto.getObjekat().getId() == proslava.getObjekat().getId())
                 taStolovi.appendText("Sto " + brojStola++ + ": " + sto.getBrojMjesta() + " mjesta\n");
-            }
-        }
 
         Image strelica = new Image((new File("resursi/backArrow.png")).toURI().toString());
         ImageView prikazStrelice = new ImageView(strelica);
@@ -93,7 +100,9 @@ public class ScenaObjekatZaVlasnika {
         stageProslava.show();
     }
 
-    public static void scenaObjekatZaVlasnika(Stage primaryStage, Objekat objekat, Map<Integer, Sto> stolovi, Map<Integer, Proslava> proslave) {
+    public static void scenaObjekatZaVlasnika(Stage primaryStage, Objekat objekat) {
+        Map<Integer, Proslava> proslave = Controller.getProslave();
+
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 
@@ -103,12 +112,7 @@ public class ScenaObjekatZaVlasnika {
         Label lblProslave = new Label("Lista proslava");
         lblNaslov.setStyle("-fx-font: 32 'Comic Sans MS';");
 
-        Set<LocalDate> zauzetiDatumi = new HashSet<>();
-        for (Proslava pr : proslave.values()) {
-            if (pr.getObjekat().getId() == objekat.getId())
-                zauzetiDatumi.add(pr.getDatum());
-        }
-
+        Set<LocalDate> zauzetiDatumi = Controller.zauzetiDatumi(objekat);
         DatePicker kalendar = new DatePicker();
         Callback<DatePicker, DateCell> izmjenaPolja = dp -> new DateCell() {
             @Override
@@ -134,7 +138,7 @@ public class ScenaObjekatZaVlasnika {
         lvProslave.setOnMouseClicked(event -> {
             Proslava izabranaProslava = lvProslave.getSelectionModel().getSelectedItem();
             if (izabranaProslava != null) {
-                scenaInformacijeOProslavi(izabranaProslava, stolovi);
+                scenaInformacijeOProslavi(izabranaProslava);
             }
         });
         Runnable izmjeniListu = () -> {
@@ -163,7 +167,7 @@ public class ScenaObjekatZaVlasnika {
         prikazStrelice.setFitHeight(20);
 
         Button btnNazad = new Button("", prikazStrelice);
-        btnNazad.setOnAction(actionEvent -> Controller.scenaVlasnik(primaryStage, objekat.getVlasnik()));
+        btnNazad.setOnAction(actionEvent -> ScenaVlasnik.scenaVlasnik(primaryStage, objekat.getVlasnik()));
         root.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 btnNazad.fire();

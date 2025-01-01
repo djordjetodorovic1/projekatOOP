@@ -9,7 +9,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -37,19 +36,21 @@ public class ScenaBiranjeObjekta {
         tfBrMjesta.setPromptText("100");
 
         DatePicker kalendar = new DatePicker();
-        kalendar.setOnAction(event -> datum = kalendar.getValue());
 
         ChoiceBox<String> cbGradovi = new ChoiceBox<>();
         Set<String> skupGradova = new HashSet<>();
+        skupGradova.add("");
         for (Objekat objekat : objekti)
-            skupGradova.add(objekat.getGrad());
+            skupGradova.add(objekat.getGrad().toUpperCase());
         cbGradovi.getItems().addAll(skupGradova);
+        cbGradovi.setValue("");
+        cbGradovi.setPadding(new Insets(5, 50, 5, 50));
 
         ListView<Objekat> lvObjekti = new ListView<>();
         lvObjekti.setOnMouseClicked(event -> {
             Objekat izabraniObjekat = lvObjekti.getSelectionModel().getSelectedItem();
             if (izabraniObjekat != null) {
-                //scena
+                ScenaRezervacijaObjekta.scenaRezervacijaObjekta(primaryStage, izabraniObjekat, klijent);
             }
         });
         Runnable izmjeniListu = () -> {
@@ -59,15 +60,21 @@ public class ScenaBiranjeObjekta {
                 zadovoljava = true;
                 if (!tfBrMjesta.getText().isEmpty() && objekat.getBrojMjesta() < Integer.parseInt(tfBrMjesta.getText()))
                     zadovoljava = false;
-                if (datum != null && !Controller.zauzetObjekatZaDatum(datum, objekat))
+                if (datum != null && Controller.zauzetObjekatZaDatum(datum, objekat))
                     zadovoljava = false;
-                if (cbGradovi.getValue() != null && !objekat.getGrad().equals(cbGradovi.getValue()))
+                if (!cbGradovi.getValue().isEmpty() && !objekat.getGrad().toUpperCase().equals(cbGradovi.getValue()))
                     zadovoljava = false;
                 if (zadovoljava)
                     lvObjekti.getItems().add(objekat);
             }
         };
         izmjeniListu.run();
+        tfBrMjesta.textProperty().addListener((observable, oldValue, newValue) -> izmjeniListu.run());
+        kalendar.setOnAction(event -> {
+            datum = kalendar.getValue();
+            izmjeniListu.run();
+        });
+        cbGradovi.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> izmjeniListu.run());
 
         Image strelica = new Image((new File("resursi/backArrow.png")).toURI().toString());
         ImageView prikazStrelice = new ImageView(strelica);
@@ -75,26 +82,22 @@ public class ScenaBiranjeObjekta {
         prikazStrelice.setFitHeight(20);
 
         Button btnNazad = new Button("", prikazStrelice);
-        Button btnFilter = new Button("Filtriraj");
+        Button btnReset = new Button("Obrisi filtere");
+        btnReset.setPadding(new Insets(10, 30, 10, 30));
 
         btnNazad.setOnAction(actionEvent -> Controller.scenaKlijent(primaryStage, klijent));
-        btnFilter.setOnAction(actionEvent -> {/*Filtriraj*/});
-
-        root.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                btnFilter.fire();
-            }
+        btnReset.setOnAction(actionEvent -> {
+            tfBrMjesta.clear();
+            kalendar.setValue(null);
+            cbGradovi.setValue("");
         });
 
-        VBox vBoxLijevi = new VBox(10);
-        vBoxLijevi.getChildren().addAll(lvObjekti, btnFilter);
-        vBoxLijevi.setAlignment(Pos.CENTER);
         VBox vBoxDesni = new VBox(10);
-        vBoxDesni.getChildren().addAll(lblBrMjesta, tfBrMjesta, lblKalendar, kalendar, lblGrad, cbGradovi);
+        vBoxDesni.getChildren().addAll(lblBrMjesta, tfBrMjesta, lblKalendar, kalendar, lblGrad, cbGradovi, btnReset);
 
         HBox hBox = new HBox(40);
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(vBoxLijevi, vBoxDesni);
+        hBox.getChildren().addAll(lvObjekti, vBoxDesni);
 
         VBox vBoxInfo = new VBox(10);
         vBoxInfo.getChildren().addAll(lblNaslov, hBox);

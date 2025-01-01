@@ -29,6 +29,10 @@ public class BankovniRacun {
         return stanje;
     }
 
+    public void setStanje(double stanje) {
+        this.stanje = stanje;
+    }
+
     @Override
     public String toString() {
         return "BankovniRacun{" +

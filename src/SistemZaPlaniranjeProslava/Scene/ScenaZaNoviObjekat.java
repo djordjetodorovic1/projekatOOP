@@ -20,7 +20,6 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ScenaZaNoviObjekat {
     private static boolean scenaZaMeniAktivna = false;
@@ -153,8 +152,8 @@ public class ScenaZaNoviObjekat {
         prikazStrelice.setFitHeight(20);
 
         Button btnNoviObjekat = new Button("Kreiraj novi nalog");
-        Button btnBrojStolica = new Button("Unesi");
-        Button btnMeni = new Button("Unesi");
+        Button btnBrojStolica = new Button();
+        Button btnMeni = new Button();
         Button btnNazad = new Button("", prikazStrelice);
         btnBrojStolica.setPadding(new Insets(5, 50, 5, 50));
         btnMeni.setPadding(new Insets(5, 50, 5, 50));
@@ -169,6 +168,8 @@ public class ScenaZaNoviObjekat {
             tfNaziv.setEditable(false);
             tfGrad.setEditable(false);
             tfAdresa.setEditable(false);
+            btnBrojStolica.setText("Unesi");
+            btnMeni.setText("Unesi");
         } else {
             tfNaziv.setPromptText("Caffe Renas");
             tfCijenaRezervacije.setPromptText("200.00");
@@ -176,18 +177,22 @@ public class ScenaZaNoviObjekat {
             tfAdresa.setPromptText("Mladena Stojanovica 2");
             tfBrojMjesta.setPromptText("50");
             tfBrojStolova.setPromptText("10");
+            btnBrojStolica.setText("Izmjeni");
+            btnMeni.setText("Izmjeni");
         }
 
         btnNazad.setOnAction(actionEvent -> {
             if (obavjestenje != null)
                 stageNoviObjekat.close();
             else
-                Controller.scenaVlasnik(stageNoviObjekat, vlasnik);
+                ScenaVlasnik.scenaVlasnik(stageNoviObjekat, vlasnik);
         });
 
         btnBrojStolica.setOnAction(event -> {
             if (!scenaZaStoAktivna) {
                 if (Validator.validacijaIntBroj(tfBrojStolova)) {
+                    if (obavjestenje != null)
+                        Controller.brisanjeStolovaIzBaze(obavjestenje.getObjekat().getId());
                     scenaZaStoAktivna = true;
                     scenaZaUnosStolova(Integer.parseInt(tfBrojStolova.getText()));
                 } else {
@@ -198,19 +203,23 @@ public class ScenaZaNoviObjekat {
 
         btnMeni.setOnAction(event -> {
             if (!scenaZaMeniAktivna) {
+                if (obavjestenje != null)
+                    Controller.brisanjeMenijaIzBaze(obavjestenje.getObjekat().getId());
                 scenaZaMeniAktivna = true;
                 scenaZaUnosMenija();
             }
         });
 
         btnNoviObjekat.setOnAction(event -> {
-            ArrayList<Integer> brojMjestaPoStolovima = spinnerBrojMjestaPoStolovima.stream()
-                    .map(spinner -> Integer.parseInt(spinner.getValue().toString()))
-                    .collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<Integer> brojMjestaPoStolovima = new ArrayList<>();
+            if (!spinnerBrojMjestaPoStolovima.isEmpty())
+                spinnerBrojMjestaPoStolovima.stream()
+                        .map(spinner -> Integer.parseInt(spinner.getValue().toString()))
+                        .forEach(brojMjestaPoStolovima::add);
             if (obavjestenje == null) {
                 if (Controller.kreirajNoviObjekat(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
                         tfBrojMjesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMjestaPoStolovima, 0))
-                    Controller.scenaVlasnik(stageNoviObjekat, vlasnik);
+                    ScenaVlasnik.scenaVlasnik(stageNoviObjekat, vlasnik);
             } else {
                 if (Controller.kreirajNoviObjekat(tfNaziv, tfGrad, tfAdresa, tfCijenaRezervacije,
                         tfBrojMjesta, tfBrojStolova, meniOpis, meniCijene, vlasnik, brojMjestaPoStolovima, obavjestenje.getObjekat().getId()))

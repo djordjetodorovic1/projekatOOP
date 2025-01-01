@@ -2,13 +2,13 @@ package SistemZaPlaniranjeProslava.Scene;
 
 import SistemZaPlaniranjeProslava.Controller;
 import SistemZaPlaniranjeProslava.Model.Klijent;
+import SistemZaPlaniranjeProslava.Model.Proslava;
+import SistemZaPlaniranjeProslava.Model.StatusProslave;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -33,8 +33,6 @@ public class ScenaKlijent {
         Label lblStanjeUBanci = new Label("Stanje na racunu:");
         Label lblNovaLozinka = new Label("Promijeni lozinku");
         lblNaslov.setStyle("-fx-font: 32 'Comic Sans MS';");
-        lblPodnaslov1.setStyle("-fx-font: 24 'Comic Sans MS';");
-        lblPodnaslov2.setStyle("-fx-font: 24 'Comic Sans MS';");
 
         TextField tfIme = new TextField(klijent.getIme());
         TextField tfPrezime = new TextField(klijent.getPrezime());
@@ -45,6 +43,38 @@ public class ScenaKlijent {
         tfKorisnickoIme.setEditable(false);
         tfStanjeUBanci.setEditable(false);
 
+        CheckBox cbProtekle = new CheckBox("Protekle");
+        CheckBox cbAktivne = new CheckBox("Aktivne");
+        CheckBox cbOtkazane = new CheckBox("Otkazane");
+        cbAktivne.setSelected(true);
+
+        ListView<Proslava> lvProslave = new ListView<>();
+        lvProslave.setOnMouseClicked(event -> {
+            Proslava izabranaProslava = lvProslave.getSelectionModel().getSelectedItem();
+            if (izabranaProslava != null) {
+                //scenaInformacijeOProslavi(izabranaProslava);
+            }
+        });
+        Runnable izmjeniListu = () -> {
+            lvProslave.getItems().clear();
+            for (Proslava pr : Controller.getProslave().values()) {
+                if (pr.getKlijent().getId() == klijent.getId()) {
+                    if (cbAktivne.isSelected() && pr.getStatus() == StatusProslave.AKTIVNA) {
+                        lvProslave.getItems().add(pr);
+                    } else if (cbProtekle.isSelected() && pr.getStatus() == StatusProslave.PROTEKLA) {
+                        lvProslave.getItems().add(pr);
+                    } else if (cbOtkazane.isSelected() && pr.getStatus() == StatusProslave.OTKAZANA) {
+                        lvProslave.getItems().add(pr);
+                    }
+                }
+            }
+        };
+
+        cbProtekle.setOnAction(event -> izmjeniListu.run());
+        cbAktivne.setOnAction(event -> izmjeniListu.run());
+        cbOtkazane.setOnAction(event -> izmjeniListu.run());
+        izmjeniListu.run();
+
         Image strelica = new Image((new File("resursi/backArrow.png")).toURI().toString());
         ImageView prikazStrelice = new ImageView(strelica);
         prikazStrelice.setFitWidth(20);
@@ -53,9 +83,8 @@ public class ScenaKlijent {
         Button btnNazad = new Button("", prikazStrelice);
         Button btnPromjeniLozinku = new Button("Nova lozinka");
         Button btnNovaProslavaObjekat = new Button("Izaberi objekat");
-        Button btnPostojeceProslave = new Button("Izaberi proslavu");
+        btnPromjeniLozinku.setPadding(new Insets(10, 53, 10, 53));
         btnNovaProslavaObjekat.setPadding(new Insets(10, 53, 10, 53));
-        btnPostojeceProslave.setPadding(new Insets(10, 53, 10, 53));
 
         btnNazad.setOnAction(actionEvent -> ScenaZaPrijavu.scenaPrijava(primaryStage));
 
@@ -68,10 +97,6 @@ public class ScenaKlijent {
 
         btnNovaProslavaObjekat.setOnAction(event -> Controller.scenaBiranjeObjekta(primaryStage, klijent));
 
-        btnPostojeceProslave.setOnAction(event -> {
-            //ScenaZaNoviObjekat.scenaNoviObjekat(primaryStage, klijent);
-        });
-
         VBox vLijeviLijevi = new VBox(22);
         vLijeviLijevi.getChildren().addAll(lblIme, lblPrezime, lblKorisnickoIme, lblStanjeUBanci);
         vLijeviLijevi.setAlignment(Pos.CENTER_RIGHT);
@@ -80,17 +105,24 @@ public class ScenaKlijent {
 
         HBox hBoxLijevi = new HBox(10);
         hBoxLijevi.getChildren().addAll(vLijeviLijevi, vLijeviDesni);
+        HBox hBoxDesni = new HBox(10);
+        hBoxDesni.getChildren().addAll(cbProtekle, cbAktivne, cbOtkazane);
+
         VBox vBoxDesni = new VBox(10);
-        vBoxDesni.getChildren().addAll(lblNovaLozinka, btnPromjeniLozinku);
+        vBoxDesni.getChildren().addAll(lblPodnaslov2, lvProslave, hBoxDesni);
         vBoxDesni.setAlignment(Pos.CENTER);
+
+        VBox vBoxLijevi = new VBox(10);
+        vBoxLijevi.setAlignment(Pos.CENTER);
+        vBoxLijevi.getChildren().addAll(hBoxLijevi, lblNovaLozinka, btnPromjeniLozinku, lblPodnaslov1, btnNovaProslavaObjekat);
 
         HBox hBox = new HBox(40);
         hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(hBoxLijevi, vBoxDesni);
+        hBox.getChildren().addAll(vBoxLijevi, vBoxDesni);
         hBox.setPadding(new Insets(30, 0, 20, 0));
 
-        VBox vBox = new VBox(10);
-        vBox.getChildren().addAll(lblNaslov, hBox, lblPodnaslov1, btnNovaProslavaObjekat, lblPodnaslov2, btnPostojeceProslave);
+        VBox vBox = new VBox(1);
+        vBox.getChildren().addAll(lblNaslov, hBox);
         vBox.setAlignment(Pos.CENTER);
 
         root.getChildren().addAll(btnNazad, vBox);

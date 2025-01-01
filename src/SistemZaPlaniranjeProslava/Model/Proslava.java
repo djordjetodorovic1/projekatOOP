@@ -13,15 +13,23 @@ public class Proslava {
     private double uplacen_iznos;
     private StatusProslave status;
 
+    public Proslava(int id, Objekat objekat, Klijent klijent, LocalDate datum) {
+        init(id, objekat, klijent, datum);
+    }
+
     public Proslava(int id, Objekat objekat, Klijent klijent, Meni meni, LocalDate datum, int broj_gostiju, double ukupna_cijena, double uplacen_iznos) {
-        this.id = id;
-        this.objekat = objekat;
-        this.klijent = klijent;
+        init(id, objekat, klijent, datum);
         this.meni = meni;
-        this.datum = datum;
         this.broj_gostiju = broj_gostiju;
         this.ukupna_cijena = ukupna_cijena;
         this.uplacen_iznos = uplacen_iznos;
+    }
+
+    private void init(int id, Objekat objekat, Klijent klijent, LocalDate datum) {
+        this.id = id;
+        this.objekat = objekat;
+        this.klijent = klijent;
+        this.datum = datum;
 
         LocalDate danas = LocalDate.now();
         if (datum.isAfter(danas))
@@ -103,13 +111,13 @@ public class Proslava {
     }
 
     public String getPotpunaUplata() {
-        if (this.ukupna_cijena == this.uplacen_iznos)
+        if (this.ukupna_cijena != 0 && this.ukupna_cijena == this.uplacen_iznos)
             return "DA";
         return "NE";
     }
 
     @Override
     public String toString() {
-        return "(id:" + id + ") klijent=" + klijent.getKorisnickoIme() + ", datum=" + datum;
+        return "klijent=" + klijent.getKorisnickoIme() + ", datum=" + datum;
     }
 }

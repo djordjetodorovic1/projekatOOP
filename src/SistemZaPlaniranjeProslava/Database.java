@@ -1,11 +1,9 @@
 package SistemZaPlaniranjeProslava;
 
 import SistemZaPlaniranjeProslava.Model.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
+import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -240,6 +238,19 @@ public class Database {
         }
     }
 
+    public static int dodajProslavuUBazu(int idObjekta, int idKlijent, LocalDate datum) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "INSERT INTO `proslava`(`Objekat_id`, `Klijent_id`, `datum`) VALUES (" + idObjekta + "," + idKlijent + ",'" + Date.valueOf(datum) + "')";
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+
+            return procitajID("SELECT id FROM proslava ORDER BY id DESC LIMIT 1");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void izmjeniLozinku(String nalog, String lozinka, String korisnickoIme) {
         try {
             Statement statement = connection.createStatement();
@@ -289,6 +300,17 @@ public class Database {
         try {
             Statement statement = connection.createStatement();
             String SQLQuery = "DELETE FROM `obavjestenje` WHERE id =" + obavjestenjeID;
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void izmjeniStanjeRacuna(int idRacuna, double stanje) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "UPDATE `bankovni racun` SET `stanje`=" + stanje + " WHERE id=" + idRacuna;
             statement.executeUpdate(SQLQuery);
             statement.close();
         } catch (SQLException e) {
