@@ -49,7 +49,7 @@ public class ScenaAdmin {
         prikazStrelice.setFitHeight(20);
 
         Button btnNazad = new Button("", prikazStrelice);
-        Button btnProvjera = new Button("Posalji poruku");
+        Button btnProvjera = new Button("Pošalji poruku");
 
         btnNazad.setOnAction(actionEvent -> {
             scenaZaPorukuAktivna = false;
@@ -217,12 +217,12 @@ public class ScenaAdmin {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 
-        Label lblNaslov = new Label("Vasi podaci");
+        Label lblNaslov = new Label("Vaši podaci");
         Label lblIme = new Label("Ime:");
         Label lblPrezime = new Label("Prezime:");
-        Label lblKorisnickoIme = new Label("Korisnicko ime:");
+        Label lblKorisnickoIme = new Label("Korisničko ime:");
         Label lblNovaLozinka = new Label("Promijeni lozinku");
-        Label lblObavjestenja = new Label("Obavjestenja");
+        Label lblObavjestenja = new Label("Obavještenja");
         lblNaslov.setStyle("-fx-font: 32 'Comic Sans MS';");
 
         TextField tfIme = new TextField(admin.getIme());

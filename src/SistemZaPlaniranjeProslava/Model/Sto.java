@@ -37,10 +37,6 @@ public class Sto {
 
     @Override
     public String toString() {
-        return "Sto{" +
-                "id=" + id +
-                ", objekat=" + objekat.getId() + " " + objekat.getNaziv() +
-                ", broj_mjesta=" + broj_mjesta +
-                '}';
+        return "Sto" + id;
     }
 }

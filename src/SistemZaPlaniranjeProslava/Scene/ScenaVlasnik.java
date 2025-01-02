@@ -27,13 +27,13 @@ public class ScenaVlasnik {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 
-        Label lblNaslov = new Label("Vasi podaci");
+        Label lblNaslov = new Label("Vaši podaci");
         Label lblPodnaslov1 = new Label("Izaberite objekat za prikaz");
         Label lblPodnaslov2 = new Label("Dodajte novi objekat");
         Label lblIme = new Label("Ime:");
         Label lblPrezime = new Label("Prezime:");
-        Label lblKorisnickoIme = new Label("Korisnicko ime:");
-        Label lblStanjeUBanci = new Label("Stanje na racunu:");
+        Label lblKorisnickoIme = new Label("Korisničko ime:");
+        Label lblStanjeUBanci = new Label("Stanje na računu:");
         Label lblNovaLozinka = new Label("Promijeni lozinku");
         lblNaslov.setStyle("-fx-font: 32 'Comic Sans MS';");
         lblPodnaslov1.setStyle("-fx-font: 24 'Comic Sans MS';");

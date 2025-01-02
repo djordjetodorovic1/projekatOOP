@@ -82,7 +82,7 @@ public class ScenaBiranjeObjekta {
         prikazStrelice.setFitHeight(20);
 
         Button btnNazad = new Button("", prikazStrelice);
-        Button btnReset = new Button("Obrisi filtere");
+        Button btnReset = new Button("Obriši filtere");
         btnReset.setPadding(new Insets(10, 30, 10, 30));
 
         btnNazad.setOnAction(actionEvent -> Controller.scenaKlijent(primaryStage, klijent));

@@ -20,6 +20,7 @@ public class Database {
     private static Map<Integer, Sto> stolovi = new HashMap<>();
     private static Map<Integer, Meni> meniji = new HashMap<>();
     private static Map<Integer, Proslava> proslave = new HashMap<>();
+    private static Map<String, Raspored> rasporedi = new HashMap<>();
 
     public static void connectWithDB() {
         try {
@@ -156,6 +157,16 @@ public class Database {
                     resultSet.getDouble(7), resultSet.getDouble(8)));
         statement.close();
         return proslave;
+    }
+
+    public static Map<String, Raspored> ucitajRasporede() throws SQLException {
+        Statement statement = connection.createStatement();
+        String SQLQuery = "SELECT * FROM raspored";
+        ResultSet resultSet = statement.executeQuery(SQLQuery);
+        while (resultSet.next())
+            rasporedi.put(resultSet.getInt(1) + "-" + resultSet.getInt(2), new Raspored(stolovi.get(resultSet.getInt(1)), proslave.get(resultSet.getInt(2)), resultSet.getString(3)));
+        statement.close();
+        return rasporedi;
     }
 
     private static int procitajID(String SQLQuery) throws SQLException {

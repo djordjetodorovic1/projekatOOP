@@ -45,7 +45,7 @@ public class ScenaObjekatZaVlasnika {
         TextField tfBrojGostiju = new TextField("Broj gostiju: " + proslava.getBrojGostiju());
         TextField tfMeni = new TextField();
         TextField tfUkupnaCijena = new TextField();
-        TextField tfPotvrdaUplate = new TextField("Uplacen ukupan iznos: " + proslava.getPotpunaUplata());
+        TextField tfPotvrdaUplate = new TextField("Uplaćen ukupan iznos: " + proslava.getPotpunaUplata());
         Label lblStolovi = new Label("Broj gostiju po stolovima");
 
         if (proslava.getMeni() == null) {

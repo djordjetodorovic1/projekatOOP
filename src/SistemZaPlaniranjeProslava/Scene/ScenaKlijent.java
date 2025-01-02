@@ -24,13 +24,13 @@ public class ScenaKlijent {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 
-        Label lblNaslov = new Label("Vasi podaci");
+        Label lblNaslov = new Label("Vaši podaci");
         Label lblPodnaslov1 = new Label("Izaberite objekat za novu proslavu");
-        Label lblPodnaslov2 = new Label("Uredite vec rezervisane proslave");
+        Label lblPodnaslov2 = new Label("Uredite već rezervisane proslave");
         Label lblIme = new Label("Ime:");
         Label lblPrezime = new Label("Prezime:");
-        Label lblKorisnickoIme = new Label("Korisnicko ime:");
-        Label lblStanjeUBanci = new Label("Stanje na racunu:");
+        Label lblKorisnickoIme = new Label("Korisničko ime:");
+        Label lblStanjeUBanci = new Label("Stanje na računu:");
         Label lblNovaLozinka = new Label("Promijeni lozinku");
         lblNaslov.setStyle("-fx-font: 32 'Comic Sans MS';");
 
@@ -43,36 +43,38 @@ public class ScenaKlijent {
         tfKorisnickoIme.setEditable(false);
         tfStanjeUBanci.setEditable(false);
 
-        CheckBox cbProtekle = new CheckBox("Protekle");
-        CheckBox cbAktivne = new CheckBox("Aktivne");
-        CheckBox cbOtkazane = new CheckBox("Otkazane");
-        cbAktivne.setSelected(true);
+        RadioButton rbProtekle = new RadioButton("Protekle");
+        RadioButton rbAktivne = new RadioButton("Aktivne");
+        RadioButton rbOtkazane = new RadioButton("Otkazane");
+        rbAktivne.setSelected(true);
+        ToggleGroup toggleGroup = new ToggleGroup();
+        toggleGroup.getToggles().addAll(rbProtekle, rbAktivne, rbOtkazane);
 
         ListView<Proslava> lvProslave = new ListView<>();
         lvProslave.setOnMouseClicked(event -> {
             Proslava izabranaProslava = lvProslave.getSelectionModel().getSelectedItem();
             if (izabranaProslava != null) {
-                //scenaInformacijeOProslavi(izabranaProslava);
+                ScenaUredjivanjeProslava.scenaUredjivanjeProslava(primaryStage, klijent, izabranaProslava);
             }
         });
         Runnable izmjeniListu = () -> {
             lvProslave.getItems().clear();
             for (Proslava pr : Controller.getProslave().values()) {
                 if (pr.getKlijent().getId() == klijent.getId()) {
-                    if (cbAktivne.isSelected() && pr.getStatus() == StatusProslave.AKTIVNA) {
+                    if (rbAktivne.isSelected() && pr.getStatus() == StatusProslave.AKTIVNA) {
                         lvProslave.getItems().add(pr);
-                    } else if (cbProtekle.isSelected() && pr.getStatus() == StatusProslave.PROTEKLA) {
+                    } else if (rbProtekle.isSelected() && pr.getStatus() == StatusProslave.PROTEKLA) {
                         lvProslave.getItems().add(pr);
-                    } else if (cbOtkazane.isSelected() && pr.getStatus() == StatusProslave.OTKAZANA) {
+                    } else if (rbOtkazane.isSelected() && pr.getStatus() == StatusProslave.OTKAZANA) {
                         lvProslave.getItems().add(pr);
                     }
                 }
             }
         };
 
-        cbProtekle.setOnAction(event -> izmjeniListu.run());
-        cbAktivne.setOnAction(event -> izmjeniListu.run());
-        cbOtkazane.setOnAction(event -> izmjeniListu.run());
+        rbProtekle.setOnAction(event -> izmjeniListu.run());
+        rbAktivne.setOnAction(event -> izmjeniListu.run());
+        rbOtkazane.setOnAction(event -> izmjeniListu.run());
         izmjeniListu.run();
 
         Image strelica = new Image((new File("resursi/backArrow.png")).toURI().toString());
@@ -106,7 +108,7 @@ public class ScenaKlijent {
         HBox hBoxLijevi = new HBox(10);
         hBoxLijevi.getChildren().addAll(vLijeviLijevi, vLijeviDesni);
         HBox hBoxDesni = new HBox(10);
-        hBoxDesni.getChildren().addAll(cbProtekle, cbAktivne, cbOtkazane);
+        hBoxDesni.getChildren().addAll(rbProtekle, rbAktivne, rbOtkazane);
 
         VBox vBoxDesni = new VBox(10);
         vBoxDesni.getChildren().addAll(lblPodnaslov2, lvProslave, hBoxDesni);

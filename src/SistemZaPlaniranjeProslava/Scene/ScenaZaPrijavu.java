@@ -30,8 +30,8 @@ public class ScenaZaPrijavu {
         logoPrikaz.setPreserveRatio(true);
 
         Label lblNaziv = new Label("Zlatna ribica");
-        Label lblSlogan = new Label("ispunjavamo vase zelje");
-        Label lblKorisnickoIme = new Label("Unesite korisnicko ime");
+        Label lblSlogan = new Label("ispunjavamo vaše želje");
+        Label lblKorisnickoIme = new Label("Unesite korisničko ime");
         Label lblLozinka = new Label("Unesite lozinku");
         Label lblIli = new Label("ili");
         lblNaziv.setTextFill(Color.GOLD);

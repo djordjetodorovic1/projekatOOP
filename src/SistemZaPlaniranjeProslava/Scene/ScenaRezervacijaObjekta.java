@@ -20,7 +20,7 @@ import javafx.util.Callback;
 
 import java.io.File;
 import java.time.LocalDate;
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.Set;
 
 public class ScenaRezervacijaObjekta {
@@ -40,17 +40,14 @@ public class ScenaRezervacijaObjekta {
                 if (Controller.getStanjeRacuna(klijent.getBrojRacuna()) >= objekat.getCijenaRezervacije()) {
                     Controller.transakcija(klijent, objekat.getVlasnik(), objekat.getCijenaRezervacije());
                     Controller.dodajProslavu(objekat, klijent, datum);
-                    //ScenaKlijent.scenaKlijent(pr, klijent);
-                    if (Main.potvrda("Trenutno stanje na racunu: " + Controller.getStanjeRacuna(klijent.getBrojRacuna()) + " Proslava je uspjesno rezervisana! Da li zelite odmah da je uredite?")) {
-                        //Edit proslave
-                    }
+                    Main.informacija("Trenutno stanje na računu: " + Controller.getStanjeRacuna(klijent.getBrojRacuna()) + " Proslava je uspješno rezervisana!");
                 } else {
-                    Main.upozorenje("Rezervacija proslave nije moguca zbog nedovoljno novca na racunu!");
+                    Main.upozorenje("Rezervacija proslave nije moguća zbog nedovoljno novca na racunu!");
                 }
                 stagePotvrdaLozinke.close();
                 Controller.scenaKlijent(primaryStage, klijent);
             } else {
-                Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
+                Main.upozorenje("Pogrešna lozinka! Pokušajte ponovo");
                 Main.ocistiPolje(pfLozinka);
             }
         });
@@ -68,11 +65,10 @@ public class ScenaRezervacijaObjekta {
     }
 
     public static void scenaRezervacijaObjekta(Stage primaryStage, Objekat objekat, Klijent klijent) {
-        Map<Integer, Meni> meniji = Controller.getMeni();
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 
-        Label lblNaslov = new Label("Rezervisite objekat");
+        Label lblNaslov = new Label("Rezervišite objekat");
         Label lblNaziv = new Label("Naziv: \"" + objekat.getNaziv() + "\"");
         Label lblAdresa = new Label("Adresa: " + objekat.getAdresa() + ", " + objekat.getGrad());
         Label lblCijenaRezervacije = new Label("Cijena rezervacije: " + objekat.getCijenaRezervacije());
@@ -85,9 +81,10 @@ public class ScenaRezervacijaObjekta {
         taMeni.setEditable(false);
         taMeni.setPrefWidth(350);
         int brojMenija = 1;
-        for (Meni meni : meniji.values())
+        ArrayList<Meni> meniji = Controller.menijiZaObjekat(objekat.getId());
+        for (Meni meni : meniji)
             if (meni.getObjekat().getId() == objekat.getId())
-                taMeni.appendText("Meni " + brojMenija++ + ": " + meni.getOpis() + " - " + meni.getCijenaPoOsobi() + "\n");
+                taMeni.appendText("Meni " + brojMenija++ + ": " + meni + "\n");
 
         Set<LocalDate> zauzetiDatumi = Controller.zauzetiDatumi(objekat);
         DatePicker kalendar = new DatePicker();
@@ -98,10 +95,8 @@ public class ScenaRezervacijaObjekta {
                 if (zauzetiDatumi.contains(item)) {
                     setStyle("-fx-background-color: #ff0000; -fx-text-fill: #ffffff;");
                     setDisable(true);
-                } else if (item.isBefore(LocalDate.now())) {
-                    setStyle("-fx-background-color: #ff0000; -fx-text-fill: #ffffff;");
+                } else if (item.isBefore(LocalDate.now()))
                     setDisable(true);
-                }
             }
         };
         kalendar.setDayCellFactory(izmjenaPolja);
@@ -121,7 +116,7 @@ public class ScenaRezervacijaObjekta {
             if (kalendar.getValue() != null)
                 scenaZaLozinku(primaryStage, klijent, objekat, kalendar.getValue());
             else
-                Main.upozorenje("Niste odabrali datum! Pokusajte ponovo");
+                Main.upozorenje("Niste odabrali datum! Pokušajte ponovo");
         });
         root.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {

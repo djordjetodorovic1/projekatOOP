@@ -85,7 +85,7 @@ public class Validator {
         if (!validacijaDoubleBroj(cijena))
             detektorGreske = true;
         if (detektorGreske)
-            Main.upozorenje("Nekorektan unos! Pokusajte ponovo");
+            Main.upozorenje("Nekorektan unos! Pokušajte ponovo");
         return !detektorGreske;
     }
 

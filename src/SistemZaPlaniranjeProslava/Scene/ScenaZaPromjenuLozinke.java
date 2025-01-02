@@ -30,7 +30,7 @@ public class ScenaZaPromjenuLozinke {
         root.setPadding(new Insets(20, 20, 20, 20));
 
         Label lblNaslov = new Label("Promjena lozinke");
-        Label lblKorisnickoIme = new Label("Korisnicko ime");
+        Label lblKorisnickoIme = new Label("Korisničko ime");
         Label lblStaraLozinka = new Label("Unesite staru lozinku");
         Label lblNovaLozinka = new Label("Unesite novu lozinku");
         Label lblPotvrdaLozinke = new Label("Potvrdite novu lozinku:");

@@ -27,8 +27,8 @@ public class ScenaZaNoviNalog {
         Label lblIme = new Label("Unesite ime");
         Label lblPrezime = new Label("Unesite prezime");
         Label lblJBMG = new Label("Unesite JMBG");
-        Label lblBrojUBanci = new Label("Unesite broj racuna u banci");
-        Label lblKorisnickoIme = new Label("Unesite korisnicko ime");
+        Label lblBrojUBanci = new Label("Unesite broj računa u banci");
+        Label lblKorisnickoIme = new Label("Unesite korisničko ime");
         Label lblLozinka = new Label("Unesite lozinku");
         Label lblPotvrdaLozinke = new Label("Potvrdite lozinku");
         Label lblTipNaloga = new Label("Izaberite tip naloga");

@@ -31,6 +31,6 @@ public class Meni {
 
     @Override
     public String toString() {
-        return this.opis;
+        return this.getOpis() + " - " + this.getCijenaPoOsobi();
     }
 }

@@ -48,14 +48,14 @@ public class ScenaZaNoviObjekat {
         spinnerBrojMjestaPoStolovima.clear();
         for (int i = 0; i < brojStolova; i++) {
             Label lblSto = new Label("Sto broj " + (i + 1));
-            Spinner<Integer> newSpinner = new Spinner<>(1, 100, 5);
+            Spinner<Integer> newSpinner = new Spinner<>(1, 16, 5);
             newSpinner.setPromptText("Sto broj " + (i + 1));
             newSpinner.setMaxWidth(250);
             vBoxtf.getChildren().addAll(lblSto, newSpinner);
             spinnerBrojMjestaPoStolovima.add(newSpinner);
         }
 
-        Button btnSacuvaj = new Button("Sacuvaj izmjene");
+        Button btnSacuvaj = new Button("Sačuvaj izmjene");
         btnSacuvaj.setOnAction(actionEvent -> {
             scenaZaStoAktivna = false;
             stageSto.close();
@@ -85,7 +85,7 @@ public class ScenaZaNoviObjekat {
 
         TextField tfMeni = new TextField();
         TextField tfCijenaMenija = new TextField();
-        tfMeni.setPromptText("Predjelo - Glavno jelo - Dezert");
+        tfMeni.setPromptText("Predjelo Glavno jelo Dezert");
         tfCijenaMenija.setPromptText("50.00");
         tfMeni.setMaxWidth(300);
         tfCijenaMenija.setMaxWidth(300);
@@ -168,8 +168,8 @@ public class ScenaZaNoviObjekat {
             tfNaziv.setEditable(false);
             tfGrad.setEditable(false);
             tfAdresa.setEditable(false);
-            btnBrojStolica.setText("Unesi");
-            btnMeni.setText("Unesi");
+            btnBrojStolica.setText("Izmjeni");
+            btnMeni.setText("Izmjeni");
         } else {
             tfNaziv.setPromptText("Caffe Renas");
             tfCijenaRezervacije.setPromptText("200.00");
@@ -177,8 +177,8 @@ public class ScenaZaNoviObjekat {
             tfAdresa.setPromptText("Mladena Stojanovica 2");
             tfBrojMjesta.setPromptText("50");
             tfBrojStolova.setPromptText("10");
-            btnBrojStolica.setText("Izmjeni");
-            btnMeni.setText("Izmjeni");
+            btnBrojStolica.setText("Unesi");
+            btnMeni.setText("Unesi");
         }
 
         btnNazad.setOnAction(actionEvent -> {
@@ -196,7 +196,7 @@ public class ScenaZaNoviObjekat {
                     scenaZaStoAktivna = true;
                     scenaZaUnosStolova(Integer.parseInt(tfBrojStolova.getText()));
                 } else {
-                    Main.upozorenje("Polje za broj stolova nije korektno popunjeno! Pokusajte ponovo");
+                    Main.upozorenje("Polje za broj stolova nije korektno popunjeno! Pokušajte ponovo");
                 }
             }
         });

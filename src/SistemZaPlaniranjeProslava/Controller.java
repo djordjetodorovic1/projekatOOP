@@ -2,7 +2,6 @@ package SistemZaPlaniranjeProslava;
 
 import SistemZaPlaniranjeProslava.Model.*;
 import SistemZaPlaniranjeProslava.Scene.*;
-import com.sun.javafx.css.CssUtil;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -22,6 +21,7 @@ public class Controller {
     private static Map<Integer, Sto> stolovi = new HashMap<>();
     private static Map<Integer, Meni> meniji = new HashMap<>();
     private static Map<Integer, Proslava> proslave = new HashMap<>();
+    private static Map<String, Raspored> rasporedi = new HashMap<>();
 
     public static void connectDB() {
         Database.connectWithDB();
@@ -42,10 +42,7 @@ public class Controller {
             meniji = Database.ucitajMenije();
             obavjestenja = Database.ucitajObavjestenje();
             proslave = Database.ucitajProslave();
-
-            proslave.put(1, new Proslava(1, objekti.get(16),
-                    Database.getKlijent(4), meniji.get(30), LocalDate.of(2025, 2, 5), 10,
-                    300, 250));
+            rasporedi = Database.ucitajRasporede();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -62,6 +59,7 @@ public class Controller {
         for (Obavjestenje ob : obavjestenja)
             System.out.println(ob);
         proslave.values().forEach(System.out::println);
+        rasporedi.values().forEach(System.out::println);
     }
 
     private static void prijavaVlasnik(Stage primaryStage, String korisnickoIme) {
@@ -110,36 +108,36 @@ public class Controller {
 
     public static void prijava(Stage primaryStage, TextField tfKorisnickoIme, PasswordField pfLozinka) {
         if (tfKorisnickoIme.getText().isEmpty() || pfLozinka.getText().isEmpty()) {
-            Main.upozorenje("Niste popunili sva polja! Pokusajte ponovo");
+            Main.upozorenje("Niste popunili sva polja! Pokušajte ponovo");
         } else if (Validator.provjeriPrijavu(tfKorisnickoIme.getText(), pfLozinka.getText())) {
             if (admin.getKorisnickoIme().equals(tfKorisnickoIme.getText())) {
                 if (admin.getLozinka().equals(pfLozinka.getText())) {
                     prijavaAdmin(primaryStage);
                 } else {
-                    Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
+                    Main.upozorenje("Pogrešna lozinka! Pokušajte ponovo");
                     Main.ocistiPolje(pfLozinka);
                 }
             } else if (klijenti.containsKey(tfKorisnickoIme.getText())) {
                 if (klijenti.get(tfKorisnickoIme.getText()).getLozinka().equals(pfLozinka.getText())) {
                     prijavaKlijent(primaryStage, tfKorisnickoIme.getText());
                 } else {
-                    Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
+                    Main.upozorenje("Pogrešna lozinka! Pokušajte ponovo");
                     Main.ocistiPolje(pfLozinka);
                 }
             } else if (vlasnici.containsKey(tfKorisnickoIme.getText())) {
                 if (vlasnici.get(tfKorisnickoIme.getText()).getLozinka().equals(pfLozinka.getText())) {
                     prijavaVlasnik(primaryStage, tfKorisnickoIme.getText());
                 } else {
-                    Main.upozorenje("Pogresna lozinka! Pokusajte ponovo");
+                    Main.upozorenje("Pogrešna lozinka! Pokušajte ponovo");
                     Main.ocistiPolje(pfLozinka);
                 }
             } else {
-                Main.upozorenje("Nalog ne postoji! Pokusajte ponovo ili kreirajte novi nalog");
+                Main.upozorenje("Nalog ne postoji! Pokušajte ponovo ili kreirajte novi nalog");
                 Main.ocistiPolje(tfKorisnickoIme);
                 Main.ocistiPolje(pfLozinka);
             }
         } else {
-            Main.upozorenje("Nekorektan unos! Pokusajte ponovo");
+            Main.upozorenje("Nekorektan unos! Pokušajte ponovo");
             Main.ocistiPolje(tfKorisnickoIme);
             Main.ocistiPolje(pfLozinka);
         }
@@ -148,7 +146,7 @@ public class Controller {
     public static void kreirajNoviNalog(Stage primaryStage, TextField tfIme, TextField tfPrezime, TextField tfJMBG, TextField tfBrojUBanci,
                                         TextField tfKorisnickoIme, PasswordField pfLozinka, PasswordField pfPotvrdaLozinke, ChoiceBox<String> cbTipNaloga) {
         if (!Validator.provjeriNoviNalog(tfIme, tfPrezime, tfJMBG, tfBrojUBanci, tfKorisnickoIme, pfLozinka, pfPotvrdaLozinke, cbTipNaloga, bankovniRacuni, klijenti, vlasnici)) {
-            Main.upozorenje("Neka od polja nisu pravilno popunjena ili je korisnicko ime vec zauzeto! Pokusajte ponovo");
+            Main.upozorenje("Neka od polja nisu pravilno popunjena ili je korisničko ime već zauzeto! Pokušajte ponovo");
         } else {
             String nalog = "klijent";
             if (cbTipNaloga.getValue().equals("Vlasnik"))
@@ -159,7 +157,7 @@ public class Controller {
                 klijenti.put(tfKorisnickoIme.getText(), new Klijent(id, tfIme.getText(), tfPrezime.getText(), tfJMBG.getText(), tfBrojUBanci.getText(), tfKorisnickoIme.getText(), pfLozinka.getText()));
             else
                 vlasnici.put(tfKorisnickoIme.getText(), new Vlasnik(id, tfIme.getText(), tfPrezime.getText(), tfJMBG.getText(), tfBrojUBanci.getText(), tfKorisnickoIme.getText(), pfLozinka.getText()));
-            Main.informacija("Nalog uspjesno kreiran!");
+            Main.informacija("Nalog uspješno kreiran!");
             ScenaZaPrijavu.scenaPrijava(primaryStage);
         }
     }
@@ -181,11 +179,11 @@ public class Controller {
             } else {
                 Main.ocistiPolje(pfLozinka);
                 Main.ocistiPolje(pfPotvrdaLozinke);
-                Main.upozorenje("Nova lozinka nije pravilno unesena! Pokusajte ponovo");
+                Main.upozorenje("Nova lozinka nije pravilno unesena! Pokušajte ponovo");
             }
         } else {
             Main.ocistiPolje(tfStaraLozinka);
-            Main.upozorenje("Stara lozinka nije pravilno unesena! Pokusajte ponovo");
+            Main.upozorenje("Stara lozinka nije pravilno unesena! Pokušajte ponovo");
         }
         return false;
     }
@@ -193,13 +191,13 @@ public class Controller {
     public static boolean kreirajNoviObjekat(TextField tfNaziv, TextField tfGrad, TextField tfAdresa, TextField tfCijenaRezervacije, TextField tfBrojMjesta,
                                              TextField tfBrojStolova, ArrayList<String> meniOpis, ArrayList<Double> meniCijene, Vlasnik vlasnik, ArrayList<Integer> brojMjestaPoStolovima, int idObjekat) {
         if (!Validator.provjeraObjektaZaUnos(tfGrad, tfAdresa, tfCijenaRezervacije, tfBrojMjesta, tfBrojStolova))
-            Main.upozorenje("Neka od polja nisu pravilno popunjena! Pokusajte ponovo");
+            Main.upozorenje("Neka od polja nisu pravilno popunjena! Pokušajte ponovo");
         else if (idObjekat == 0 && meniOpis.isEmpty())
-            Main.upozorenje("Niste popunili meni! Pokusajte ponovo");
+            Main.upozorenje("Niste popunili meni! Pokušajte ponovo");
         else if (idObjekat == 0 && (brojMjestaPoStolovima.isEmpty() || brojMjestaPoStolovima.size() != Integer.parseInt(tfBrojStolova.getText())))
-            Main.upozorenje("Niste popunili podatke o stolovima! Pokusajte ponovo");
-        else if (idObjekat > 0 && (stoloviZaObjekatBrojac(idObjekat) != Integer.parseInt(tfBrojStolova.getText())) && brojMjestaPoStolovima.size() != Integer.parseInt(tfBrojStolova.getText())) {
-            Main.upozorenje("Niste popunili podatke o stolovima! Pokusajte ponovo");
+            Main.upozorenje("Niste popunili podatke o stolovima! Pokušajte ponovo");
+        else if (idObjekat > 0 && (stoloviZaObjekat(idObjekat).size() != Integer.parseInt(tfBrojStolova.getText())) && brojMjestaPoStolovima.size() != Integer.parseInt(tfBrojStolova.getText())) {
+            Main.upozorenje("Niste popunili podatke o stolovima! Pokušajte ponovo");
         } else {
             if (idObjekat > 0) {
                 Database.izmjeniObjekatUBazi(Double.parseDouble(tfCijenaRezervacije.getText()), Integer.parseInt(tfBrojMjesta.getText()), Integer.parseInt(tfBrojStolova.getText()), idObjekat);
@@ -225,10 +223,10 @@ public class Controller {
                 stolovi.put(idSto, new Sto(idSto, objekti.get(idObjekat), brMjesta));
             }
 
-            idObavjestenje = Database.dodajObavjestenjeUBazu(idObjekat, "Novi objekat ceka na odobrenje!");
-            obavjestenja.add(new Obavjestenje(idObavjestenje, objekti.get(idObjekat), "Novi objekat ceka na odobreneje!"));
+            idObavjestenje = Database.dodajObavjestenjeUBazu(idObjekat, "Novi objekat čeka na odobrenje!");
+            obavjestenja.add(new Obavjestenje(idObavjestenje, objekti.get(idObjekat), "Novi objekat čeka na odobreneje!"));
 
-            Main.informacija("Objekat uspjesno kreiran!");
+            Main.informacija("Objekat uspješno kreiran!");
             return true;
         }
         return false;
@@ -288,12 +286,20 @@ public class Controller {
         return datumi;
     }
 
-    public static int stoloviZaObjekatBrojac(int idObjekat) {
-        int brojac = 0;
+    public static ArrayList<Sto> stoloviZaObjekat(int idObjekat) {
+        ArrayList<Sto> stoloviZaObjekat = new ArrayList<>();
         for (Sto sto : stolovi.values())
             if (sto.getObjekat().getId() == idObjekat)
-                brojac++;
-        return brojac;
+                stoloviZaObjekat.add(sto);
+        return stoloviZaObjekat;
+    }
+
+    public static ArrayList<Meni> menijiZaObjekat(int idObjekat) {
+        ArrayList<Meni> menijiZaObjekat = new ArrayList<>();
+        for (Meni meni : meniji.values())
+            if (meni.getObjekat().getId() == idObjekat)
+                menijiZaObjekat.add(meni);
+        return menijiZaObjekat;
     }
 
     public static void brisanjeStolovaIzBaze(int idObjekat) {
@@ -330,6 +336,11 @@ public class Controller {
         proslave.put(id, new Proslava(id, objekat, klijent, datum));
     }
 
+    public static void dodajURaspored(Sto sto, Proslava proslava, ArrayList<String> gosti) {
+        rasporedi.put(sto.getId() + "-" + proslava.getId(), new Raspored(sto, proslava, gosti));
+        System.out.println(rasporedi);
+    }
+
     public static Map<Integer, Meni> getMeni() {
         return meniji;
     }
@@ -360,5 +371,9 @@ public class Controller {
 
     public static Map<Integer, Proslava> getProslave() {
         return proslave;
+    }
+
+    public static Map<String, Raspored> getRasporedi() {
+        return rasporedi;
     }
 }
