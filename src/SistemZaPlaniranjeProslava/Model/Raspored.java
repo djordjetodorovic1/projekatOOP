@@ -2,6 +2,7 @@ package SistemZaPlaniranjeProslava.Model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 
 public class Raspored {
     private Sto sto;
@@ -12,7 +13,7 @@ public class Raspored {
         this.sto = sto;
         this.proslava = proslava;
         if (!gosti.isEmpty())
-            this.gosti.addAll(Arrays.stream(gosti.split(",")).toList());
+            this.gosti = new ArrayList<>(Arrays.asList(gosti.split(", ", -1)));
     }
 
     public Raspored(Sto sto, Proslava proslava, ArrayList<String> gosti) {
@@ -40,6 +41,13 @@ public class Raspored {
     public ArrayList<String> getGosti() {
         return gosti;
     }
+
+    public void setGosti(ArrayList<String> gosti) {
+        this.gosti = gosti;
+    }
+
+    public final static Comparator<String> porediPoImenu = String::compareTo;
+    public final static Comparator<Sto> porediPoStolovima = (sto1, sto2) -> Integer.compare(sto1.getId(), sto2.getId());
 
     @Override
     public String toString() {

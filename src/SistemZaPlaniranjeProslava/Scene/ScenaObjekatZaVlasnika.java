@@ -24,18 +24,14 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 
-//umjesto stolova za objekat dodati stolove iz rasporeda sjedenja
-
 public class ScenaObjekatZaVlasnika {
     private static void podesiTF(TextField tf) {
         tf.setPadding(new Insets(10));
-        tf.setPrefWidth(300);
+        tf.setPrefWidth(320);
         tf.setEditable(false);
     }
 
     public static void scenaInformacijeOProslavi(Proslava proslava) {
-        Map<Integer, Sto> stolovi = Controller.getStolovi();
-
         Stage stageProslava = new Stage();
         stageProslava.setTitle("Informacije o proslavi");
 
@@ -61,12 +57,13 @@ public class ScenaObjekatZaVlasnika {
         podesiTF(tfUkupnaCijena);
         podesiTF(tfPotvrdaUplate);
 
+        Map<String, Raspored> rasporedi = Controller.getRasporedi();
         TextArea taStolovi = new TextArea();
         taStolovi.setEditable(false);
-        int brojStola = 1;
-        for (Sto sto : stolovi.values())
-            if (sto.getObjekat().getId() == proslava.getObjekat().getId())
-                taStolovi.appendText("Sto " + brojStola++ + ": " + sto.getBrojMjesta() + " mjesta\n");
+        int brojStola = 1, brojMjesta;
+        for (Raspored raspored : rasporedi.values())
+            if (raspored.getProslava().getId() == proslava.getId() && (brojMjesta = raspored.getGosti().stream().filter(s -> (!s.isEmpty())).toList().size()) > 0)
+                taStolovi.appendText("Sto " + brojStola++ + ": " + brojMjesta + " mjesta\n");
 
         Image strelica = new Image((new File("resursi/backArrow.png")).toURI().toString());
         ImageView prikazStrelice = new ImageView(strelica);

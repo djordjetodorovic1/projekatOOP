@@ -118,6 +118,16 @@ public class Proslava {
 
     @Override
     public String toString() {
-        return "klijent=" + klijent.getKorisnickoIme() + ", datum=" + datum;
+        return "Proslava{" +
+                "id=" + id +
+                ", objekat=" + objekat +
+                ", klijent=" + klijent +
+                ", meni=" + meni +
+                ", datum=" + datum +
+                ", broj_gostiju=" + broj_gostiju +
+                ", ukupna_cijena=" + ukupna_cijena +
+                ", uplacen_iznos=" + uplacen_iznos +
+                ", status=" + status +
+                '}';
     }
 }

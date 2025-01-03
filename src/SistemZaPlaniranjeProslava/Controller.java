@@ -337,8 +337,15 @@ public class Controller {
     }
 
     public static void dodajURaspored(Sto sto, Proslava proslava, ArrayList<String> gosti) {
-        rasporedi.put(sto.getId() + "-" + proslava.getId(), new Raspored(sto, proslava, gosti));
-        System.out.println(rasporedi);
+        Raspored raspored = rasporedi.get(sto.getId() + "-" + proslava.getId());
+        String gostiUpis = String.join(", ", gosti);
+        if (raspored == null) {
+            rasporedi.put(sto.getId() + "-" + proslava.getId(), new Raspored(sto, proslava, gosti));
+            Database.dodajRasporedUBazu(sto.getId(), proslava.getId(), gostiUpis);
+        } else {
+            raspored.setGosti(gosti);
+            Database.izmjeniRasporedUBazi(raspored);
+        }
     }
 
     public static Map<Integer, Meni> getMeni() {

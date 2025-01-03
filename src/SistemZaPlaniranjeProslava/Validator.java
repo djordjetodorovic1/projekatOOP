@@ -10,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Validator {
-    private static boolean provjeraRegIzraza(String string, String regex) {
+    public synchronized static boolean provjeraRegIzraza(String string, String regex) {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(string);
         return matcher.matches();
@@ -50,15 +50,15 @@ public class Validator {
         return provjeraRegIzraza(adresa, "^[A-Z][a-zA-Z]+([a-zA-Z\\s]+)*(\\d|bb|BB)?");
     }
 
-    public static boolean validacijaIntBroj(TextField tfBrojStolova) {
+    public static boolean validacijaIntBroj(TextField tfIntBroj) {
         try {
-            int br = Integer.parseInt(tfBrojStolova.getText());
+            int br = Integer.parseInt(tfIntBroj.getText());
             if (br > 0)
                 return true;
-            Main.ocistiPolje(tfBrojStolova);
+            Main.ocistiPolje(tfIntBroj);
             return false;
         } catch (NumberFormatException e) {
-            Main.ocistiPolje(tfBrojStolova);
+            Main.ocistiPolje(tfIntBroj);
             return false;
         }
     }

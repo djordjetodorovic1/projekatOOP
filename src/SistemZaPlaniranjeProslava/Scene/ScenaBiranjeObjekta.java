@@ -58,14 +58,21 @@ public class ScenaBiranjeObjekta {
             boolean zadovoljava;
             for (Objekat objekat : objekti) {
                 zadovoljava = true;
-                if (!tfBrMjesta.getText().isEmpty() && objekat.getBrojMjesta() < Integer.parseInt(tfBrMjesta.getText()))
-                    zadovoljava = false;
+                if (!tfBrMjesta.getText().isEmpty()) {
+                    try {
+                        if (objekat.getBrojMjesta() < Integer.parseInt(tfBrMjesta.getText()))
+                            zadovoljava = false;
+                    } catch (NumberFormatException e) {
+                        zadovoljava = false;
+                    }
+                }
                 if (datum != null && Controller.zauzetObjekatZaDatum(datum, objekat))
                     zadovoljava = false;
                 if (!cbGradovi.getValue().isEmpty() && !objekat.getGrad().toUpperCase().equals(cbGradovi.getValue()))
                     zadovoljava = false;
                 if (zadovoljava)
                     lvObjekti.getItems().add(objekat);
+                System.out.println(lvObjekti.getItems());
             }
         };
         izmjeniListu.run();

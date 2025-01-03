@@ -1,7 +1,10 @@
 package SistemZaPlaniranjeProslava.Scene;
 
 import SistemZaPlaniranjeProslava.Controller;
+import SistemZaPlaniranjeProslava.Database;
+import SistemZaPlaniranjeProslava.Main;
 import SistemZaPlaniranjeProslava.Model.*;
+import SistemZaPlaniranjeProslava.Validator;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -15,10 +18,9 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.*;
 
 public class ScenaUredjivanjeProslava {
-    private static ArrayList<TextField> textFields = new ArrayList<>();
     private static ArrayList<String> imenaGostiju = new ArrayList<>();
 
     public static void scenaUredjivanjeProslava(Stage primaryStage, Klijent klijent, Proslava proslava) {
@@ -35,8 +37,8 @@ public class ScenaUredjivanjeProslava {
         ChoiceBox<Meni> cbMeni = new ChoiceBox<>();
         for (Meni meni : meniji)
             cbMeni.getItems().add(meni);
-        cbMeni.setPadding(new Insets(5, 50, 5, 50));
-        cbMeni.setPrefWidth(450);
+        cbMeni.setPadding(new Insets(5));
+        cbMeni.setPrefWidth(300);
 
         ArrayList<Sto> stolovi = Controller.stoloviZaObjekat(proslava.getObjekat().getId());
         ChoiceBox<Sto> cbSto = new ChoiceBox<>();
@@ -51,7 +53,7 @@ public class ScenaUredjivanjeProslava {
 
         Button btnNazad = new Button("", prikazStrelice);
         Button btnZamjena = new Button("Zamjeni mjesta sjedenja");
-        Button btnSacuvajIzmjene = new Button("Sacuvaj izmjene");
+        Button btnSacuvajIzmjene = new Button("Izracunaj ukupnu sumu");
         Button btnStampanje = new Button("Štampanje rasporeda");
         Button btnZavrsi = new Button("Završi uređivanje proslave");
 
@@ -65,78 +67,82 @@ public class ScenaUredjivanjeProslava {
         btnZavrsi.setPrefWidth(300);
 
         btnNazad.setOnAction(actionEvent -> Controller.scenaKlijent(primaryStage, klijent));
-
+        btnZamjena.setOnAction(actionEvent -> ScenaZamjenaGostiju.scenaZamjenaGostiju(primaryStage, stolovi, klijent, proslava));
         btnSacuvajIzmjene.setOnAction(actionEvent -> {
-            /*proslava.setMeni(cbMeni.getValue());
             int brojGostijuNaProslavi = 0;
-            for (Sto sto : stolovi)
-                brojGostijuNaProslavi += Controller.getRasporedi().get(sto.getId() + "-" + proslava.getId()).getGosti().size();
+            for (Sto sto : stolovi) {
+                Raspored raspored = Controller.getRasporedi().get(sto.getId() + "-" + proslava.getId());
+                if (raspored != null)
+                    brojGostijuNaProslavi += raspored.getGosti().stream().filter(s -> (!s.isEmpty())).toList().size();
+            }
             proslava.setBrojGostiju(brojGostijuNaProslavi);
-            proslava.setUkupnaCijena(brojGostijuNaProslavi * proslava.getMeni().getCijenaPoOsobi());*/
+            if (cbMeni.getValue() != null) {
+                proslava.setMeni(cbMeni.getValue());
+                proslava.setUkupnaCijena(brojGostijuNaProslavi * proslava.getMeni().getCijenaPoOsobi());
+                Database.izmjeniProslavu(proslava);
+                Main.informacija("Trenutna suma: " + proslava.getUkupnaCijena());
+            } else
+                Main.informacija("Niste izabrali meni! Pokušajte ponovo");
         });
-
-        btnZamjena.setOnAction(actionEvent -> {/*Zamjena gostiju*/});
-        btnStampanje.setOnAction(actionEvent -> {/*Prikaz sortirano*/});
+        btnStampanje.setOnAction(actionEvent -> ScenaStampanje.stampanje(proslava, stolovi));
         btnZavrsi.setOnAction(actionEvent -> {/*Placanje Kraj*/});
 
         Pane paneSto = new Pane();
-        paneSto.setMinSize(800, 550);
-        paneSto.setMaxSize(800, 550);
+        paneSto.setMinSize(800, 650);
+        paneSto.setMaxSize(800, 650);
         paneSto.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-
-        Circle krug = new Circle(400, 270, 150, Color.ORANGE);
-        paneSto.getChildren().add(krug);
+        Circle krug = new Circle(400, 350, 150, Color.ORANGE);
 
         cbSto.setOnAction(event -> {
             Sto izabraniSto = cbSto.getValue();
-            imenaGostiju.clear();
-            textFields.forEach(paneSto.getChildren()::remove);
-            textFields.clear();
+            paneSto.getChildren().clear();
+            paneSto.getChildren().add(krug);
 
             Raspored raspored = Controller.getRasporedi().get(izabraniSto.getId() + "-" + proslava.getId());
             if (raspored != null)
-                imenaGostiju = new ArrayList<>(raspored.getGosti());
-
+                imenaGostiju = raspored.getGosti();
+            else {
+                ArrayList<String> lista = new ArrayList<>();
+                for (int j = 0; j < izabraniSto.getBrojMjesta(); j++)
+                    lista.add("");
+                imenaGostiju = lista;
+            }
             double pomjerajUgla = 360.0 / izabraniSto.getBrojMjesta();
             for (int i = 0; i < izabraniSto.getBrojMjesta(); i++) {
-                double x = 400 + Math.cos(Math.toRadians(pomjerajUgla * i)) * 220 - 40;
-                double y = 270 + Math.sin(Math.toRadians(pomjerajUgla * i)) * 220 - 20;
+                double x = 400 + Math.cos(Math.toRadians(pomjerajUgla * i)) * 280 - 50;
+                double y = 350 + Math.sin(Math.toRadians(pomjerajUgla * i)) * 280 - 20;
 
                 TextField tfGost = new TextField();
                 tfGost.setLayoutX(x);
                 tfGost.setLayoutY(y);
-                tfGost.setPrefWidth(80);
+                tfGost.setPrefWidth(110);
 
-                if (i < imenaGostiju.size())
-                    tfGost.setText(imenaGostiju.get(i));
-                else
-                    tfGost.setText("");
+                tfGost.setText(imenaGostiju.get(i));
 
                 final int index = i;
                 tfGost.textProperty().addListener((observable, oldValue, newValue) -> {
                     if (newValue != null) {
-                        if (imenaGostiju.isEmpty())
-                            for (int j = 0; j < textFields.size(); j++)
-                                imenaGostiju.add("");
-                        imenaGostiju.set(index, newValue);
-
-                        System.out.println(imenaGostiju);
-                        Controller.dodajURaspored(izabraniSto, proslava, new ArrayList<>(imenaGostiju));
+                        if (tfGost.getText().isEmpty() || Validator.provjeraRegIzraza(tfGost.getText(), "^[a-zA-Z\\s]*$")) {
+                            imenaGostiju.set(index, newValue);
+                            Controller.dodajURaspored(izabraniSto, proslava, new ArrayList<>(imenaGostiju));
+                        } else {
+                            tfGost.setText(imenaGostiju.get(index));
+                            Main.upozorenje("Nekorektan unos! Pokušajte ponovo");
+                        }
                     }
                 });
-                textFields.add(tfGost);
                 paneSto.getChildren().add(tfGost);
             }
         });
 
         VBox vLijevi = new VBox(20);
         vLijevi.setPrefWidth(450);
-        vLijevi.getChildren().addAll(lblNaziv, lblMeni, cbMeni, btnSacuvajIzmjene, btnZamjena, btnStampanje, btnZavrsi);
+        vLijevi.getChildren().addAll(lblNaziv, lblRaspored, cbSto, btnZamjena, lblMeni, cbMeni, btnSacuvajIzmjene, btnStampanje, btnZavrsi);
         vLijevi.setAlignment(Pos.CENTER);
 
         VBox vDesni = new VBox(10);
         vDesni.setPrefWidth(800);
-        vDesni.getChildren().addAll(lblRaspored, cbSto, paneSto);
+        vDesni.getChildren().addAll(paneSto);
         vDesni.setAlignment(Pos.CENTER);
 
         HBox hBox = new HBox(40);

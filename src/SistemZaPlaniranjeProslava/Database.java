@@ -262,6 +262,17 @@ public class Database {
         }
     }
 
+    public static void dodajRasporedUBazu(int idSto, int idProslava, String gosti) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "INSERT INTO `raspored`(`idSto`, `idProslava`, `gosti`) VALUES (" + idSto + "," + idProslava + ",'" + gosti + "')";
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void izmjeniLozinku(String nalog, String lozinka, String korisnickoIme) {
         try {
             Statement statement = connection.createStatement();
@@ -322,6 +333,28 @@ public class Database {
         try {
             Statement statement = connection.createStatement();
             String SQLQuery = "UPDATE `bankovni racun` SET `stanje`=" + stanje + " WHERE id=" + idRacuna;
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void izmjeniProslavu(Proslava proslava) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "UPDATE `proslava` SET `Meni_id`=" + proslava.getMeni().getId() + ",`broj_gostiju`=" + proslava.getBrojGostiju() + ",`ukupna_cijena`= " + proslava.getUkupnaCijena() + " WHERE id = " + proslava.getId();
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void izmjeniRasporedUBazi(Raspored raspored) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "UPDATE `raspored` SET `gosti`='" + String.join(", ", raspored.getGosti()) + "' WHERE idSto = " + raspored.getSto().getId() + " && idProslava = " + raspored.getProslava().getId();
             statement.executeUpdate(SQLQuery);
             statement.close();
         } catch (SQLException e) {
