@@ -25,13 +25,12 @@ public class ScenaZamjenaGostiju {
         root.setPadding(new Insets(20, 20, 20, 20));
 
         ChoiceBox<Sto> cbSto1 = new ChoiceBox<>();
-        for (Sto sto : stolovi)
-            cbSto1.getItems().add(sto);
-        cbSto1.setPadding(new Insets(5, 50, 5, 50));
-
         ChoiceBox<Sto> cbSto2 = new ChoiceBox<>();
-        for (Sto sto : stolovi)
+        for (Sto sto : stolovi) {
+            cbSto1.getItems().add(sto);
             cbSto2.getItems().add(sto);
+        }
+        cbSto1.setPadding(new Insets(5, 50, 5, 50));
         cbSto2.setPadding(new Insets(5, 50, 5, 50));
 
         Image strelica = new Image((new File("resursi/backArrow.png")).toURI().toString());
@@ -63,7 +62,6 @@ public class ScenaZamjenaGostiju {
                     if (!s.isEmpty())
                         lvRaspored2.getItems().add(s);
         };
-
         cbSto1.setOnAction(event -> izmjeniRaspored1.run());
         cbSto2.setOnAction(event -> izmjeniRaspored2.run());
 
@@ -72,12 +70,11 @@ public class ScenaZamjenaGostiju {
             String gost2 = lvRaspored2.getSelectionModel().getSelectedItem();
 
             if (cbSto1.getValue() == null || cbSto2.getValue() == null) {
-                Main.upozorenje("Molimo odaberite oba stola za zamenu.");
+                Main.upozorenje("Niste izabrali sto! Pokušajte ponovo");
                 return;
             }
-
             if (gost1 == null && gost2 == null) {
-                Main.upozorenje("Molimo selektujte bar jednog gosta za zamenu.");
+                Main.upozorenje("Niste izabrali gosta za zamjenu! Pokušajte ponovo");
                 return;
             }
 
@@ -87,54 +84,74 @@ public class ScenaZamjenaGostiju {
             ArrayList<String> imenaGostiju1 = new ArrayList<>();
             if (raspored1 != null)
                 imenaGostiju1 = new ArrayList<>(raspored1.getGosti());
-            if (imenaGostiju1.isEmpty()) {
+            else {
                 for (int j = 0; j < cbSto1.getValue().getBrojMjesta(); j++)
                     imenaGostiju1.add("");
                 Controller.dodajURaspored(cbSto1.getValue(), proslava, new ArrayList<>(imenaGostiju1));
-                raspored1 = Controller.getRasporedi().get(cbSto1.getValue().getId() + "-" + proslava.getId());
             }
             ArrayList<String> imenaGostiju2 = new ArrayList<>();
             if (raspored2 != null)
                 imenaGostiju2 = new ArrayList<>(raspored2.getGosti());
-            if (imenaGostiju2.isEmpty()) {
+            else {
                 for (int j = 0; j < cbSto2.getValue().getBrojMjesta(); j++)
                     imenaGostiju2.add("");
                 Controller.dodajURaspored(cbSto2.getValue(), proslava, new ArrayList<>(imenaGostiju2));
-                raspored2 = Controller.getRasporedi().get(cbSto2.getValue().getId() + "-" + proslava.getId());
             }
 
-            if (gost1 == null) {
-                if (raspored1.getSto().getBrojMjesta() > raspored1.getGosti().stream().filter(s -> (!s.isEmpty())).toList().size()) {
-                    for (String s : raspored1.getGosti())
-                        if (s.isEmpty()) {
-                            raspored1.getGosti().set(raspored1.getGosti().indexOf(s), gost2);
-                            break;
-                        }
-                    raspored2.getGosti().set(raspored2.getGosti().indexOf(gost2), "");
-                    Controller.dodajURaspored(cbSto1.getValue(), proslava, raspored1.getGosti());
-                    Controller.dodajURaspored(cbSto2.getValue(), proslava, raspored2.getGosti());
-                } else
-                    Main.upozorenje("Kapacitet stola je već popunjen!");
-            } else if (gost2 == null) {
-                if (raspored2.getSto().getBrojMjesta() > raspored2.getGosti().stream().filter(s -> (!s.isEmpty())).toList().size()) {
-                    for (String s : raspored2.getGosti())
-                        if (s.isEmpty()) {
-                            raspored2.getGosti().set(raspored2.getGosti().indexOf(s), gost1);
-                            break;
-                        }
-                    raspored1.getGosti().set(raspored1.getGosti().indexOf(gost1), "");
-                    Controller.dodajURaspored(cbSto1.getValue(), proslava, raspored1.getGosti());
-                    Controller.dodajURaspored(cbSto2.getValue(), proslava, raspored2.getGosti());
-                } else
-                    Main.upozorenje("Kapacitet stola je već popunjen!");
-            } else {
-                raspored1.getGosti().set(raspored1.getGosti().indexOf(gost1), gost2);
-                raspored2.getGosti().set(raspored2.getGosti().indexOf(gost2), gost1);
-                Controller.dodajURaspored(cbSto1.getValue(), proslava, raspored1.getGosti());
-                Controller.dodajURaspored(cbSto2.getValue(), proslava, raspored2.getGosti());
+            if (gost1 == null && cbSto1.getValue().getId() != cbSto2.getValue().getId()) {
+                if (raspored1 != null) {
+                    if (raspored1.getSto().getBrojMjesta() > imenaGostiju1.stream().filter(s -> (!s.isEmpty())).toList().size()) {
+                        for (String s : imenaGostiju1)
+                            if (s.isEmpty()) {
+                                imenaGostiju1.set(imenaGostiju1.indexOf(s), gost2);
+                                break;
+                            }
+                        imenaGostiju2.set(imenaGostiju2.indexOf(gost2), "");
+                        Controller.dodajURaspored(cbSto1.getValue(), proslava, new ArrayList<>(imenaGostiju1));
+                        Controller.dodajURaspored(cbSto2.getValue(), proslava, new ArrayList<>(imenaGostiju2));
+                    } else
+                        Main.upozorenje("Kapacitet stola je već popunjen!");
+                } else {
+                    imenaGostiju1.add(gost2);
+                    imenaGostiju2.set(imenaGostiju2.indexOf(gost2), "");
+                    Controller.dodajURaspored(cbSto1.getValue(), proslava, new ArrayList<>(imenaGostiju1));
+                    Controller.dodajURaspored(cbSto2.getValue(), proslava, new ArrayList<>(imenaGostiju2));
+                }
+            } else if (gost2 == null && cbSto1.getValue().getId() != cbSto2.getValue().getId()) {
+                if (raspored2 != null) {
+                    if (raspored2.getSto().getBrojMjesta() > imenaGostiju2.stream().filter(s -> (!s.isEmpty())).toList().size()) {
+                        for (String s : imenaGostiju2)
+                            if (s.isEmpty()) {
+                                imenaGostiju2.set(imenaGostiju2.indexOf(s), gost1);
+                                break;
+                            }
+                        imenaGostiju1.set(imenaGostiju1.indexOf(gost1), "");
+                        Controller.dodajURaspored(cbSto1.getValue(), proslava, new ArrayList<>(imenaGostiju1));
+                        Controller.dodajURaspored(cbSto2.getValue(), proslava, new ArrayList<>(imenaGostiju2));
+                    } else
+                        Main.upozorenje("Kapacitet stola je već popunjen!");
+                } else {
+                    imenaGostiju2.add(gost1);
+                    imenaGostiju1.set(imenaGostiju1.indexOf(gost1), "");
+                    Controller.dodajURaspored(cbSto1.getValue(), proslava, new ArrayList<>(imenaGostiju1));
+                    Controller.dodajURaspored(cbSto2.getValue(), proslava, new ArrayList<>(imenaGostiju2));
+                }
+            } else if (gost1 != null && gost2 != null) {
+                if (cbSto1.getValue().getId() == cbSto2.getValue().getId()) {
+                    int index1 = imenaGostiju1.indexOf(gost1);
+                    int index2 = imenaGostiju1.indexOf(gost2);
+                    if (index1 != index2) {
+                        String temp = imenaGostiju1.get(index1);
+                        imenaGostiju1.set(index1, imenaGostiju1.get(index2));
+                        imenaGostiju1.set(index2, temp);
+                    }
+                } else {
+                    imenaGostiju1.set(imenaGostiju1.indexOf(gost1), gost2);
+                    imenaGostiju2.set(imenaGostiju2.indexOf(gost2), gost1);
+                    Controller.dodajURaspored(cbSto2.getValue(), proslava, new ArrayList<>(imenaGostiju2));
+                }
+                Controller.dodajURaspored(cbSto1.getValue(), proslava, new ArrayList<>(imenaGostiju1));
             }
-            System.out.println("1\n" + raspored1);
-            System.out.println("2\n" + raspored2);
             izmjeniRaspored1.run();
             izmjeniRaspored2.run();
         });
@@ -159,6 +176,7 @@ public class ScenaZamjenaGostiju {
         root.setStyle("-fx-font: 16 'Comic Sans MS';");
         Platform.runLater(root::requestFocus);
         Scene scenaZamjena = new Scene(root, 1000, 600);
+        Platform.runLater(root::requestFocus);
         primaryStage.setScene(scenaZamjena);
         primaryStage.show();
     }

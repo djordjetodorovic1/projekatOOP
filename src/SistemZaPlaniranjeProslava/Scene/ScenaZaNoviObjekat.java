@@ -3,6 +3,7 @@ package SistemZaPlaniranjeProslava.Scene;
 import SistemZaPlaniranjeProslava.Controller;
 import SistemZaPlaniranjeProslava.Main;
 import SistemZaPlaniranjeProslava.Model.Obavjestenje;
+import SistemZaPlaniranjeProslava.Model.Sto;
 import SistemZaPlaniranjeProslava.Validator;
 import SistemZaPlaniranjeProslava.Model.Vlasnik;
 import javafx.application.Platform;
@@ -28,7 +29,7 @@ public class ScenaZaNoviObjekat {
     private static ArrayList<String> meniOpis = new ArrayList<>();
     private static ArrayList<Double> meniCijene = new ArrayList<>();
 
-    private static void scenaZaUnosStolova(int brojStolova) {
+    private static void scenaZaUnosStolova(int brojStolova, Obavjestenje obavjestenje) {
         Stage stageSto = new Stage();
         stageSto.setTitle("Kreiraj novi objekat");
         stageSto.setOnCloseRequest(e -> scenaZaStoAktivna = false);
@@ -45,18 +46,34 @@ public class ScenaZaNoviObjekat {
         vBoxtf.setAlignment(Pos.CENTER);
         vBoxtf.setPadding(new Insets(10, 40, 10, 40));
 
+        ArrayList<Sto> stoloviZaObjekat = new ArrayList<>();
+        if (obavjestenje != null)
+            stoloviZaObjekat = Controller.stoloviZaObjekat(obavjestenje.getObjekat().getId());
         spinnerBrojMjestaPoStolovima.clear();
         for (int i = 0; i < brojStolova; i++) {
             Label lblSto = new Label("Sto broj " + (i + 1));
-            Spinner<Integer> newSpinner = new Spinner<>(1, 16, 5);
-            newSpinner.setPromptText("Sto broj " + (i + 1));
+
+            Spinner<Integer> newSpinner = new Spinner<>();
+            SpinnerValueFactory<Integer> valueFactory;
+            if (stoloviZaObjekat.isEmpty())
+                valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 16, 4);
+            else
+                valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 16, stoloviZaObjekat.get(i).getBrojMjesta());
+            newSpinner.setEditable(true);
             newSpinner.setMaxWidth(250);
+            newSpinner.setValueFactory(valueFactory);
+            newSpinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue.matches("\\d*"))
+                    newSpinner.getEditor().setText(oldValue);
+            });
             vBoxtf.getChildren().addAll(lblSto, newSpinner);
             spinnerBrojMjestaPoStolovima.add(newSpinner);
         }
 
         Button btnSacuvaj = new Button("Sačuvaj izmjene");
         btnSacuvaj.setOnAction(actionEvent -> {
+            if (obavjestenje != null)
+                Controller.brisanjeStolovaIzBaze(obavjestenje.getObjekat().getId());
             scenaZaStoAktivna = false;
             stageSto.close();
         });
@@ -97,15 +114,13 @@ public class ScenaZaNoviObjekat {
             if (Controller.dodavanjeMenija(tfMeni, tfCijenaMenija)) {
                 meniOpis.add(tfMeni.getText());
                 meniCijene.add(Double.parseDouble(tfCijenaMenija.getText()));
-
                 Main.ocistiPolje(tfMeni);
                 Main.ocistiPolje(tfCijenaMenija);
             }
         });
         root.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER)
                 btnDodajMeni.fire();
-            }
         });
 
         root.getChildren().addAll(lblNaslov, tfMeni, tfCijenaMenija, btnDodajMeni);
@@ -191,13 +206,10 @@ public class ScenaZaNoviObjekat {
         btnBrojStolica.setOnAction(event -> {
             if (!scenaZaStoAktivna) {
                 if (Validator.validacijaIntBroj(tfBrojStolova)) {
-                    if (obavjestenje != null)
-                        Controller.brisanjeStolovaIzBaze(obavjestenje.getObjekat().getId());
                     scenaZaStoAktivna = true;
-                    scenaZaUnosStolova(Integer.parseInt(tfBrojStolova.getText()));
-                } else {
+                    scenaZaUnosStolova(Integer.parseInt(tfBrojStolova.getText()), obavjestenje);
+                } else
                     Main.upozorenje("Polje za broj stolova nije korektno popunjeno! Pokušajte ponovo");
-                }
             }
         });
 
@@ -227,9 +239,8 @@ public class ScenaZaNoviObjekat {
             }
         });
         root.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER)
                 btnNoviObjekat.fire();
-            }
         });
 
         VBox vBoxLijevi = new VBox(10);

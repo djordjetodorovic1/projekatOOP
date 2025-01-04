@@ -22,8 +22,6 @@ public class ScenaVlasnik {
     public static boolean scenaZaLozinkuAktivna = false;
 
     public static void scenaVlasnik(Stage primaryStage, Vlasnik vlasnik) {
-        Map<Integer, Objekat> objekti = Controller.getObjekti();
-
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 
@@ -58,26 +56,23 @@ public class ScenaVlasnik {
         Button btnNoviObjekat = new Button("Kreiraj zahtjev");
         btnNoviObjekat.setPadding(new Insets(10, 53, 10, 53));
 
+        Map<Integer, Objekat> objekti = Controller.getObjekti();
         ChoiceBox<String> cbObjekti = new ChoiceBox<>();
-        for (Objekat objekat : objekti.values()) {
+        for (Objekat objekat : objekti.values())
             if (objekat.getVlasnik().getId() == vlasnik.getId())
                 cbObjekti.getItems().add(objekat.getNaziv());
-        }
         cbObjekti.setValue("Izaberite objekat za prikaz");
         cbObjekti.setPadding(new Insets(5, 5, 5, 5));
         cbObjekti.setPrefWidth(250);
 
         cbObjekti.setOnAction(event -> ScenaObjekatZaVlasnika.scenaObjekatZaVlasnika(primaryStage, Objects.requireNonNull(Controller.getObjekat(cbObjekti.getValue()))));
-
         btnNazad.setOnAction(actionEvent -> ScenaZaPrijavu.scenaPrijava(primaryStage));
-
         btnPromjeniLozinku.setOnAction(actionEvent -> {
             if (!scenaZaLozinkuAktivna) {
                 scenaZaLozinkuAktivna = true;
                 ScenaZaPromjenuLozinke.scenaZaPromjenuLozinke(vlasnik);
             }
         });
-
         btnNoviObjekat.setOnAction(event -> ScenaZaNoviObjekat.scenaNoviObjekat(primaryStage, vlasnik));
 
         VBox vLijeviLijevi = new VBox(22);
@@ -104,8 +99,8 @@ public class ScenaVlasnik {
         root.getChildren().addAll(btnNazad, vBox);
         root.setStyle("-fx-font: 16 'Comic Sans MS';");
         Platform.runLater(root::requestFocus);
-        Scene scenaNoviNalog = new Scene(root, 750, 600);
-        primaryStage.setScene(scenaNoviNalog);
+        Scene scenaVlasnik = new Scene(root, 750, 600);
+        primaryStage.setScene(scenaVlasnik);
         primaryStage.show();
     }
 }

@@ -63,12 +63,10 @@ public class ScenaZaNoviNalog {
         cbTipNaloga.setPadding(new Insets(0, 53, 0, 53));
 
         btnNazad.setOnAction(actionEvent -> ScenaZaPrijavu.scenaPrijava(primaryStage));
-
         btnNoviNalog.setOnAction(event -> Controller.kreirajNoviNalog(primaryStage, tfIme, tfPrezime, tfJMBG, tfBrojUBanci, tfKorisnickoIme, pfLozinka, pfPotvrdaLozinke, cbTipNaloga));
         root.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER)
                 btnNoviNalog.fire();
-            }
         });
 
         VBox vBoxLijevi = new VBox(10);

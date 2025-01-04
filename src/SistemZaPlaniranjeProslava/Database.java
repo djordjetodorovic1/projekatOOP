@@ -12,8 +12,6 @@ public class Database {
     private static Connection connection;
 
     private static Admin admin = null;
-    private static ArrayList<Obavjestenje> obavjestenja = new ArrayList<>();
-    private static Map<String, BankovniRacun> bankovniRacuni = new HashMap<>();
     private static Map<String, Vlasnik> vlasnici = new HashMap<>();
     private static Map<String, Klijent> klijenti = new HashMap<>();
     private static Map<Integer, Objekat> objekti = new HashMap<>();
@@ -56,6 +54,7 @@ public class Database {
     }
 
     public static Map<String, BankovniRacun> ucitajBankovneRacune() throws SQLException {
+        Map<String, BankovniRacun> bankovniRacuni = new HashMap<>();
         Statement statement = connection.createStatement();
         String SQLQuery = "SELECT * FROM `bankovni racun`";
         ResultSet resultSet = statement.executeQuery(SQLQuery);
@@ -95,7 +94,7 @@ public class Database {
         return null;
     }
 
-    public static Klijent getKlijent(int id) {
+    private static Klijent getKlijent(int id) {
         for (Klijent klijent : klijenti.values())
             if (klijent.getId() == id)
                 return klijent;
@@ -109,7 +108,7 @@ public class Database {
         while (resultSet.next())
             objekti.put(resultSet.getInt(1), new Objekat(resultSet.getInt(1), getVlasnik(resultSet.getInt(2)), resultSet.getString(3),
                     resultSet.getDouble(4), resultSet.getString(5), resultSet.getString(6), resultSet.getInt(7),
-                    resultSet.getInt(8), resultSet.getString(9), resultSet.getDouble(10), StatusObjekta.valueOf(resultSet.getString(11))));
+                    resultSet.getInt(8), resultSet.getDouble(10), StatusObjekta.valueOf(resultSet.getString(11))));
         statement.close();
         return objekti;
     }
@@ -138,6 +137,7 @@ public class Database {
     }
 
     public static ArrayList<Obavjestenje> ucitajObavjestenje() throws SQLException {
+        ArrayList<Obavjestenje> obavjestenja = new ArrayList<>();
         Statement statement = connection.createStatement();
         String SQLQuery = "SELECT * FROM obavjestenje";
         ResultSet resultSet = statement.executeQuery(SQLQuery);
@@ -351,10 +351,43 @@ public class Database {
         }
     }
 
+    public static void uredjenaProslava(int proslavaID, double uplacenIznos) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "UPDATE `proslava` SET `uplacen_iznos`=" + uplacenIznos + " WHERE id = " + proslavaID;
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void otkazanaProslava(int proslavaID, LocalDate datum) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "UPDATE `proslava` SET `datum`='" + Date.valueOf(datum) + "' WHERE id = " + proslavaID;
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void izmjeniRasporedUBazi(Raspored raspored) {
         try {
             Statement statement = connection.createStatement();
             String SQLQuery = "UPDATE `raspored` SET `gosti`='" + String.join(", ", raspored.getGosti()) + "' WHERE idSto = " + raspored.getSto().getId() + " && idProslava = " + raspored.getProslava().getId();
+            statement.executeUpdate(SQLQuery);
+            statement.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void izmjeniZaraduObjekta(int idObjekat, double zarada) {
+        try {
+            Statement statement = connection.createStatement();
+            String SQLQuery = "UPDATE `objekat` SET `zarada`=" + zarada + " WHERE id=" + idObjekat;
             statement.executeUpdate(SQLQuery);
             statement.close();
         } catch (SQLException e) {

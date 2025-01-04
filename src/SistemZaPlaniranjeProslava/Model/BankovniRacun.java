@@ -17,10 +17,6 @@ public class BankovniRacun {
         return id;
     }
 
-    public String getBrojRacuna() {
-        return broj_racuna;
-    }
-
     public String getJmbg() {
         return jmbg;
     }

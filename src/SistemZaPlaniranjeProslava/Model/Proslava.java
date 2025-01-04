@@ -1,6 +1,7 @@
 package SistemZaPlaniranjeProslava.Model;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 public class Proslava {
     private int id;
@@ -32,34 +33,24 @@ public class Proslava {
         this.datum = datum;
 
         LocalDate danas = LocalDate.now();
-        if (datum.isAfter(danas))
-            this.status = StatusProslave.AKTIVNA;
+        if (datum.equals(LocalDate.of(1980, 1, 1)))
+            this.status = StatusProslave.OTKAZANA;
         else if (datum.isBefore(danas))
             this.status = StatusProslave.PROTEKLA;
+        else
+            this.status = StatusProslave.AKTIVNA;
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public Objekat getObjekat() {
         return objekat;
     }
 
-    public void setObjekat(Objekat objekat) {
-        this.objekat = objekat;
-    }
-
     public Klijent getKlijent() {
         return klijent;
-    }
-
-    public void setKlijent(Klijent klijent) {
-        this.klijent = klijent;
     }
 
     public Meni getMeni() {
@@ -72,10 +63,6 @@ public class Proslava {
 
     public LocalDate getDatum() {
         return datum;
-    }
-
-    public void setDatum(LocalDate datum) {
-        this.datum = datum;
     }
 
     public int getBrojGostiju() {
@@ -110,24 +97,25 @@ public class Proslava {
         this.status = status;
     }
 
-    public String getPotpunaUplata() {
-        if (this.ukupna_cijena != 0 && this.ukupna_cijena == this.uplacen_iznos)
-            return "DA";
-        return "NE";
+    public void setDatum(LocalDate datum) {
+        this.datum = datum;
+    }
+
+    public boolean provjeraDatumZaUredjivanje() {
+        LocalDate danas = LocalDate.now();
+        long daniDoProslave = ChronoUnit.DAYS.between(danas, this.datum);
+        return daniDoProslave > 3;
+    }
+
+    public boolean getPotpunaUplata() {
+        return this.ukupna_cijena != 0 && this.ukupna_cijena == this.uplacen_iznos;
     }
 
     @Override
     public String toString() {
-        return "Proslava{" +
-                "id=" + id +
-                ", objekat=" + objekat +
-                ", klijent=" + klijent +
-                ", meni=" + meni +
-                ", datum=" + datum +
-                ", broj_gostiju=" + broj_gostiju +
-                ", ukupna_cijena=" + ukupna_cijena +
-                ", uplacen_iznos=" + uplacen_iznos +
-                ", status=" + status +
-                '}';
+        String ispis = "klijent=" + klijent.getKorisnickoIme();
+        if (!datum.equals(LocalDate.of(1980, 1, 1)))
+            ispis += ", datum=" + datum;
+        return ispis;
     }
 }

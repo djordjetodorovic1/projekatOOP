@@ -47,7 +47,7 @@ public class Validator {
     }
 
     private static boolean validacijaAdresa(String adresa) {
-        return provjeraRegIzraza(adresa, "^[A-Z][a-zA-Z]+([a-zA-Z\\s]+)*(\\d|bb|BB)?");
+        return provjeraRegIzraza(adresa, "^[A-Z][a-zA-Z]+([a-zA-Z\\s]+)*(\\d+|bb|BB)?");
     }
 
     public static boolean validacijaIntBroj(TextField tfIntBroj) {
@@ -63,7 +63,7 @@ public class Validator {
         }
     }
 
-    public static boolean validacijaDoubleBroj(TextField tfDoubleBroj) {
+    private static boolean validacijaDoubleBroj(TextField tfDoubleBroj) {
         try {
             double dbl = Double.parseDouble(tfDoubleBroj.getText());
             if (dbl > 0)
@@ -151,33 +151,5 @@ public class Validator {
         if (!validacijaIntBroj(tfBrojStolova))
             detektorGreske = true;
         return !detektorGreske;
-    }
-
-    public static boolean provjeraCijeneMenijaZaOdobrenje(Objekat objekat, Map<Integer, Meni> meniji) {
-        int brojMenija = 0;
-        int brojMenijaObjekta = 0;
-        double ukupnaCijenaSvihMenija = 0.0;
-        double ukupnaCijenaMenijaObjekta = 0.0;
-
-        for (Meni meni : meniji.values()) {
-            if (meni.getObjekat().getId() == objekat.getId()) {
-                brojMenijaObjekta++;
-                ukupnaCijenaMenijaObjekta += meni.getCijenaPoOsobi();
-            } else {
-                brojMenija++;
-                ukupnaCijenaSvihMenija += meni.getCijenaPoOsobi();
-            }
-        }
-        double prosjecnaCijenaSvihMenija = ukupnaCijenaSvihMenija / brojMenija;
-        double prosjecnaCijenaMenijaObjekta = ukupnaCijenaMenijaObjekta / brojMenijaObjekta;
-        return Math.floor(prosjecnaCijenaMenijaObjekta / prosjecnaCijenaSvihMenija) < 10;
-    }
-
-    public static boolean provjeraMjestaZaOdobrenje(Objekat objekat, Map<Integer, Sto> stolovi) {
-        int sumaMjesta = 0;
-        for (Sto sto : stolovi.values())
-            if (sto.getObjekat().getId() == objekat.getId())
-                sumaMjesta += sto.getBrojMjesta();
-        return sumaMjesta == objekat.getBrojMjesta();
     }
 }

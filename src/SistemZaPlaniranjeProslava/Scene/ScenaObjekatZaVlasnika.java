@@ -31,7 +31,7 @@ public class ScenaObjekatZaVlasnika {
         tf.setEditable(false);
     }
 
-    public static void scenaInformacijeOProslavi(Proslava proslava) {
+    private static void scenaInformacijeOProslavi(Proslava proslava) {
         Stage stageProslava = new Stage();
         stageProslava.setTitle("Informacije o proslavi");
 
@@ -41,7 +41,7 @@ public class ScenaObjekatZaVlasnika {
         TextField tfBrojGostiju = new TextField("Broj gostiju: " + proslava.getBrojGostiju());
         TextField tfMeni = new TextField();
         TextField tfUkupnaCijena = new TextField();
-        TextField tfPotvrdaUplate = new TextField("Uplaćen ukupan iznos: " + proslava.getPotpunaUplata());
+        TextField tfPotvrdaUplate = new TextField("Uplaćen ukupan iznos: " + (proslava.getPotpunaUplata() ? "DA" : "NE"));
         Label lblStolovi = new Label("Broj gostiju po stolovima");
 
         if (proslava.getMeni() == null) {
@@ -98,8 +98,6 @@ public class ScenaObjekatZaVlasnika {
     }
 
     public static void scenaObjekatZaVlasnika(Stage primaryStage, Objekat objekat) {
-        Map<Integer, Proslava> proslave = Controller.getProslave();
-
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 
@@ -131,6 +129,7 @@ public class ScenaObjekatZaVlasnika {
         CheckBox cbOtkazane = new CheckBox("Otkazane");
         cbAktivne.setSelected(true);
 
+        Map<Integer, Proslava> proslave = Controller.getProslave();
         ListView<Proslava> lvProslave = new ListView<>();
         lvProslave.setOnMouseClicked(event -> {
             Proslava izabranaProslava = lvProslave.getSelectionModel().getSelectedItem();
@@ -141,14 +140,13 @@ public class ScenaObjekatZaVlasnika {
         Runnable izmjeniListu = () -> {
             lvProslave.getItems().clear();
             for (Proslava pr : proslave.values()) {
-                if (pr.getObjekat().getId() == objekat.getId()) {
-                    if (cbAktivne.isSelected() && pr.getStatus() == StatusProslave.AKTIVNA) {
+                if (pr.getObjekat().equals(objekat)) {
+                    if (cbAktivne.isSelected() && pr.getStatus() == StatusProslave.AKTIVNA)
                         lvProslave.getItems().add(pr);
-                    } else if (cbProtekle.isSelected() && pr.getStatus() == StatusProslave.PROTEKLA) {
+                    else if (cbProtekle.isSelected() && pr.getStatus() == StatusProslave.PROTEKLA)
                         lvProslave.getItems().add(pr);
-                    } else if (cbOtkazane.isSelected() && pr.getStatus() == StatusProslave.OTKAZANA) {
+                    else if (cbOtkazane.isSelected() && pr.getStatus() == StatusProslave.OTKAZANA)
                         lvProslave.getItems().add(pr);
-                    }
                 }
             }
         };

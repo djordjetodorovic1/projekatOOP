@@ -53,21 +53,19 @@ public class ScenaKlijent {
         ListView<Proslava> lvProslave = new ListView<>();
         lvProslave.setOnMouseClicked(event -> {
             Proslava izabranaProslava = lvProslave.getSelectionModel().getSelectedItem();
-            if (izabranaProslava != null) {
+            if (izabranaProslava != null)
                 ScenaUredjivanjeProslava.scenaUredjivanjeProslava(primaryStage, klijent, izabranaProslava);
-            }
         });
         Runnable izmjeniListu = () -> {
             lvProslave.getItems().clear();
             for (Proslava pr : Controller.getProslave().values()) {
                 if (pr.getKlijent().getId() == klijent.getId()) {
-                    if (rbAktivne.isSelected() && pr.getStatus() == StatusProslave.AKTIVNA) {
+                    if (rbAktivne.isSelected() && pr.getStatus() == StatusProslave.AKTIVNA)
                         lvProslave.getItems().add(pr);
-                    } else if (rbProtekle.isSelected() && pr.getStatus() == StatusProslave.PROTEKLA) {
+                    else if (rbProtekle.isSelected() && pr.getStatus() == StatusProslave.PROTEKLA)
                         lvProslave.getItems().add(pr);
-                    } else if (rbOtkazane.isSelected() && pr.getStatus() == StatusProslave.OTKAZANA) {
+                    else if (rbOtkazane.isSelected() && pr.getStatus() == StatusProslave.OTKAZANA)
                         lvProslave.getItems().add(pr);
-                    }
                 }
             }
         };
@@ -89,14 +87,12 @@ public class ScenaKlijent {
         btnNovaProslavaObjekat.setPadding(new Insets(10, 53, 10, 53));
 
         btnNazad.setOnAction(actionEvent -> ScenaZaPrijavu.scenaPrijava(primaryStage));
-
         btnPromjeniLozinku.setOnAction(actionEvent -> {
             if (!scenaZaLozinkuAktivna) {
                 scenaZaLozinkuAktivna = true;
                 ScenaZaPromjenuLozinke.scenaZaPromjenuLozinke(klijent);
             }
         });
-
         btnNovaProslavaObjekat.setOnAction(event -> Controller.scenaBiranjeObjekta(primaryStage, klijent));
 
         VBox vLijeviLijevi = new VBox(22);
@@ -130,8 +126,8 @@ public class ScenaKlijent {
         root.getChildren().addAll(btnNazad, vBox);
         root.setStyle("-fx-font: 16 'Comic Sans MS';");
         Platform.runLater(root::requestFocus);
-        Scene scenaNoviNalog = new Scene(root, 750, 600);
-        primaryStage.setScene(scenaNoviNalog);
+        Scene scena = new Scene(root, 750, 600);
+        primaryStage.setScene(scena);
         primaryStage.show();
     }
 }

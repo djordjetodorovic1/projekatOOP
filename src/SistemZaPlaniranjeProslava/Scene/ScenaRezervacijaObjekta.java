@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class ScenaRezervacijaObjekta {
-    public static void scenaZaLozinku(Stage primaryStage, Klijent klijent, Objekat objekat, LocalDate datum) {
+    private static void scenaZaLozinku(Stage primaryStage, Klijent klijent, Objekat objekat, LocalDate datum) {
         Stage stagePotvrdaLozinke = new Stage();
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
@@ -38,23 +38,22 @@ public class ScenaRezervacijaObjekta {
         btnPotvrda.setOnAction(actionEvent -> {
             if (pfLozinka.getText().equals(klijent.getLozinka())) {
                 if (Controller.getStanjeRacuna(klijent.getBrojRacuna()) >= objekat.getCijenaRezervacije()) {
-                    Controller.transakcija(klijent, objekat.getVlasnik(), objekat.getCijenaRezervacije());
+
+                    Controller.transakcija(klijent, objekat, objekat.getCijenaRezervacije());
                     Controller.dodajProslavu(objekat, klijent, datum);
                     Main.informacija("Trenutno stanje na računu: " + Controller.getStanjeRacuna(klijent.getBrojRacuna()) + " Proslava je uspješno rezervisana!");
-                } else {
+                } else
                     Main.upozorenje("Rezervacija proslave nije moguća zbog nedovoljno novca na racunu!");
-                }
                 stagePotvrdaLozinke.close();
-                Controller.scenaKlijent(primaryStage, klijent);
+                ScenaKlijent.scenaKlijent(primaryStage, klijent);
             } else {
                 Main.upozorenje("Pogrešna lozinka! Pokušajte ponovo");
                 Main.ocistiPolje(pfLozinka);
             }
         });
         root.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER)
                 btnPotvrda.fire();
-            }
         });
 
         root.getChildren().addAll(lblLozinka, pfLozinka, btnPotvrda);
@@ -83,7 +82,7 @@ public class ScenaRezervacijaObjekta {
         int brojMenija = 1;
         ArrayList<Meni> meniji = Controller.menijiZaObjekat(objekat.getId());
         for (Meni meni : meniji)
-            if (meni.getObjekat().getId() == objekat.getId())
+            if (meni.getObjekat().equals(objekat))
                 taMeni.appendText("Meni " + brojMenija++ + ": " + meni + "\n");
 
         Set<LocalDate> zauzetiDatumi = Controller.zauzetiDatumi(objekat);
@@ -111,7 +110,6 @@ public class ScenaRezervacijaObjekta {
         Button btnNazad = new Button("", prikazStrelice);
 
         btnNazad.setOnAction(actionEvent -> Controller.scenaBiranjeObjekta(primaryStage, klijent));
-
         btnPotvrdi.setOnAction(event -> {
             if (kalendar.getValue() != null)
                 scenaZaLozinku(primaryStage, klijent, objekat, kalendar.getValue());
@@ -119,9 +117,8 @@ public class ScenaRezervacijaObjekta {
                 Main.upozorenje("Niste odabrali datum! Pokušajte ponovo");
         });
         root.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER)
                 btnPotvrdi.fire();
-            }
         });
 
         VBox vBoxLijevi = new VBox(10);

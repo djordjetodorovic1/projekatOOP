@@ -27,10 +27,10 @@ import java.util.Map;
 
 public class ScenaAdmin {
     public static boolean scenaZaLozinkuAktivna = false;
-    public static boolean scenaZaPorukuAktivna = false;
+    private static boolean scenaZaPorukuAktivna = false;
     private static String poruka;
 
-    public static void scenaUnosPoruke(Runnable nakonUnosaPoruke) {
+    private static void scenaUnosPoruke(Runnable nakonUnosaPoruke) {
         Stage stagePoruka = new Stage();
         stagePoruka.setTitle("Pregled objekta");
         stagePoruka.setOnCloseRequest(e -> scenaZaPorukuAktivna = false);
@@ -55,7 +55,6 @@ public class ScenaAdmin {
             scenaZaPorukuAktivna = false;
             stagePoruka.close();
         });
-
         btnProvjera.setOnAction(event -> {
             scenaZaPorukuAktivna = false;
             if (!tfPoruka.getText().isEmpty()) {
@@ -66,9 +65,8 @@ public class ScenaAdmin {
                 Main.upozorenje("Polje za unos poruke je prazno");
         });
         root.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER)
                 btnProvjera.fire();
-            }
         });
 
         VBox vBox = new VBox(10);
@@ -83,7 +81,7 @@ public class ScenaAdmin {
         stagePoruka.show();
     }
 
-    public static void scenaObjekatAdmin(Obavjestenje obavjestenje, Runnable nakonObrade) {
+    private static void scenaObjekatAdmin(Obavjestenje obavjestenje, Runnable nakonObrade) {
         Map<Integer, Sto> stolovi = Controller.getStolovi();
         Map<Integer, Meni> meniji = Controller.getMeni();
 
@@ -125,20 +123,16 @@ public class ScenaAdmin {
         TextArea taStolovi = new TextArea();
         taStolovi.setEditable(false);
         int brojStola = 1;
-        for (Sto sto : stolovi.values()) {
-            if (sto.getObjekat().getId() == obavjestenje.getObjekat().getId()) {
+        for (Sto sto : stolovi.values())
+            if (sto.getObjekat().equals(obavjestenje.getObjekat()))
                 taStolovi.appendText("Sto " + brojStola++ + ": " + sto.getBrojMjesta() + " mjesta\n");
-            }
-        }
 
         TextArea taMeni = new TextArea();
         taMeni.setEditable(false);
         int brojMenija = 1;
-        for (Meni meni : meniji.values()) {
-            if (meni.getObjekat().getId() == obavjestenje.getObjekat().getId()) {
+        for (Meni meni : meniji.values())
+            if (meni.getObjekat().equals(obavjestenje.getObjekat()))
                 taMeni.appendText("Meni " + brojMenija++ + ": " + meni.getOpis() + " - " + meni.getCijenaPoOsobi() + "\n");
-            }
-        }
 
         Image strelica = new Image((new File("resursi/backArrow.png")).toURI().toString());
         ImageView prikazStrelice = new ImageView(strelica);
@@ -157,24 +151,17 @@ public class ScenaAdmin {
         btnOdbij.setPadding(new Insets(8, 10, 8, 10));
 
         btnNazad.setOnAction(actionEvent -> stageObjekatAdmin.close());
-
-        btnProvjera.setOnAction(event -> Controller.provjeriObjekatZaOdobrenje(obavjestenje.getObjekat()));
-
+        btnProvjera.setOnAction(event -> Objekat.provjeriObjekatZaOdobrenje(obavjestenje.getObjekat()));
         btnOdobri.setOnMouseEntered(mouseEvent -> btnOdobri.setBackground(Background.fill(Color.LIGHTGREEN)));
-
         btnOdobri.setOnMouseExited(mouseEvent -> btnOdobri.setBackground(Background.fill(Color.GREEN)));
-
         btnOdobri.setOnAction(event -> {
             poruka = "\"" + obavjestenje.getObjekat().getNaziv() + "\" - Objekat zadovoljava sve uslove!";
             Controller.promjenaStatusaObjekta(obavjestenje.getObjekat(), StatusObjekta.ODOBREN, poruka, obavjestenje);
             stageObjekatAdmin.close();
             nakonObrade.run();
         });
-
         btnOdbij.setOnMouseEntered(mouseEvent -> btnOdbij.setBackground(Background.fill(Color.ORANGERED)));
-
         btnOdbij.setOnMouseExited(mouseEvent -> btnOdbij.setBackground(Background.fill(Color.RED)));
-
         btnOdbij.setOnAction(event -> {
             if (!scenaZaPorukuAktivna) {
                 scenaZaPorukuAktivna = true;
@@ -184,7 +171,6 @@ public class ScenaAdmin {
                     stageObjekatAdmin.close();
                     nakonObrade.run();
                 }));
-
             }
         });
 
@@ -256,9 +242,8 @@ public class ScenaAdmin {
 
         lvObavjestenja.setOnMouseClicked(event -> {
             Obavjestenje izabranoObavjestenje = lvObavjestenja.getSelectionModel().getSelectedItem();
-            if (izabranoObavjestenje != null) {
+            if (izabranoObavjestenje != null)
                 scenaObjekatAdmin(izabranoObavjestenje, () -> Platform.runLater(() -> lvObavjestenja.getItems().remove(izabranoObavjestenje)));
-            }
         });
 
         VBox vBoxLijevi = new VBox(10);

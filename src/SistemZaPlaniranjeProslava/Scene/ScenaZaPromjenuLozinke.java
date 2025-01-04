@@ -59,16 +59,12 @@ public class ScenaZaPromjenuLozinke {
 
         btnPromjeniLozinku.setOnAction(actionEvent -> {
             if (Controller.promjenaLozinke(osoba, tfStaraLozinka, pfNovaLozinka, pfPotvrdaLozinke)) {
-                ScenaVlasnik.scenaZaLozinkuAktivna = false;
-                ScenaAdmin.scenaZaLozinkuAktivna = false;
-                ScenaKlijent.scenaZaLozinkuAktivna = false;
-                stageLozinka.close();
+                btnNazad.fire();
             }
         });
         root.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER)
                 btnPromjeniLozinku.fire();
-            }
         });
 
         VBox vBoxLijevi = new VBox(10);

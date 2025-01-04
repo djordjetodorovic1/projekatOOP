@@ -49,9 +49,8 @@ public class ScenaBiranjeObjekta {
         ListView<Objekat> lvObjekti = new ListView<>();
         lvObjekti.setOnMouseClicked(event -> {
             Objekat izabraniObjekat = lvObjekti.getSelectionModel().getSelectedItem();
-            if (izabraniObjekat != null) {
+            if (izabraniObjekat != null)
                 ScenaRezervacijaObjekta.scenaRezervacijaObjekta(primaryStage, izabraniObjekat, klijent);
-            }
         });
         Runnable izmjeniListu = () -> {
             lvObjekti.getItems().clear();
@@ -72,7 +71,6 @@ public class ScenaBiranjeObjekta {
                     zadovoljava = false;
                 if (zadovoljava)
                     lvObjekti.getItems().add(objekat);
-                System.out.println(lvObjekti.getItems());
             }
         };
         izmjeniListu.run();
@@ -92,7 +90,7 @@ public class ScenaBiranjeObjekta {
         Button btnReset = new Button("Obriši filtere");
         btnReset.setPadding(new Insets(10, 30, 10, 30));
 
-        btnNazad.setOnAction(actionEvent -> Controller.scenaKlijent(primaryStage, klijent));
+        btnNazad.setOnAction(actionEvent -> ScenaKlijent.scenaKlijent(primaryStage, klijent));
         btnReset.setOnAction(actionEvent -> {
             tfBrMjesta.clear();
             kalendar.setValue(null);

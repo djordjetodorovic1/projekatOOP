@@ -1,5 +1,7 @@
 package SistemZaPlaniranjeProslava.Model;
 
+import java.util.Comparator;
+
 public class Sto {
     private int id;
     private Objekat objekat;
@@ -15,28 +17,18 @@ public class Sto {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public Objekat getObjekat() {
         return objekat;
-    }
-
-    public void setObjekat(Objekat objekat) {
-        this.objekat = objekat;
     }
 
     public int getBrojMjesta() {
         return broj_mjesta;
     }
 
-    public void setBrojMjesta(int broj_mjesta) {
-        this.broj_mjesta = broj_mjesta;
-    }
+    public final static Comparator<Sto> porediPoStolovima = (sto1, sto2) -> Integer.compare(sto1.getId(), sto2.getId());
 
     @Override
     public String toString() {
-        return "Sto" + id;
+        return "Sto " + id;
     }
 }

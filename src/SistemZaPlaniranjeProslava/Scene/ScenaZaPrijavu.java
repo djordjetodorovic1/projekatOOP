@@ -49,11 +49,9 @@ public class ScenaZaPrijavu {
 
         btnPrijava.setOnAction(event -> Controller.prijava(primaryStage, tfKorisnickoIme, pfLozinka));
         root.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER)
                 btnPrijava.fire();
-            }
         });
-
         btnNoviNalog.setOnAction(event -> ScenaZaNoviNalog.scenaNoviNalog(primaryStage));
 
         VBox vBoxLogIn = new VBox();

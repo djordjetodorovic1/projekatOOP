@@ -26,16 +26,8 @@ public class Raspored {
         return sto;
     }
 
-    public void setSto(Sto sto) {
-        this.sto = sto;
-    }
-
     public Proslava getProslava() {
         return proslava;
-    }
-
-    public void setProslava(Proslava proslava) {
-        this.proslava = proslava;
     }
 
     public ArrayList<String> getGosti() {
