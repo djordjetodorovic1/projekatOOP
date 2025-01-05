@@ -43,10 +43,6 @@ public class Raspored {
 
     @Override
     public String toString() {
-        return "Raspored{" +
-                "sto=" + sto +
-                ", proslava=" + proslava +
-                ", gosti='" + gosti + '\'' +
-                '}';
+        return "Raspored{" + sto + ", proslava=" + proslava + ", gosti='" + gosti + "}";
     }
 }

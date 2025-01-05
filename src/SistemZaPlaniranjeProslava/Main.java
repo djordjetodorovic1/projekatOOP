@@ -37,13 +37,13 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Zlatna ribica");
+        primaryStage.setTitle("Slobodan sto");
         ScenaZaPrijavu.scenaPrijava(primaryStage);
     }
 
     @Override
     public void stop() {
-        Controller.ispisBaze();
+        //Controller.ispisBaze();
         Controller.disconnectDB();
     }
 }

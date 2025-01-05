@@ -73,9 +73,8 @@ public class ScenaObjekatZaVlasnika {
         Button btnNazad = new Button("", prikazStrelice);
         btnNazad.setOnAction(actionEvent -> stageProslava.close());
         root.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER)
                 btnNazad.fire();
-            }
         });
 
         VBox vBoxLijevi = new VBox(30);

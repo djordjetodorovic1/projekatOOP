@@ -26,18 +26,14 @@ public class ScenaZaPrijavu {
 
         Image logo = new Image((new File("resursi/logo.jpg")).toURI().toString());
         ImageView logoPrikaz = new ImageView(logo);
-        logoPrikaz.setFitWidth(250);
+        logoPrikaz.setFitWidth(350);
         logoPrikaz.setPreserveRatio(true);
 
-        Label lblNaziv = new Label("Zlatna ribica");
-        Label lblSlogan = new Label("ispunjavamo vaše želje");
+        Label lblNaziv = new Label("Slobodan sto");
         Label lblKorisnickoIme = new Label("Unesite korisničko ime");
         Label lblLozinka = new Label("Unesite lozinku");
         Label lblIli = new Label("ili");
-        lblNaziv.setTextFill(Color.GOLD);
-        lblSlogan.setTextFill(Color.GOLD);
-        lblNaziv.setStyle("-fx-font: 40 'Comic Sans MS';");
-        lblSlogan.setStyle("-fx-font: 24 'Comic Sans MS';");
+        lblNaziv.setStyle("-fx-text-fill: #4d6a88; -fx-font: 40 'Comic Sans MS';");
 
         TextField tfKorisnickoIme = new TextField();
         PasswordField pfLozinka = new PasswordField();
@@ -62,7 +58,7 @@ public class ScenaZaPrijavu {
         hBoxLogIn.setAlignment(Pos.CENTER);
         hBoxLogIn.setPadding(new Insets(10, 0, 10, 0));
 
-        root.getChildren().addAll(lblNaziv, logoPrikaz, lblSlogan, hBoxLogIn, lblIli, btnNoviNalog);
+        root.getChildren().addAll(lblNaziv, logoPrikaz, hBoxLogIn, lblIli, btnNoviNalog);
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-font: 16 'Comic Sans MS';");
         Platform.runLater(root::requestFocus);

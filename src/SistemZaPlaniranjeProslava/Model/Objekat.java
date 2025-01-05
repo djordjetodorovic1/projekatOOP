@@ -80,8 +80,6 @@ public class Objekat implements Comparable<Objekat> {
 
     private static boolean provjeraCijeneMenijaZaOdobrenje(Objekat objekat) {
         Map<Integer, Meni> meniji = Controller.getMeni();
-        if (meniji.isEmpty())
-            return true;
         int brojMenija = 0;
         int brojMenijaObjekta = 0;
         double ukupnaCijenaSvihMenija = 0.0;
@@ -96,6 +94,8 @@ public class Objekat implements Comparable<Objekat> {
                 ukupnaCijenaSvihMenija += meni.getCijenaPoOsobi();
             }
         }
+        if (brojMenija == 0)
+            return true;
         double prosjecnaCijenaSvihMenija = ukupnaCijenaSvihMenija / brojMenija;
         double prosjecnaCijenaMenijaObjekta = ukupnaCijenaMenijaObjekta / brojMenijaObjekta;
         return Math.floor(prosjecnaCijenaMenijaObjekta / prosjecnaCijenaSvihMenija) < 10;

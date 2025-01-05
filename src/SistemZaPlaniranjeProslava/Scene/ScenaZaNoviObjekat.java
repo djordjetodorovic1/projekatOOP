@@ -31,7 +31,7 @@ public class ScenaZaNoviObjekat {
 
     private static void scenaZaUnosStolova(int brojStolova, Obavjestenje obavjestenje) {
         Stage stageSto = new Stage();
-        stageSto.setTitle("Kreiraj novi objekat");
+        stageSto.setTitle("Slobodan sto");
         stageSto.setOnCloseRequest(e -> scenaZaStoAktivna = false);
 
         VBox root = new VBox(10);
@@ -63,7 +63,7 @@ public class ScenaZaNoviObjekat {
             newSpinner.setMaxWidth(250);
             newSpinner.setValueFactory(valueFactory);
             newSpinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
-                if (!newValue.matches("\\d*"))
+                if (!newValue.matches("\\d+"))
                     newSpinner.getEditor().setText(oldValue);
             });
             vBoxtf.getChildren().addAll(lblSto, newSpinner);
@@ -90,7 +90,7 @@ public class ScenaZaNoviObjekat {
 
     private static void scenaZaUnosMenija() {
         Stage stageMeni = new Stage();
-        stageMeni.setTitle("Kreiraj novi objekat");
+        stageMeni.setTitle("Slobodan sto");
         stageMeni.setOnCloseRequest(e -> scenaZaMeniAktivna = false);
 
         VBox root = new VBox(10);
@@ -111,7 +111,7 @@ public class ScenaZaNoviObjekat {
         btnDodajMeni.setPadding(new Insets(5, 50, 5, 50));
 
         btnDodajMeni.setOnAction(actionEvent -> {
-            if (Controller.dodavanjeMenija(tfMeni, tfCijenaMenija)) {
+            if (Validator.validacijaMeni(tfMeni, tfCijenaMenija)) {
                 meniOpis.add(tfMeni.getText());
                 meniCijene.add(Double.parseDouble(tfCijenaMenija.getText()));
                 Main.ocistiPolje(tfMeni);
@@ -139,7 +139,7 @@ public class ScenaZaNoviObjekat {
         meniOpis.clear();
         meniCijene.clear();
 
-        stageNoviObjekat.setTitle("Kreiraj novi objekat");
+        stageNoviObjekat.setTitle("Slobodan sto");
         VBox root = new VBox(10);
         root.setPadding(new Insets(20, 20, 20, 20));
 

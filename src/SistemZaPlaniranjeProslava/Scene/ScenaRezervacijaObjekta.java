@@ -38,7 +38,6 @@ public class ScenaRezervacijaObjekta {
         btnPotvrda.setOnAction(actionEvent -> {
             if (pfLozinka.getText().equals(klijent.getLozinka())) {
                 if (Controller.getStanjeRacuna(klijent.getBrojRacuna()) >= objekat.getCijenaRezervacije()) {
-
                     Controller.transakcija(klijent, objekat, objekat.getCijenaRezervacije());
                     Controller.dodajProslavu(objekat, klijent, datum);
                     Main.informacija("Trenutno stanje na računu: " + Controller.getStanjeRacuna(klijent.getBrojRacuna()) + " Proslava je uspješno rezervisana!");

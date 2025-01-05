@@ -144,7 +144,6 @@ public class Controller {
             if (cbTipNaloga.getValue().equals("Vlasnik"))
                 nalog = "vlasnik";
             int id = Database.dodajNalogUBazu(nalog, tfIme.getText(), tfPrezime.getText(), tfJMBG.getText(), tfBrojUBanci.getText(), tfKorisnickoIme.getText(), pfLozinka.getText());
-
             if (nalog.equals("klijent"))
                 klijenti.put(tfKorisnickoIme.getText(), new Klijent(id, tfIme.getText(), tfPrezime.getText(), tfJMBG.getText(),
                         tfBrojUBanci.getText(), tfKorisnickoIme.getText(), pfLozinka.getText()));
@@ -168,7 +167,6 @@ public class Controller {
                 Database.izmjeniLozinku(nalog, pfLozinka.getText(), osoba.getKorisnickoIme());
                 osoba.setLozinka(pfLozinka.getText());
                 return true;
-
             } else {
                 Main.ocistiPolje(pfLozinka);
                 Main.ocistiPolje(pfPotvrdaLozinke);
@@ -206,19 +204,17 @@ public class Controller {
             }
 
             int idMeni, idSto, idObavjestenje;
-
             for (int i = 0; i < meniOpis.size(); i++) {
                 idMeni = Database.dodajMeniUBazu(idObjekat, meniOpis.get(i), meniCijene.get(i));
                 meniji.put(idMeni, new Meni(idMeni, objekti.get(idObjekat), meniOpis.get(i), meniCijene.get(i)));
             }
-
             for (Integer brMjesta : brojMjestaPoStolovima) {
                 idSto = Database.dodajStoUBazu(idObjekat, brMjesta);
                 stolovi.put(idSto, new Sto(idSto, objekti.get(idObjekat), brMjesta));
             }
 
             idObavjestenje = Database.dodajObavjestenjeUBazu(idObjekat, "Novi objekat čeka na odobrenje!");
-            obavjestenja.add(new Obavjestenje(idObavjestenje, objekti.get(idObjekat), "Novi objekat čeka na odobreneje!"));
+            obavjestenja.add(new Obavjestenje(idObavjestenje, objekti.get(idObjekat), "Novi objekat čeka na odobrenje!"));
 
             Main.informacija("Objekat uspješno kreiran!");
             return true;
@@ -234,10 +230,6 @@ public class Controller {
         Database.izbrisiObavjestenjeIzBaze(obavjestenje.getId());
         int idObavjestenje = Database.dodajObavjestenjeUBazu(objekat.getId(), poruka);
         obavjestenja.add(new Obavjestenje(idObavjestenje, objekat, poruka));
-    }
-
-    public static boolean dodavanjeMenija(TextField tfMeni, TextField tfCijenaMenija) {
-        return Validator.validacijaMeni(tfMeni, tfCijenaMenija);
     }
 
     public static double getStanjeRacuna(String brojRacuna) {

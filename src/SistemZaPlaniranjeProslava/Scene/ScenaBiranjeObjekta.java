@@ -90,7 +90,10 @@ public class ScenaBiranjeObjekta {
         Button btnReset = new Button("Obriši filtere");
         btnReset.setPadding(new Insets(10, 30, 10, 30));
 
-        btnNazad.setOnAction(actionEvent -> ScenaKlijent.scenaKlijent(primaryStage, klijent));
+        btnNazad.setOnAction(actionEvent -> {
+            btnReset.fire();
+            ScenaKlijent.scenaKlijent(primaryStage, klijent);
+        });
         btnReset.setOnAction(actionEvent -> {
             tfBrMjesta.clear();
             kalendar.setValue(null);

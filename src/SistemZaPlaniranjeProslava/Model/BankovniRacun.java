@@ -31,11 +31,6 @@ public class BankovniRacun {
 
     @Override
     public String toString() {
-        return "BankovniRacun{" +
-                "id=" + id +
-                ", broj_racuna='" + broj_racuna + '\'' +
-                ", jmbg='" + jmbg + '\'' +
-                ", stanje=" + stanje +
-                '}';
+        return "BankovniRacun{id=" + id + ", broj_racuna='" + broj_racuna + ", jmbg='" + jmbg + ", stanje=" + stanje + "}";
     }
 }

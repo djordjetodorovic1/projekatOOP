@@ -58,9 +58,8 @@ public class ScenaZaPromjenuLozinke {
         });
 
         btnPromjeniLozinku.setOnAction(actionEvent -> {
-            if (Controller.promjenaLozinke(osoba, tfStaraLozinka, pfNovaLozinka, pfPotvrdaLozinke)) {
+            if (Controller.promjenaLozinke(osoba, tfStaraLozinka, pfNovaLozinka, pfPotvrdaLozinke))
                 btnNazad.fire();
-            }
         });
         root.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER)
